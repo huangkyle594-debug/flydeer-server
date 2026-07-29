@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS `user` (
+    `id`           BIGINT       NOT NULL,
+    `channel`      VARCHAR(16)  NOT NULL,
+    `channel_uid`  VARCHAR(128) NOT NULL,
+    `phone`        VARCHAR(32)  NULL,
+    `verified`     TINYINT      NOT NULL DEFAULT 0,
+    `nickname`     VARCHAR(64)  NOT NULL DEFAULT '',
+    `status`       TINYINT      NOT NULL DEFAULT 1,
+    `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE (`channel`, `channel_uid`)
+);
+
+CREATE TABLE IF NOT EXISTS `user_delegate` (
+    `id`            BIGINT       NOT NULL AUTO_INCREMENT,
+    `grantor_id`    BIGINT       NOT NULL,
+    `grantee_id`    BIGINT       NOT NULL,
+    `request_type`  VARCHAR(16)  NOT NULL,
+    `status`        VARCHAR(16)  NOT NULL,
+    `created_at`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `responded_at`  TIMESTAMP    NULL,
+    PRIMARY KEY (`id`)
+);

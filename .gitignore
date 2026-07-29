@@ -1,0 +1,94 @@
+# Build
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Maven Wrapper (downloaded jar)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE — IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+.idea_modules/
+
+# IDE — Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+
+# IDE — NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# IDE — VS Code / Cursor (keep shared settings if committed intentionally)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Runtime / local config
+*.pid
+*.seed
+*.pid.lock
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+application-secret.yml
+application-secret.properties
+
+# Test / coverage
+.jacoco/
+coverage/
+*.exec
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# Package files
+*.tar.gz
+*.zip
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# runtime logs/pids from bash/run.sh
+bash/.run/

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flydeer.structmind.repository.mapper.UserMapper">
+
+    <resultMap id="UserMap" type="com.flydeer.structmind.repository.entity.UserEntity">
+        <id property="id" column="id"/>
+        <result property="channel" column="channel"/>
+        <result property="channelUid" column="channel_uid"/>
+        <result property="phone" column="phone"/>
+        <result property="verified" column="verified"/>
+        <result property="nickname" column="nickname"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="UserMap">
+        SELECT * FROM `user` WHERE id = #{id}
+    </select>
+
+    <select id="selectByChannelAndUid" resultMap="UserMap">
+        SELECT * FROM `user` WHERE channel = #{channel} AND channel_uid = #{channelUid}
+    </select>
+
+    <select id="selectByPhone" resultMap="UserMap">
+        SELECT * FROM `user` WHERE phone = #{phone}
+    </select>
+
+    <select id="selectMaxId" resultType="java.lang.Long">
+        SELECT MAX(id) FROM `user`
+    </select>
+
+    <insert id="insert">
+        INSERT INTO `user` (id, channel, channel_uid, phone, verified, nickname, status)
+        VALUES (#{id}, #{channel}, #{channelUid}, #{phone}, #{verified}, #{nickname}, #{status})
+    </insert>
+
+    <update id="updateNickname">
+        UPDATE `user` SET nickname = #{nickname} WHERE id = #{id}
+    </update>
+
+    <update id="bindPhone">
+        UPDATE `user` SET phone = #{phone}, verified = 1 WHERE id = #{id}
+    </update>
+</mapper>

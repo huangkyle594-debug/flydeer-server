@@ -1,0 +1,33 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  datasource:
+    url: jdbc:h2:mem:struct_mind;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-user.sql
+  docker:
+    compose:
+      enabled: false
+
+pagehelper:
+  helper-dialect: h2
+
+app:
+  auth:
+    jwt-secret: test-jwt-secret-key-at-least-32-bytes!!
+    access-token-ttl: 2h
+    refresh-token-ttl: 90d
+  sms:
+    mock-enabled: true
+
+logging:
+  level:
+    root: WARN
+    com.flydeer.structmind: INFO

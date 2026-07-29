@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: flydeer-struct-mind-server
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:struct_mind}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${MYSQL_USER:struct_mind}
+    password: ${MYSQL_PASSWORD:struct_mind}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  docker:
+    compose:
+      enabled: false
+      lifecycle-management: start-and-stop
+      skip:
+        in-tests: true
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.flydeer.structmind.repository.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    root: INFO
+    com.flydeer.structmind: DEBUG
+
+app:
+  auth:
+    jwt-secret: ${AUTH_JWT_SECRET:change-me-to-a-long-random-secret-key!!}
+    access-token-ttl: ${AUTH_ACCESS_TTL:2h}
+    refresh-token-ttl: ${AUTH_REFRESH_TTL:90d}
+    refresh-cookie-name: ${AUTH_REFRESH_COOKIE:refresh_token}
+    refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
+    refresh-cookie-path: /api/v1/auth
+    frontend-redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:3000/auth/callback}
+  id:
+    start: ${ID_START:10000000}
+    step-min: ${ID_STEP_MIN:1}
+    step-max: ${ID_STEP_MAX:99}
+  sms:
+    mock-enabled: ${SMS_MOCK_ENABLED:true}
+    access-key-id: ${SMS_ACCESS_KEY_ID:}
+    access-key-secret: ${SMS_ACCESS_KEY_SECRET:}
+    sign-name: ${SMS_SIGN_NAME:}
+    template-code: ${SMS_TEMPLATE_CODE:}
+    region: ${SMS_REGION:cn-shanghai}
+    endpoint: ${SMS_ENDPOINT:dypnsapi.aliyuncs.com}
+    country-code: ${SMS_COUNTRY_CODE:86}
+  rate-limit:
+    sms-interval: ${SMS_INTERVAL:60s}
+    sms-daily-limit-per-phone: ${SMS_DAILY_PHONE:20}
+    sms-daily-limit-per-ip: ${SMS_DAILY_IP:50}
+    login-interval: ${LOGIN_INTERVAL:1s}
+  oauth:
+    gitee:
+      client-id: ${OAUTH_GITEE_CLIENT_ID:}
+      client-secret: ${OAUTH_GITEE_CLIENT_SECRET:}
+      redirect-uri: ${OAUTH_GITEE_REDIRECT_URI:http://localhost:8080/api/v1/auth/gitee/callback}
+      authorize-url: https://gitee.com/oauth/authorize
+      token-url: https://gitee.com/oauth/token
+      user-url: https://gitee.com/api/v5/user
+      scope: user_info
+    github:
+      client-id: ${OAUTH_GITHUB_CLIENT_ID:}
+      client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:}
+      redirect-uri: ${OAUTH_GITHUB_REDIRECT_URI:http://localhost:8080/api/v1/auth/github/callback}
+      authorize-url: https://github.com/login/oauth/authorize
+      token-url: https://github.com/login/oauth/access_token
+      user-url: https://api.github.com/user
+      scope: read:user

@@ -1,0 +1,2 @@
+# Keep mapper XML files under classpath:/mapper/
+# Example: src/main/resources/mapper/DemoMapper.xml
