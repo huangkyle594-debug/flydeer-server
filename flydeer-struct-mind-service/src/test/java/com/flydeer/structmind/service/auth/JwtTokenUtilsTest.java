@@ -3,15 +3,17 @@ package com.flydeer.structmind.service.auth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.flydeer.structmind.common.exception.BusinessException;
+import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.service.config.AppAuthProperties;
 import java.time.Duration;
+
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class JwtTokenServiceTest {
+class JwtTokenUtilsTest {
 
-    private JwtTokenService jwtTokenService;
+    private JwtTokenUtils jwtTokenUtils;
 
     @BeforeEach
     void setUp() {
@@ -19,22 +21,22 @@ class JwtTokenServiceTest {
         properties.getAuth().setJwtSecret("test-jwt-secret-key-at-least-32-bytes!!");
         properties.getAuth().setAccessTokenTtl(Duration.ofHours(2));
         properties.getAuth().setRefreshTokenTtl(Duration.ofDays(90));
-        jwtTokenService = new JwtTokenService(properties);
+        //jwtTokenUtils = new JwtTokenUtils(properties);
     }
 
     @Test
     void issueAndParseAccessToken() {
-        JwtTokenService.IssuedTokens tokens = jwtTokenService.issue(10000001L);
-        long userId = jwtTokenService.parseUserId(tokens.accessToken(), JwtTokenService.TYP_ACCESS);
+        JwtTokenUtils.IssuedTokens tokens = jwtTokenUtils.issue(10000001L);
+        long userId = jwtTokenUtils.parseAccessToken(tokens.accessToken());
         assertEquals(10000001L, userId);
         assertEquals(7200L, tokens.expiresInSeconds());
     }
 
     @Test
     void rejectAccessAsRefresh() {
-        JwtTokenService.IssuedTokens tokens = jwtTokenService.issue(10000001L);
+        JwtTokenUtils.IssuedTokens tokens = jwtTokenUtils.issue(10000001L);
         assertThrows(
                 BusinessException.class,
-                () -> jwtTokenService.parseUserId(tokens.accessToken(), JwtTokenService.TYP_REFRESH));
+                () -> jwtTokenUtils.parseRefreshToken(tokens.accessToken()));
     }
 }

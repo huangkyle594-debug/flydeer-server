@@ -2,7 +2,7 @@ package com.flydeer.structmind.controller.web;
 
 import com.flydeer.structmind.api.auth.AuthFacade;
 import com.flydeer.structmind.common.error.ErrorCodes;
-import com.flydeer.structmind.common.exception.BusinessException;
+import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.common.result.ApiResult;
 import com.flydeer.structmind.contract.auth.AuthorizeUrlResponse;
 import com.flydeer.structmind.contract.auth.SmsLoginRequest;
@@ -10,7 +10,7 @@ import com.flydeer.structmind.contract.auth.SmsSendRequest;
 import com.flydeer.structmind.contract.auth.TokenResponse;
 import com.flydeer.structmind.contract.enums.LoginChannel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
-import com.flydeer.structmind.service.auth.JwtTokenService;
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.config.AppAuthProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ public class AuthController {
             @Valid @RequestBody SmsLoginRequest request,
             HttpServletRequest http,
             HttpServletResponse response) {
-        JwtTokenService.IssuedTokens tokens =
+        JwtTokenUtils.IssuedTokens tokens =
                 authFacade.loginBySms(request.getPhone(), request.getCode(), clientIp(http));
         authCookieSupport.writeRefreshCookie(response, tokens);
         return ApiResult.ok(authFacade.toTokenResponse(tokens));
@@ -72,7 +72,7 @@ public class AuthController {
             @RequestParam("state") String state,
             HttpServletResponse response)
             throws IOException {
-        JwtTokenService.IssuedTokens tokens =
+        JwtTokenUtils.IssuedTokens tokens =
                 authFacade.oauthCallback(parseProvider(provider), code, state);
         authCookieSupport.writeRefreshCookie(response, tokens);
         String redirect = properties.getAuth().getFrontendRedirectUrl()
@@ -88,7 +88,7 @@ public class AuthController {
         if (!StringUtils.hasText(refresh)) {
             throw new BusinessException(ErrorCodes.UNAUTHORIZED, "refresh token missing");
         }
-        JwtTokenService.IssuedTokens tokens = authFacade.refresh(refresh);
+        JwtTokenUtils.IssuedTokens tokens = authFacade.refresh(refresh);
         authCookieSupport.writeRefreshCookie(response, tokens);
         return ApiResult.ok(authFacade.toTokenResponse(tokens));
     }

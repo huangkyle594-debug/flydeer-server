@@ -1,13 +1,13 @@
-package com.flydeer.structmind.service.user;
+package com.flydeer.structmind.service.service.user;
 
 import com.flydeer.structmind.common.error.ErrorCodes;
-import com.flydeer.structmind.common.exception.BusinessException;
+import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.contract.enums.LoginChannel;
 import com.flydeer.structmind.repository.entity.UserEntity;
 import com.flydeer.structmind.repository.mapper.UserDelegateMapper;
 import com.flydeer.structmind.repository.mapper.UserMapper;
-import com.flydeer.structmind.service.id.IdGenerator;
-import com.flydeer.structmind.service.oauth.OauthUserInfo;
+import com.flydeer.structmind.service.utils.IdGenerateUtils;
+import com.flydeer.structmind.service.model.user.OauthUserRecord;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +18,13 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final UserDelegateMapper userDelegateMapper;
-    private final IdGenerator idGenerator;
+    private final IdGenerateUtils idGenerateUtils;
 
     public UserService(
-            UserMapper userMapper, UserDelegateMapper userDelegateMapper, IdGenerator idGenerator) {
+            UserMapper userMapper, UserDelegateMapper userDelegateMapper, IdGenerateUtils idGenerateUtils) {
         this.userMapper = userMapper;
         this.userDelegateMapper = userDelegateMapper;
-        this.idGenerator = idGenerator;
+        this.idGenerateUtils = idGenerateUtils;
     }
 
     public UserEntity requireActive(Long userId) {
@@ -55,7 +55,7 @@ public class UserService {
             return byPhone;
         }
         UserEntity user = new UserEntity();
-        user.setId(idGenerator.nextUserId());
+        user.setId(idGenerateUtils.nextUserId());
         user.setChannel(LoginChannel.PHONE.name());
         user.setChannelUid(phone);
         user.setPhone(phone);
@@ -67,7 +67,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity loginOrRegisterOauth(LoginChannel channel, OauthUserInfo info) {
+    public UserEntity loginOrRegisterOauth(LoginChannel channel, OauthUserRecord info) {
         UserEntity existing =
                 userMapper.selectByChannelAndUid(channel.name(), info.channelUid());
         if (existing != null) {
@@ -75,7 +75,7 @@ public class UserService {
             return existing;
         }
         UserEntity user = new UserEntity();
-        user.setId(idGenerator.nextUserId());
+        user.setId(idGenerateUtils.nextUserId());
         user.setChannel(channel.name());
         user.setChannelUid(info.channelUid());
         user.setPhone(null);

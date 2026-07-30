@@ -1,16 +1,18 @@
 package com.flydeer.structmind.controller.aspect;
 
 import com.flydeer.structmind.common.error.ErrorCodes;
-import com.flydeer.structmind.common.exception.BusinessException;
+import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.contract.auth.BaseRequest;
 import com.flydeer.structmind.contract.enums.UserLevel;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
 import com.flydeer.structmind.repository.entity.UserEntity;
-import com.flydeer.structmind.service.auth.JwtTokenService;
-import com.flydeer.structmind.service.user.UserService;
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
+import com.flydeer.structmind.service.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -24,30 +26,30 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class RequireUserLevelAspect {
 
-    private final JwtTokenService jwtTokenService;
+    private final JwtTokenUtils jwtTokenUtils;
     private final UserService userService;
     private final AuthCookieSupport authCookieSupport;
 
     public RequireUserLevelAspect(
-            JwtTokenService jwtTokenService, UserService userService, AuthCookieSupport authCookieSupport) {
-        this.jwtTokenService = jwtTokenService;
+        JwtTokenUtils jwtTokenUtils, UserService userService, AuthCookieSupport authCookieSupport) {
+        this.jwtTokenUtils = jwtTokenUtils;
         this.userService = userService;
         this.authCookieSupport = authCookieSupport;
     }
 
     @Around("@annotation(com.flydeer.structmind.controller.auth.RequireUserLevel) || "
-            + "@within(com.flydeer.structmind.controller.auth.RequireUserLevel)")
+        + "@within(com.flydeer.structmind.controller.auth.RequireUserLevel)")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         RequireUserLevel methodAnno =
-                AnnotationUtils.findAnnotation(signature.getMethod(), RequireUserLevel.class);
+            AnnotationUtils.findAnnotation(signature.getMethod(), RequireUserLevel.class);
         RequireUserLevel typeAnno =
-                AnnotationUtils.findAnnotation(signature.getDeclaringType(), RequireUserLevel.class);
+            AnnotationUtils.findAnnotation(signature.getDeclaringType(), RequireUserLevel.class);
         RequireUserLevel anno = methodAnno != null ? methodAnno : typeAnno;
         UserLevel required = anno != null ? anno.value() : UserLevel.AUTHENTICATED;
 
         ServletRequestAttributes attrs =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attrs == null) {
             throw new BusinessException(ErrorCodes.UNAUTHORIZED, "no request context");
         }
@@ -56,7 +58,7 @@ public class RequireUserLevelAspect {
 
         UserEntity user = null;
         if (bearer != null && !bearer.isBlank()) {
-            long userId = jwtTokenService.parseUserId(bearer, JwtTokenService.TYP_ACCESS);
+            long userId = jwtTokenUtils.parseAccessToken(bearer);
             user = userService.requireActive(userId);
         }
 

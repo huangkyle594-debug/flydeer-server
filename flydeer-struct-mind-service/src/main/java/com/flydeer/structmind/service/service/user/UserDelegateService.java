@@ -1,7 +1,7 @@
-package com.flydeer.structmind.service.delegate;
+package com.flydeer.structmind.service.service.user;
 
 import com.flydeer.structmind.common.error.ErrorCodes;
-import com.flydeer.structmind.common.exception.BusinessException;
+import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.contract.delegate.DelegateItemResponse;
 import com.flydeer.structmind.contract.enums.DelegateRequestType;
 import com.flydeer.structmind.contract.enums.DelegateStatus;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DelegateService {
+public class UserDelegateService {
 
     private final UserDelegateMapper delegateMapper;
     private final UserMapper userMapper;
 
-    public DelegateService(UserDelegateMapper delegateMapper, UserMapper userMapper) {
+    public UserDelegateService(UserDelegateMapper delegateMapper, UserMapper userMapper) {
         this.delegateMapper = delegateMapper;
         this.userMapper = userMapper;
     }

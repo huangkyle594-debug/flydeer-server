@@ -47,13 +47,15 @@ logging:
     com.flydeer.structmind: DEBUG
 
 app:
-  auth:
-    jwt-secret: ${AUTH_JWT_SECRET:change-me-to-a-long-random-secret-key!!}
+  jwt:
+    secret: ${AUTH_JWT_SECRET:change-me-to-a-long-random-secret-key!!}
     access-token-ttl: ${AUTH_ACCESS_TTL:2h}
     refresh-token-ttl: ${AUTH_REFRESH_TTL:90d}
+  #oauth:
     refresh-cookie-name: ${AUTH_REFRESH_COOKIE:refresh_token}
     refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
     refresh-cookie-path: /api/v1/auth
+  auth:
     frontend-redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:3000/auth/callback}
   id:
     start: ${ID_START:10000000}

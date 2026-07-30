@@ -2,36 +2,36 @@ package com.flydeer.structmind.api.delegate;
 
 import com.flydeer.structmind.contract.delegate.DelegateItemResponse;
 import com.flydeer.structmind.contract.enums.DelegateRequestType;
-import com.flydeer.structmind.service.delegate.DelegateService;
+import com.flydeer.structmind.service.service.user.UserDelegateService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DelegateFacade {
 
-    private final DelegateService delegateService;
+    private final UserDelegateService userDelegateService;
 
-    public DelegateFacade(DelegateService delegateService) {
-        this.delegateService = delegateService;
+    public DelegateFacade(UserDelegateService userDelegateService) {
+        this.userDelegateService = userDelegateService;
     }
 
     public void create(Long userId, Long peerUserId, DelegateRequestType requestType) {
-        delegateService.create(userId, peerUserId, requestType);
+        userDelegateService.create(userId, peerUserId, requestType);
     }
 
     public void accept(Long userId, Long peerUserId) {
-        delegateService.accept(userId, peerUserId);
+        userDelegateService.accept(userId, peerUserId);
     }
 
     public void reject(Long userId, Long peerUserId) {
-        delegateService.reject(userId, peerUserId);
+        userDelegateService.reject(userId, peerUserId);
     }
 
     public void cancel(Long userId, Long peerUserId) {
-        delegateService.cancel(userId, peerUserId);
+        userDelegateService.cancel(userId, peerUserId);
     }
 
     public List<DelegateItemResponse> list(Long userId) {
-        return delegateService.list(userId);
+        return userDelegateService.list(userId);
     }
 }

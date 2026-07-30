@@ -4,66 +4,67 @@ import com.flydeer.structmind.contract.auth.AuthorizeUrlResponse;
 import com.flydeer.structmind.contract.auth.TokenResponse;
 import com.flydeer.structmind.contract.enums.LoginChannel;
 import com.flydeer.structmind.repository.entity.UserEntity;
-import com.flydeer.structmind.service.auth.JwtTokenService;
-import com.flydeer.structmind.service.oauth.OauthClientService;
-import com.flydeer.structmind.service.oauth.OauthUserInfo;
-import com.flydeer.structmind.service.ratelimit.LocalRateLimiter;
-import com.flydeer.structmind.service.sms.SmsVerifyClient;
-import com.flydeer.structmind.service.user.UserService;
+import com.flydeer.structmind.service.model.user.IssuedTokensRecord;
+import com.flydeer.structmind.service.model.user.OauthUserRecord;
+import com.flydeer.structmind.service.service.user.OauthService;
+import com.flydeer.structmind.service.service.user.SmsVerifyService;
+import com.flydeer.structmind.service.service.user.UserService;
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
+import com.flydeer.structmind.service.utils.RateLimitUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthFacade {
 
-    private final SmsVerifyClient smsVerifyClient;
+    private final SmsVerifyService smsVerifyService;
     private final UserService userService;
-    private final JwtTokenService jwtTokenService;
-    private final OauthClientService oauthClientService;
-    private final LocalRateLimiter rateLimiter;
+    private final JwtTokenUtils jwtTokenUtils;
+    private final OauthService oauthService;
+    private final RateLimitUtils rateLimiter;
 
     public AuthFacade(
-            SmsVerifyClient smsVerifyClient,
-            UserService userService,
-            JwtTokenService jwtTokenService,
-            OauthClientService oauthClientService,
-            LocalRateLimiter rateLimiter) {
-        this.smsVerifyClient = smsVerifyClient;
+        SmsVerifyService smsVerifyService,
+        UserService userService,
+        JwtTokenUtils jwtTokenUtils,
+        OauthService oauthService,
+        RateLimitUtils rateLimiter) {
+        this.smsVerifyService = smsVerifyService;
         this.userService = userService;
-        this.jwtTokenService = jwtTokenService;
-        this.oauthClientService = oauthClientService;
+        this.jwtTokenUtils = jwtTokenUtils;
+        this.oauthService = oauthService;
         this.rateLimiter = rateLimiter;
     }
 
     public void sendSmsCode(String phone, String ip) {
         rateLimiter.checkSms(phone, ip);
-        smsVerifyClient.sendVerifyCode(phone);
+        smsVerifyService.sendVerifyCode(phone);
     }
 
-    public JwtTokenService.IssuedTokens loginBySms(String phone, String code, String ip) {
+    public IssuedTokensRecord loginBySms(String phone, String code, String ip) {
         rateLimiter.checkLogin("sms:" + phone + ":" + ip);
-        smsVerifyClient.checkVerifyCode(phone, code);
+        smsVerifyService.checkVerifyCode(phone, code);
         UserEntity user = userService.loginOrRegisterPhone(phone);
-        return jwtTokenService.issue(user.getId());
+        return jwtTokenUtils.issue(user.getId());
     }
 
     public AuthorizeUrlResponse authorizeUrl(LoginChannel channel) {
-        return new AuthorizeUrlResponse(oauthClientService.buildAuthorizeUrl(channel));
+        return new AuthorizeUrlResponse(oauthService.buildAuthorizeUrl(channel));
     }
 
-    public JwtTokenService.IssuedTokens oauthCallback(LoginChannel channel, String code, String state) {
-        oauthClientService.validateState(state);
-        OauthUserInfo info = oauthClientService.exchange(channel, code);
+    public IssuedTokensRecord oauthCallback(LoginChannel channel, String code, String state) {
+        oauthService.validateState(state);
+        OauthUserRecord info = oauthService.exchange(channel, code);
         UserEntity user = userService.loginOrRegisterOauth(channel, info);
-        return jwtTokenService.issue(user.getId());
+        return jwtTokenUtils.issue(user.getId());
     }
 
-    public JwtTokenService.IssuedTokens refresh(String refreshToken) {
-        long userId = jwtTokenService.parseUserId(refreshToken, JwtTokenService.TYP_REFRESH);
+    public IssuedTokensRecord refresh(String refreshToken) {
+        long userId = jwtTokenUtils.parseRefreshToken(refreshToken);
         userService.requireActive(userId);
-        return jwtTokenService.issue(userId);
+        return jwtTokenUtils.issue(userId);
     }
 
-    public TokenResponse toTokenResponse(JwtTokenService.IssuedTokens tokens) {
+    public TokenResponse toTokenResponse(IssuedTokensRecord tokens) {
         return new TokenResponse(tokens.accessToken(), tokens.expiresInSeconds());
     }
 }

@@ -10,7 +10,7 @@ import com.flydeer.structmind.contract.user.UpdateNicknameRequest;
 import com.flydeer.structmind.contract.user.UserProfileResponse;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
-import com.flydeer.structmind.service.auth.JwtTokenService;
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +48,7 @@ public class UserController {
     @RequireUserLevel(UserLevel.AUTHENTICATED)
     public ApiResult<TokenResponse> bindPhone(
             @Valid @RequestBody BindPhoneRequest request, HttpServletResponse response) {
-        JwtTokenService.IssuedTokens tokens =
+        JwtTokenUtils.IssuedTokens tokens =
                 userFacade.bindPhone(request.getUserId(), request.getPhone(), request.getCode());
         authCookieSupport.writeRefreshCookie(response, tokens);
         return ApiResult.ok(userFacade.toTokenResponse(tokens));

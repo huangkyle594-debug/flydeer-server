@@ -3,9 +3,9 @@ package com.flydeer.structmind.api.user;
 import com.flydeer.structmind.contract.auth.TokenResponse;
 import com.flydeer.structmind.contract.user.UserProfileResponse;
 import com.flydeer.structmind.repository.entity.UserEntity;
-import com.flydeer.structmind.service.auth.JwtTokenService;
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.sms.SmsVerifyClient;
-import com.flydeer.structmind.service.user.UserService;
+import com.flydeer.structmind.service.service.user.UserService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,13 @@ public class UserFacade {
 
     private final UserService userService;
     private final SmsVerifyClient smsVerifyClient;
-    private final JwtTokenService jwtTokenService;
+    private final JwtTokenUtils jwtTokenUtils;
 
     public UserFacade(
-            UserService userService, SmsVerifyClient smsVerifyClient, JwtTokenService jwtTokenService) {
+            UserService userService, SmsVerifyClient smsVerifyClient, JwtTokenUtils jwtTokenUtils) {
         this.userService = userService;
         this.smsVerifyClient = smsVerifyClient;
-        this.jwtTokenService = jwtTokenService;
+        this.jwtTokenUtils = jwtTokenUtils;
     }
 
     public UserProfileResponse me(Long userId) {
@@ -40,13 +40,13 @@ public class UserFacade {
         return me(userId);
     }
 
-    public JwtTokenService.IssuedTokens bindPhone(Long userId, String phone, String code) {
+    public JwtTokenUtils.IssuedTokens bindPhone(Long userId, String phone, String code) {
         smsVerifyClient.checkVerifyCode(phone, code);
         userService.bindPhone(userId, phone);
-        return jwtTokenService.issue(userId);
+        return jwtTokenUtils.issue(userId);
     }
 
-    public TokenResponse toTokenResponse(JwtTokenService.IssuedTokens tokens) {
+    public TokenResponse toTokenResponse(JwtTokenUtils.IssuedTokens tokens) {
         return new TokenResponse(tokens.accessToken(), tokens.expiresInSeconds());
     }
 }

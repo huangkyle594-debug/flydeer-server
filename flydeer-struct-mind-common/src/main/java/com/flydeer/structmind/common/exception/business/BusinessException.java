@@ -1,4 +1,4 @@
-package com.flydeer.structmind.common.exception;
+package com.flydeer.structmind.common.exception.business;
 
 /**
  * Base domain/business exception.

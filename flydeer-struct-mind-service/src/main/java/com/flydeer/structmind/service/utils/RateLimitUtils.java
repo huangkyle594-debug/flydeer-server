@@ -1,7 +1,7 @@
-package com.flydeer.structmind.service.ratelimit;
+package com.flydeer.structmind.service.utils;
 
 import com.flydeer.structmind.common.error.ErrorCodes;
-import com.flydeer.structmind.common.exception.BusinessException;
+import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.service.config.AppAuthProperties;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -10,13 +10,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocalRateLimiter {
+public class RateLimitUtils {
 
     private final AppAuthProperties properties;
     private final Cache<String, Long> intervalCache;
     private final Cache<String, AtomicInteger> dailyCache;
 
-    public LocalRateLimiter(AppAuthProperties properties) {
+    public RateLimitUtils(AppAuthProperties properties) {
         this.properties = properties;
         this.intervalCache = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).build();
         this.dailyCache = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).build();

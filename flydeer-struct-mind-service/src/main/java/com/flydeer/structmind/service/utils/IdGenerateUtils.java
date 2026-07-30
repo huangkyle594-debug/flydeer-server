@@ -1,26 +1,29 @@
-package com.flydeer.structmind.service.id;
+package com.flydeer.structmind.service.utils;
 
 import com.flydeer.structmind.repository.mapper.UserMapper;
-import com.flydeer.structmind.service.config.AppAuthProperties;
+
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.flydeer.structmind.service.config.user.IdGenerateConfig;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IdGenerator {
+public class IdGenerateUtils {
 
     private final UserMapper userMapper;
-    private final AppAuthProperties properties;
+    private final IdGenerateConfig idGenerateConfig;
 
-    public IdGenerator(UserMapper userMapper, AppAuthProperties properties) {
+    public IdGenerateUtils(UserMapper userMapper,
+                           IdGenerateConfig idGenerateConfig) {
         this.userMapper = userMapper;
-        this.properties = properties;
+        this.idGenerateConfig=idGenerateConfig;
     }
 
     public synchronized long nextUserId() {
         Long max = userMapper.selectMaxId();
-        long start = properties.getId().getStart();
-        int min = properties.getId().getStepMin();
-        int maxStep = properties.getId().getStepMax();
+        long start = idGenerateConfig.getStart();
+        int min = idGenerateConfig.getStepMin();
+        int maxStep = idGenerateConfig.getStepMax();
         if (maxStep < min) {
             maxStep = min;
         }

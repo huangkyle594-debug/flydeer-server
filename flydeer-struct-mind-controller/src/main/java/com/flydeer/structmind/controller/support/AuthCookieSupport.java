@@ -1,6 +1,6 @@
 package com.flydeer.structmind.controller.support;
 
-import com.flydeer.structmind.service.auth.JwtTokenService;
+import com.flydeer.structmind.service.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.config.AppAuthProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,7 @@ public class AuthCookieSupport {
         this.properties = properties;
     }
 
-    public void writeRefreshCookie(HttpServletResponse response, JwtTokenService.IssuedTokens tokens) {
+    public void writeRefreshCookie(HttpServletResponse response, JwtTokenUtils.IssuedTokens tokens) {
         ResponseCookie cookie = ResponseCookie.from(
                         properties.getAuth().getRefreshCookieName(), tokens.refreshToken())
                 .httpOnly(true)
