@@ -6,7 +6,7 @@ import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.enums.UserLevel;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
-import com.flydeer.structmind.repository.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserEntity;
 import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;

@@ -9,7 +9,7 @@ import com.flydeer.structmind.contract.user.enums.LoginChannel;
 import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.contract.user.vo.OauthUrlVO;
 import com.flydeer.structmind.contract.user.vo.TokenResponse;
-import com.flydeer.structmind.repository.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserEntity;
 import com.flydeer.structmind.service.user.OauthService;
 import com.flydeer.structmind.service.user.SmsVerifyService;
 import com.flydeer.structmind.service.user.UserService;

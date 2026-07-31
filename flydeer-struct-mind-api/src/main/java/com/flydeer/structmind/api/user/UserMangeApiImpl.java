@@ -3,7 +3,7 @@ package com.flydeer.structmind.api.user;
 import com.flydeer.structmind.contract.user.UserMangeApi;
 import com.flydeer.structmind.contract.user.vo.TokenResponse;
 import com.flydeer.structmind.contract.user.vo.UserProfileResponse;
-import com.flydeer.structmind.repository.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserEntity;
 import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.sms.SmsVerifyClient;
 import com.flydeer.structmind.service.user.UserService;

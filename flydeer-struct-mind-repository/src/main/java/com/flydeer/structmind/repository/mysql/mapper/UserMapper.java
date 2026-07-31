@@ -1,6 +1,6 @@
-package com.flydeer.structmind.repository.mapper;
+package com.flydeer.structmind.repository.mysql.mapper;
 
-import com.flydeer.structmind.repository.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

@@ -1,6 +1,6 @@
 package com.flydeer.structmind.service.user.utils;
 
-import com.flydeer.structmind.repository.mapper.UserMapper;
+import com.flydeer.structmind.repository.mysql.mapper.UserMapper;
 
 import java.util.concurrent.ThreadLocalRandom;
 

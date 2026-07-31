@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flydeer.structmind.repository.mapper.UserMapper">
+<mapper namespace="com.flydeer.structmind.repository.mysql.mapper.UserMapper">
 
-    <resultMap id="UserMap" type="com.flydeer.structmind.repository.entity.UserEntity">
+    <resultMap id="UserMap" type="com.flydeer.structmind.repository.mysql.entity.UserEntity">
         <id property="id" column="id"/>
         <result property="channel" column="channel"/>
         <result property="channelUid" column="channel_uid"/>

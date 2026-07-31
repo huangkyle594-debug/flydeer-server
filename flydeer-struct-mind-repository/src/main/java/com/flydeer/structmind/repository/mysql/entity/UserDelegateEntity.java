@@ -1,4 +1,4 @@
-package com.flydeer.structmind.repository.entity;
+package com.flydeer.structmind.repository.mysql.entity;
 
 import java.time.LocalDateTime;
 import lombok.Data;

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flydeer.structmind.repository.mapper.UserDelegateMapper">
+<mapper namespace="com.flydeer.structmind.repository.mysql.mapper.UserDelegateMapper">
 
-    <resultMap id="DelegateMap" type="com.flydeer.structmind.repository.entity.UserDelegateEntity">
+    <resultMap id="DelegateMap" type="com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity">
         <id property="id" column="id"/>
         <result property="grantorId" column="grantor_id"/>
         <result property="granteeId" column="grantee_id"/>
