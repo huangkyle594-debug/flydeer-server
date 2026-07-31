@@ -3,7 +3,7 @@ package com.flydeer.structmind.common.exception.auth;
 import lombok.Getter;
 
 @Getter
-public class AuthorizedException extends RuntimeException {
+public class AuthorizedException extends Exception {
 
     private final int code;
 

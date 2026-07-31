@@ -1,6 +1,6 @@
 package com.flydeer.structmind.controller.auth;
 
-import com.flydeer.structmind.contract.enums.UserLevel;
+import com.flydeer.structmind.contract.user.enums.UserLevel;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

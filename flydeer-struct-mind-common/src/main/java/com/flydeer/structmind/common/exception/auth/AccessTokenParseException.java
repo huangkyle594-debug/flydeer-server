@@ -1,6 +1,6 @@
 package com.flydeer.structmind.common.exception.auth;
 
-import com.flydeer.structmind.common.error.ErrorCodes;
+import com.flydeer.structmind.common.exception.ErrorCodes;
 
 public class AccessTokenParseException extends AuthorizedException {
 

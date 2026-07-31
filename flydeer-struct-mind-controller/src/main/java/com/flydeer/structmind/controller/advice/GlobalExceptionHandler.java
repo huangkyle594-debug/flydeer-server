@@ -1,8 +1,8 @@
 package com.flydeer.structmind.controller.advice;
 
-import com.flydeer.structmind.common.error.ErrorCodes;
+import com.flydeer.structmind.common.exception.ErrorCodes;
 import com.flydeer.structmind.common.exception.business.BusinessException;
-import com.flydeer.structmind.common.result.ApiResult;
+import com.flydeer.structmind.contract.base.response.ApiResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

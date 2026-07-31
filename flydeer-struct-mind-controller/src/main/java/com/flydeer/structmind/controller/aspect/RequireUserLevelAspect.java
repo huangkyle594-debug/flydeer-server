@@ -1,14 +1,14 @@
 package com.flydeer.structmind.controller.aspect;
 
-import com.flydeer.structmind.common.error.ErrorCodes;
+import com.flydeer.structmind.common.exception.ErrorCodes;
 import com.flydeer.structmind.common.exception.business.BusinessException;
-import com.flydeer.structmind.contract.auth.BaseRequest;
-import com.flydeer.structmind.contract.enums.UserLevel;
+import com.flydeer.structmind.contract.base.request.ApiRequest;
+import com.flydeer.structmind.contract.user.enums.UserLevel;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
 import com.flydeer.structmind.repository.entity.UserEntity;
-import com.flydeer.structmind.service.utils.JwtTokenUtils;
-import com.flydeer.structmind.service.service.user.UserService;
+import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
+import com.flydeer.structmind.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -89,7 +89,7 @@ public class RequireUserLevelAspect {
             return;
         }
         for (Object arg : args) {
-            if (arg instanceof BaseRequest base) {
+            if (arg instanceof ApiRequest base) {
                 base.setUserId(user.getId());
                 base.setChannel(user.getChannel());
                 base.setVerified(user.getVerified() != null && user.getVerified() == 1);

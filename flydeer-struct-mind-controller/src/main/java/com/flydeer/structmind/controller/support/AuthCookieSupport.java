@@ -1,7 +1,6 @@
 package com.flydeer.structmind.controller.support;
 
-import com.flydeer.structmind.service.utils.JwtTokenUtils;
-import com.flydeer.structmind.service.config.AppAuthProperties;
+import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

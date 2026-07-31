@@ -1,17 +1,16 @@
 package com.flydeer.structmind.controller.web;
 
-import com.flydeer.structmind.api.auth.AuthFacade;
-import com.flydeer.structmind.common.error.ErrorCodes;
+import com.flydeer.structmind.api.user.AuthorizationApiImpl;
+import com.flydeer.structmind.common.exception.ErrorCodes;
 import com.flydeer.structmind.common.exception.business.BusinessException;
-import com.flydeer.structmind.common.result.ApiResult;
-import com.flydeer.structmind.contract.auth.AuthorizeUrlResponse;
-import com.flydeer.structmind.contract.auth.SmsLoginRequest;
-import com.flydeer.structmind.contract.auth.SmsSendRequest;
-import com.flydeer.structmind.contract.auth.TokenResponse;
-import com.flydeer.structmind.contract.enums.LoginChannel;
+import com.flydeer.structmind.contract.base.response.ApiResult;
+import com.flydeer.structmind.contract.user.vo.AuthorizeUrlResponse;
+import com.flydeer.structmind.contract.user.request.SmsLoginRequest;
+import com.flydeer.structmind.contract.user.request.SmsSendRequest;
+import com.flydeer.structmind.contract.user.vo.TokenResponse;
+import com.flydeer.structmind.contract.user.enums.LoginChannel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
-import com.flydeer.structmind.service.utils.JwtTokenUtils;
-import com.flydeer.structmind.service.config.AppAuthProperties;
+import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -32,20 +31,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final AuthFacade authFacade;
+    private final AuthorizationApiImpl authServiceImpl;
     private final AuthCookieSupport authCookieSupport;
     private final AppAuthProperties properties;
 
     public AuthController(
-            AuthFacade authFacade, AuthCookieSupport authCookieSupport, AppAuthProperties properties) {
-        this.authFacade = authFacade;
+        AuthorizationApiImpl authServiceImpl, AuthCookieSupport authCookieSupport, AppAuthProperties properties) {
+        this.authServiceImpl = authServiceImpl;
         this.authCookieSupport = authCookieSupport;
         this.properties = properties;
     }
 
     @PostMapping("/sms/send")
     public ApiResult<Void> sendSms(@Valid @RequestBody SmsSendRequest request, HttpServletRequest http) {
-        authFacade.sendSmsCode(request.getPhone(), clientIp(http));
+        authServiceImpl.sendSmsCode(request.getPhone(), clientIp(http));
         return ApiResult.ok();
     }
 
@@ -55,14 +54,14 @@ public class AuthController {
             HttpServletRequest http,
             HttpServletResponse response) {
         JwtTokenUtils.IssuedTokens tokens =
-                authFacade.loginBySms(request.getPhone(), request.getCode(), clientIp(http));
+                authServiceImpl.loginBySms(request.getPhone(), request.getCode(), clientIp(http));
         authCookieSupport.writeRefreshCookie(response, tokens);
-        return ApiResult.ok(authFacade.toTokenResponse(tokens));
+        return ApiResult.ok(authServiceImpl.toTokenResponse(tokens));
     }
 
     @GetMapping("/{provider}/authorize")
     public ApiResult<AuthorizeUrlResponse> authorize(@PathVariable("provider") String provider) {
-        return ApiResult.ok(authFacade.authorizeUrl(parseProvider(provider)));
+        return ApiResult.ok(authServiceImpl.authorizeUrl(parseProvider(provider)));
     }
 
     @GetMapping("/{provider}/callback")
@@ -73,7 +72,7 @@ public class AuthController {
             HttpServletResponse response)
             throws IOException {
         JwtTokenUtils.IssuedTokens tokens =
-                authFacade.oauthCallback(parseProvider(provider), code, state);
+                authServiceImpl.oauthCallback(parseProvider(provider), code, state);
         authCookieSupport.writeRefreshCookie(response, tokens);
         String redirect = properties.getAuth().getFrontendRedirectUrl()
                 + (properties.getAuth().getFrontendRedirectUrl().contains("?") ? "&" : "?")
@@ -88,9 +87,9 @@ public class AuthController {
         if (!StringUtils.hasText(refresh)) {
             throw new BusinessException(ErrorCodes.UNAUTHORIZED, "refresh token missing");
         }
-        JwtTokenUtils.IssuedTokens tokens = authFacade.refresh(refresh);
+        JwtTokenUtils.IssuedTokens tokens = authServiceImpl.refresh(refresh);
         authCookieSupport.writeRefreshCookie(response, tokens);
-        return ApiResult.ok(authFacade.toTokenResponse(tokens));
+        return ApiResult.ok(authServiceImpl.toTokenResponse(tokens));
     }
 
     @PostMapping("/logout")
