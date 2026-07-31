@@ -9,17 +9,13 @@ import lombok.NoArgsConstructor;
 public class UserDelegateEntity {
     private Long id;
 
-    private Long grantorId;
+    private Long userId;
 
-    private Long granteeId;
-
-    private String requestType;
+    private Long grantedUserId;
 
     private String status;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-    private LocalDateTime respondedAt;
 }

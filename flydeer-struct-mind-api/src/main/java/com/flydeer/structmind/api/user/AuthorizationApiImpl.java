@@ -9,7 +9,7 @@ import com.flydeer.structmind.contract.user.enums.LoginChannel;
 import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.contract.user.vo.OauthUrlVO;
 import com.flydeer.structmind.contract.user.vo.TokenResponse;
-import com.flydeer.structmind.repository.mysql.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
 import com.flydeer.structmind.service.user.OauthService;
 import com.flydeer.structmind.service.user.SmsVerifyService;
 import com.flydeer.structmind.service.user.UserService;
@@ -41,7 +41,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         throws LoginRateLimitException, SmsVerifyException {
         rateLimiter.checkLogin("sms:" + phone + ":" + ip);
         smsVerifyService.checkVerifyCode(phone, code);
-        UserEntity user = userService.loginOrRegisterPhone(phone);
+        UserInfoEntity user = userService.loginOrRegisterPhone(phone);
         return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId()));
     }
 
@@ -55,7 +55,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         throws OauthValidateException, OauthExchangeException {
         oauthService.validateState(state);
         OauthUserRecord info = oauthService.exchange(channel, code);
-        UserEntity user = userService.loginOrRegisterOauth(channel, info);
+        UserInfoEntity user = userService.loginOrRegisterOauth(channel, info);
         return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId()));
     }
 

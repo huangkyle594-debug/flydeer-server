@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserEntity {
+public class UserInfoEntity {
     private Long id;
 
     private String channel;
@@ -17,7 +17,7 @@ public class UserEntity {
 
     private Integer verified;
 
-    private String nickname;
+    private String name;
 
     private Integer status;
 

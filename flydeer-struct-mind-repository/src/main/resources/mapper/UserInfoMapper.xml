@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flydeer.structmind.repository.mysql.mapper.UserMapper">
-  <resultMap id="BaseResultMap" type="com.flydeer.structmind.repository.mysql.entity.UserEntity">
+<mapper namespace="com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper">
+  <resultMap id="BaseResultMap" type="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="channel" jdbcType="VARCHAR" property="channel" />
     <result column="channel_uid" jdbcType="VARCHAR" property="channelUid" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
     <result column="verified" jdbcType="TINYINT" property="verified" />
-    <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="status" jdbcType="TINYINT" property="status" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
   </resultMap>
   <sql id="Base_Column_List">
-    `id`, `channel`, `channel_uid`, `phone`, `verified`, `nickname`, `status`, `created_at`, 
+    `id`, `channel`, `channel_uid`, `phone`, `verified`, `name`, `status`, `created_at`, 
     `updated_at`
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -26,17 +26,17 @@
     delete from `user_info`
     where `id` = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
+  <insert id="insert" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
     insert into `user_info` (`id`, `channel`, `channel_uid`, 
-      `phone`, `verified`, `nickname`, 
+      `phone`, `verified`, `name`, 
       `status`, `created_at`, `updated_at`
       )
     values (#{id,jdbcType=BIGINT}, #{channel,jdbcType=VARCHAR}, #{channelUid,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR}, #{verified,jdbcType=TINYINT}, #{nickname,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{verified,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
       #{status,jdbcType=TINYINT}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
+  <insert id="insertSelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
     insert into `user_info`
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -54,8 +54,8 @@
       <if test="verified != null">
         `verified`,
       </if>
-      <if test="nickname != null">
-        `nickname`,
+      <if test="name != null">
+        `name`,
       </if>
       <if test="status != null">
         `status`,
@@ -83,8 +83,8 @@
       <if test="verified != null">
         #{verified,jdbcType=TINYINT},
       </if>
-      <if test="nickname != null">
-        #{nickname,jdbcType=VARCHAR},
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
         #{status,jdbcType=TINYINT},
@@ -97,7 +97,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
+  <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
     update `user_info`
     <set>
       <if test="channel != null">
@@ -112,8 +112,8 @@
       <if test="verified != null">
         `verified` = #{verified,jdbcType=TINYINT},
       </if>
-      <if test="nickname != null">
-        `nickname` = #{nickname,jdbcType=VARCHAR},
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
         `status` = #{status,jdbcType=TINYINT},
@@ -127,13 +127,13 @@
     </set>
     where `id` = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
+  <update id="updateByPrimaryKey" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
     update `user_info`
     set `channel` = #{channel,jdbcType=VARCHAR},
       `channel_uid` = #{channelUid,jdbcType=VARCHAR},
       `phone` = #{phone,jdbcType=VARCHAR},
       `verified` = #{verified,jdbcType=TINYINT},
-      `nickname` = #{nickname,jdbcType=VARCHAR},
+      `name` = #{name,jdbcType=VARCHAR},
       `status` = #{status,jdbcType=TINYINT},
       `created_at` = #{createdAt,jdbcType=TIMESTAMP},
       `updated_at` = #{updatedAt,jdbcType=TIMESTAMP}

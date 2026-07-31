@@ -3,9 +3,9 @@ package com.flydeer.structmind.service.user;
 import com.flydeer.structmind.common.exception.ErrorCodes;
 import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.contract.user.enums.LoginChannel;
-import com.flydeer.structmind.repository.mysql.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
 import com.flydeer.structmind.repository.mysql.mapper.UserDelegateMapper;
-import com.flydeer.structmind.repository.mysql.mapper.UserMapper;
+import com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper;
 import com.flydeer.structmind.service.user.utils.IdGenerateUtils;
 import com.flydeer.structmind.service.user.model.OauthUserRecord;
 import java.util.List;
@@ -16,23 +16,23 @@ import org.springframework.util.StringUtils;
 @Service
 public class UserService {
 
-    private final UserMapper userMapper;
+    private final UserInfoMapper userInfoMapper;
     private final UserDelegateMapper userDelegateMapper;
     private final IdGenerateUtils idGenerateUtils;
 
     public UserService(
-            UserMapper userMapper, UserDelegateMapper userDelegateMapper, IdGenerateUtils idGenerateUtils) {
-        this.userMapper = userMapper;
+            UserInfoMapper userInfoMapper, UserDelegateMapper userDelegateMapper, IdGenerateUtils idGenerateUtils) {
+        this.userInfoMapper = userInfoMapper;
         this.userDelegateMapper = userDelegateMapper;
         this.idGenerateUtils = idGenerateUtils;
     }
 
-    public UserEntity requireActive(Long userId) {
-        UserEntity user = userMapper.selectById(userId);
+    public UserInfoEntity requireActive(Long userId) {
+        UserInfoEntity user = userInfoMapper.selectById(userId);
         if (user == null) {
             throw new BusinessException(ErrorCodes.UNAUTHORIZED, "user not found");
         }
-        if (user.getStatus() == null || user.getStatus() != UserEntity.STATUS_ACTIVE) {
+        if (user.getStatus() == null || user.getStatus() != UserInfoEntity.STATUS_ACTIVE) {
             throw new BusinessException(ErrorCodes.FORBIDDEN, "user disabled");
         }
         return user;
@@ -43,75 +43,75 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity loginOrRegisterPhone(String phone) {
-        UserEntity existing = userMapper.selectByChannelAndUid(LoginChannel.PHONE.name(), phone);
+    public UserInfoEntity loginOrRegisterPhone(String phone) {
+        UserInfoEntity existing = userInfoMapper.selectByChannelAndUid(LoginChannel.PHONE.name(), phone);
         if (existing != null) {
             ensureActive(existing);
             return existing;
         }
-        UserEntity byPhone = userMapper.selectByPhone(phone);
+        UserInfoEntity byPhone = userInfoMapper.selectByPhone(phone);
         if (byPhone != null) {
             ensureActive(byPhone);
             return byPhone;
         }
-        UserEntity user = new UserEntity();
+        UserInfoEntity user = new UserInfoEntity();
         user.setId(idGenerateUtils.nextUserId());
         user.setChannel(LoginChannel.PHONE.name());
         user.setChannelUid(phone);
         user.setPhone(phone);
         user.setVerified(1);
         user.setNickname(maskPhone(phone));
-        user.setStatus(UserEntity.STATUS_ACTIVE);
-        userMapper.insert(user);
+        user.setStatus(UserInfoEntity.STATUS_ACTIVE);
+        userInfoMapper.insert(user);
         return user;
     }
 
     @Transactional
-    public UserEntity loginOrRegisterOauth(LoginChannel channel, OauthUserRecord info) {
-        UserEntity existing =
-                userMapper.selectByChannelAndUid(channel.name(), info.channelUid());
+    public UserInfoEntity loginOrRegisterOauth(LoginChannel channel, OauthUserRecord info) {
+        UserInfoEntity existing =
+                userInfoMapper.selectByChannelAndUid(channel.name(), info.channelUid());
         if (existing != null) {
             ensureActive(existing);
             return existing;
         }
-        UserEntity user = new UserEntity();
+        UserInfoEntity user = new UserInfoEntity();
         user.setId(idGenerateUtils.nextUserId());
         user.setChannel(channel.name());
         user.setChannelUid(info.channelUid());
         user.setPhone(null);
         user.setVerified(0);
         user.setNickname(trimNickname(info.username()));
-        user.setStatus(UserEntity.STATUS_ACTIVE);
-        userMapper.insert(user);
+        user.setStatus(UserInfoEntity.STATUS_ACTIVE);
+        userInfoMapper.insert(user);
         return user;
     }
 
     @Transactional
-    public UserEntity updateNickname(Long userId, String nickName) {
-        UserEntity user = requireActive(userId);
-        userMapper.updateNickname(userId, trimNickname(nickName));
+    public UserInfoEntity updateNickname(Long userId, String nickName) {
+        UserInfoEntity user = requireActive(userId);
+        userInfoMapper.updateNickname(userId, trimNickname(nickName));
         user.setNickname(trimNickname(nickName));
         return user;
     }
 
     @Transactional
-    public UserEntity bindPhone(Long userId, String phone) {
-        UserEntity user = requireActive(userId);
+    public UserInfoEntity bindPhone(Long userId, String phone) {
+        UserInfoEntity user = requireActive(userId);
         if (user.getVerified() != null && user.getVerified() == 1 && phone.equals(user.getPhone())) {
             return user;
         }
-        UserEntity occupied = userMapper.selectByPhone(phone);
+        UserInfoEntity occupied = userInfoMapper.selectByPhone(phone);
         if (occupied != null && !occupied.getId().equals(userId)) {
             throw new BusinessException(ErrorCodes.CONFLICT, "phone already bound");
         }
-        userMapper.bindPhone(userId, phone);
+        userInfoMapper.bindPhone(userId, phone);
         user.setPhone(phone);
         user.setVerified(1);
         return user;
     }
 
-    private void ensureActive(UserEntity user) {
-        if (user.getStatus() == null || user.getStatus() != UserEntity.STATUS_ACTIVE) {
+    private void ensureActive(UserInfoEntity user) {
+        if (user.getStatus() == null || user.getStatus() != UserInfoEntity.STATUS_ACTIVE) {
             throw new BusinessException(ErrorCodes.FORBIDDEN, "user disabled");
         }
     }

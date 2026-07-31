@@ -6,7 +6,7 @@ import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.enums.UserLevel;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
-import com.flydeer.structmind.repository.mysql.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
 import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +56,7 @@ public class RequireUserLevelAspect {
         HttpServletRequest request = attrs.getRequest();
         String bearer = authCookieSupport.extractBearer(request);
 
-        UserEntity user = null;
+        UserInfoEntity user = null;
         if (bearer != null && !bearer.isBlank()) {
             long userId = jwtTokenUtils.parseAccessToken(bearer);
             user = userService.requireActive(userId);
@@ -84,7 +84,7 @@ public class RequireUserLevelAspect {
         return pjp.proceed();
     }
 
-    private void injectBaseRequest(Object[] args, UserEntity user, List<Long> delegated) {
+    private void injectBaseRequest(Object[] args, UserInfoEntity user, List<Long> delegated) {
         if (args == null) {
             return;
         }

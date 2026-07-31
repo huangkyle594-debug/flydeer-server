@@ -6,9 +6,9 @@ import com.flydeer.structmind.contract.user.vo.DelegateItemResponse;
 import com.flydeer.structmind.contract.user.enums.DelegateRequestType;
 import com.flydeer.structmind.contract.user.enums.DelegateStatus;
 import com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity;
-import com.flydeer.structmind.repository.mysql.entity.UserEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
 import com.flydeer.structmind.repository.mysql.mapper.UserDelegateMapper;
-import com.flydeer.structmind.repository.mysql.mapper.UserMapper;
+import com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper;
 import java.time.ZoneOffset;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDelegateService {
 
     private final UserDelegateMapper delegateMapper;
-    private final UserMapper userMapper;
+    private final UserInfoMapper userInfoMapper;
 
-    public UserDelegateService(UserDelegateMapper delegateMapper, UserMapper userMapper) {
+    public UserDelegateService(UserDelegateMapper delegateMapper, UserInfoMapper userInfoMapper) {
         this.delegateMapper = delegateMapper;
-        this.userMapper = userMapper;
+        this.userInfoMapper = userInfoMapper;
     }
 
     @Transactional
@@ -148,7 +148,7 @@ public class UserDelegateService {
     }
 
     private void requireUser(Long userId) {
-        UserEntity user = userMapper.selectById(userId);
+        UserInfoEntity user = userInfoMapper.selectById(userId);
         if (user == null) {
             throw new BusinessException(ErrorCodes.NOT_FOUND, "peer user not found");
         }

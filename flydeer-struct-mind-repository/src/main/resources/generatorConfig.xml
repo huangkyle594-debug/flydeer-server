@@ -77,8 +77,8 @@
         </javaClientGenerator>
 
         <table tableName="user_info"
-               domainObjectName="UserEntity"
-               mapperName="UserMapper"
+               domainObjectName="UserInfoEntity"
+               mapperName="UserInfoMapper"
                delimitAllColumns="true"
                delimitIdentifiers="true"
                enableCountByExample="false"
