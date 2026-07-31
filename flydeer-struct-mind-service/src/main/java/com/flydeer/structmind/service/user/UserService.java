@@ -1,133 +1,103 @@
 package com.flydeer.structmind.service.user;
 
-import com.flydeer.structmind.common.exception.ErrorCodes;
-import com.flydeer.structmind.common.exception.business.BusinessException;
+import com.flydeer.structmind.common.constants.UserConstants;
+import com.flydeer.structmind.common.exception.business.BindPhoneExceedException;
+import com.flydeer.structmind.common.exception.business.PhoneChannelOperateException;
+import com.flydeer.structmind.common.exception.business.UserInvalidException;
+import com.flydeer.structmind.common.exception.business.UserNotFoundException;
+import com.flydeer.structmind.common.utils.TextUtils;
 import com.flydeer.structmind.contract.user.enums.LoginChannel;
-import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
-import com.flydeer.structmind.repository.mysql.mapper.UserDelegateMapper;
-import com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper;
-import com.flydeer.structmind.service.user.utils.IdGenerateUtils;
+import com.flydeer.structmind.contract.user.enums.UserStatusEnum;
+import com.flydeer.structmind.contract.user.enums.UserVerifiedStatusEnum;
+import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
+import com.flydeer.structmind.repository.mysql.option.user.UserOptions;
+import com.flydeer.structmind.repository.mysql.repository.UserDelegateRepository;
+import com.flydeer.structmind.repository.mysql.repository.UserInfoRepository;
 import com.flydeer.structmind.service.user.model.OauthUserRecord;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    private final UserInfoMapper userInfoMapper;
-    private final UserDelegateMapper userDelegateMapper;
-    private final IdGenerateUtils idGenerateUtils;
+    private final UserInfoRepository userInfoRepository;
 
-    public UserService(
-            UserInfoMapper userInfoMapper, UserDelegateMapper userDelegateMapper, IdGenerateUtils idGenerateUtils) {
-        this.userInfoMapper = userInfoMapper;
-        this.userDelegateMapper = userDelegateMapper;
-        this.idGenerateUtils = idGenerateUtils;
-    }
+    private final UserDelegateRepository userDelegateRepository;
 
-    public UserInfoEntity requireActive(Long userId) {
-        UserInfoEntity user = userInfoMapper.selectById(userId);
+    public UserInfoDTO requireActive(Long userId) throws UserNotFoundException, UserInvalidException {
+        UserInfoDTO user = userInfoRepository.queryById(userId, UserOptions.option());
         if (user == null) {
-            throw new BusinessException(ErrorCodes.UNAUTHORIZED, "user not found");
+            throw new UserNotFoundException();
         }
-        if (user.getStatus() == null || user.getStatus() != UserInfoEntity.STATUS_ACTIVE) {
-            throw new BusinessException(ErrorCodes.FORBIDDEN, "user disabled");
+        if (!UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
+            throw new UserInvalidException();
         }
         return user;
     }
 
     public List<Long> listDelegatedUserIds(Long userId) {
-        return userDelegateMapper.selectAcceptedGrantorIds(userId);
+        return userDelegateRepository.selectAcceptedGrantorIds(userId, UserOptions.option().onlyAcceptGrantedIds());
     }
 
-    @Transactional
-    public UserInfoEntity loginOrRegisterPhone(String phone) {
-        UserInfoEntity existing = userInfoMapper.selectByChannelAndUid(LoginChannel.PHONE.name(), phone);
-        if (existing != null) {
-            ensureActive(existing);
-            return existing;
+    public UserInfoDTO loginOrRegisterPhone(String phone) throws UserInvalidException {
+        UserInfoDTO exist = userInfoRepository.selectByChannelAndUid(LoginChannel.PHONE, phone);
+        if (exist != null) {
+            ensureActive(exist);
+            return exist;
         }
-        UserInfoEntity byPhone = userInfoMapper.selectByPhone(phone);
-        if (byPhone != null) {
-            ensureActive(byPhone);
-            return byPhone;
-        }
-        UserInfoEntity user = new UserInfoEntity();
-        user.setId(idGenerateUtils.nextUserId());
-        user.setChannel(LoginChannel.PHONE.name());
-        user.setChannelUid(phone);
-        user.setPhone(phone);
-        user.setVerified(1);
-        user.setNickname(maskPhone(phone));
-        user.setStatus(UserInfoEntity.STATUS_ACTIVE);
-        userInfoMapper.insert(user);
-        return user;
+        return userInfoRepository.register(LoginChannel.PHONE, phone, phone, UserOptions.option().loginUsePhone());
     }
 
-    @Transactional
-    public UserInfoEntity loginOrRegisterOauth(LoginChannel channel, OauthUserRecord info) {
-        UserInfoEntity existing =
-                userInfoMapper.selectByChannelAndUid(channel.name(), info.channelUid());
-        if (existing != null) {
-            ensureActive(existing);
-            return existing;
+    public UserInfoDTO loginOrRegisterOauth(LoginChannel channel, OauthUserRecord info) throws UserInvalidException {
+        UserInfoDTO exist = userInfoRepository.selectByChannelAndUid(channel, info.channelUid());
+        if (exist != null) {
+            ensureActive(exist);
+            return exist;
         }
-        UserInfoEntity user = new UserInfoEntity();
-        user.setId(idGenerateUtils.nextUserId());
-        user.setChannel(channel.name());
-        user.setChannelUid(info.channelUid());
-        user.setPhone(null);
-        user.setVerified(0);
-        user.setNickname(trimNickname(info.username()));
-        user.setStatus(UserInfoEntity.STATUS_ACTIVE);
-        userInfoMapper.insert(user);
-        return user;
+        return userInfoRepository.register(channel, info.channelUid(), info.username(), UserOptions.option());
     }
 
-    @Transactional
-    public UserInfoEntity updateNickname(Long userId, String nickName) {
-        UserInfoEntity user = requireActive(userId);
-        userInfoMapper.updateNickname(userId, trimNickname(nickName));
-        user.setNickname(trimNickname(nickName));
-        return user;
+    public void updateUserName(Long userId, String userName) throws UserNotFoundException, UserInvalidException {
+        requireActive(userId);
+        UserInfoDTO dto = new UserInfoDTO();
+        dto.setId(userId);
+        dto.setName(TextUtils.trimText(userName, UserConstants.MAX_USER_NAME_LENGTH));
+        userInfoRepository.update(dto, UserOptions.option());
     }
 
-    @Transactional
-    public UserInfoEntity bindPhone(Long userId, String phone) {
-        UserInfoEntity user = requireActive(userId);
-        if (user.getVerified() != null && user.getVerified() == 1 && phone.equals(user.getPhone())) {
-            return user;
+    public void bindPhone(Long userId, String phone)
+        throws UserNotFoundException, UserInvalidException, PhoneChannelOperateException, BindPhoneExceedException {
+        UserInfoDTO user = requireActive(userId);
+        ensureNotPhoneChannel(user.getChannel());
+        List<UserInfoDTO> exists = userInfoRepository.selectByPhone(phone);
+        List<UserInfoDTO> bound = exists.stream()
+            .filter(e -> user.getChannel().equals(e.getChannel()))
+            .filter(e -> !e.getId().equals(userId))
+            .toList();
+        if (!bound.isEmpty()) {
+            throw new BindPhoneExceedException();
         }
-        UserInfoEntity occupied = userInfoMapper.selectByPhone(phone);
-        if (occupied != null && !occupied.getId().equals(userId)) {
-            throw new BusinessException(ErrorCodes.CONFLICT, "phone already bound");
-        }
-        userInfoMapper.bindPhone(userId, phone);
-        user.setPhone(phone);
-        user.setVerified(1);
-        return user;
+
+        UserInfoDTO dto = new UserInfoDTO();
+        dto.setId(userId);
+        dto.setVerified(UserVerifiedStatusEnum.VERIFIED.getCode());
+        dto.setPhone(phone);
+        userInfoRepository.update(dto, UserOptions.option());
     }
 
-    private void ensureActive(UserInfoEntity user) {
-        if (user.getStatus() == null || user.getStatus() != UserInfoEntity.STATUS_ACTIVE) {
-            throw new BusinessException(ErrorCodes.FORBIDDEN, "user disabled");
+    private void ensureActive(UserInfoDTO user) throws UserInvalidException {
+        if (UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
+            throw new UserInvalidException();
         }
     }
 
-    private static String maskPhone(String phone) {
-        if (!StringUtils.hasText(phone) || phone.length() < 7) {
-            return "user";
+    public void ensureNotPhoneChannel(String channel) throws PhoneChannelOperateException {
+        if (LoginChannel.PHONE.name().equals(channel)) {
+            throw new PhoneChannelOperateException();
         }
-        return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
     }
 
-    private static String trimNickname(String nickname) {
-        if (!StringUtils.hasText(nickname)) {
-            return "user";
-        }
-        String trimmed = nickname.trim();
-        return trimmed.length() > 64 ? trimmed.substring(0, 64) : trimmed;
-    }
 }

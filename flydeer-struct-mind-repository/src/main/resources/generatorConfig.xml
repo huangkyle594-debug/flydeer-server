@@ -80,12 +80,7 @@
                domainObjectName="UserInfoEntity"
                mapperName="UserInfoMapper"
                delimitAllColumns="true"
-               delimitIdentifiers="true"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false">
+               delimitIdentifiers="true">
             <property name="useActualColumnNames" value="false"/>
             <columnOverride column="verified" javaType="java.lang.Integer"/>
             <columnOverride column="status" javaType="java.lang.Integer"/>
@@ -95,12 +90,7 @@
                domainObjectName="UserDelegateEntity"
                mapperName="UserDelegateMapper"
                delimitAllColumns="true"
-               delimitIdentifiers="true"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false">
+               delimitIdentifiers="true">
             <property name="useActualColumnNames" value="false"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>

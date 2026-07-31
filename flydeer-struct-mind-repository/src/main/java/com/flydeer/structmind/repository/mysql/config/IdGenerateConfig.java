@@ -1,4 +1,4 @@
-package com.flydeer.structmind.service.user.config;
+package com.flydeer.structmind.repository.mysql.config;
 
 import lombok.Getter;
 import lombok.Setter;

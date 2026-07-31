@@ -92,6 +92,3 @@ temp/
 
 # runtime logs/pids from bash/run.sh
 bash/.run/
-
-# MyBatis Generator local JDBC (keep *.example)
-**/generatorJdbc.properties

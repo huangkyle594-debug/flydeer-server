@@ -9,9 +9,81 @@
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
   </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
   <sql id="Base_Column_List">
     `id`, `user_id`, `granted_user_id`, `status`, `created_at`, `updated_at`
   </sql>
+  <select id="selectByExample" parameterType="com.flydeer.structmind.repository.mysql.entity.UserDelegateEntityExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from `user_delegate`
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -21,6 +93,12 @@
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from `user_delegate`
     where `id` = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.flydeer.structmind.repository.mysql.entity.UserDelegateEntityExample">
+    delete from `user_delegate`
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
   </delete>
   <insert id="insert" parameterType="com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -71,6 +149,50 @@
       </if>
     </trim>
   </insert>
+  <select id="countByExample" parameterType="com.flydeer.structmind.repository.mysql.entity.UserDelegateEntityExample" resultType="java.lang.Long">
+    select count(*) from `user_delegate`
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update `user_delegate`
+    <set>
+      <if test="row.id != null">
+        `id` = #{row.id,jdbcType=BIGINT},
+      </if>
+      <if test="row.userId != null">
+        `user_id` = #{row.userId,jdbcType=BIGINT},
+      </if>
+      <if test="row.grantedUserId != null">
+        `granted_user_id` = #{row.grantedUserId,jdbcType=BIGINT},
+      </if>
+      <if test="row.status != null">
+        `status` = #{row.status,jdbcType=VARCHAR},
+      </if>
+      <if test="row.createdAt != null">
+        `created_at` = #{row.createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.updatedAt != null">
+        `updated_at` = #{row.updatedAt,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update `user_delegate`
+    set `id` = #{row.id,jdbcType=BIGINT},
+      `user_id` = #{row.userId,jdbcType=BIGINT},
+      `granted_user_id` = #{row.grantedUserId,jdbcType=BIGINT},
+      `status` = #{row.status,jdbcType=VARCHAR},
+      `created_at` = #{row.createdAt,jdbcType=TIMESTAMP},
+      `updated_at` = #{row.updatedAt,jdbcType=TIMESTAMP}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity">
     update `user_delegate`
     <set>

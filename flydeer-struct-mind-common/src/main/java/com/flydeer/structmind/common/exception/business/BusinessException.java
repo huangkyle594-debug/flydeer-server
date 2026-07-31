@@ -3,7 +3,7 @@ package com.flydeer.structmind.common.exception.business;
 /**
  * Base domain/business exception.
  */
-public class BusinessException extends RuntimeException {
+public class BusinessException extends Exception {
 
     private final int code;
 

@@ -37,7 +37,7 @@ public class UserMangeApiImpl implements UserMangeApi {
     }
 
     public UserProfileResponse updateNickname(Long userId, String nickName) {
-        userService.updateNickname(userId, nickName);
+        userService.updateUserName(userId, nickName);
         return me(userId);
     }
 

@@ -1,10 +1,11 @@
-package com.flydeer.structmind.service.user.utils;
+package com.flydeer.structmind.repository.mysql.utils;
 
+import com.flydeer.structmind.repository.mysql.config.IdGenerateConfig;
+import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
+import com.flydeer.structmind.repository.mysql.entity.UserInfoEntityExample;
 import com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper;
-
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
-import com.flydeer.structmind.service.user.config.IdGenerateConfig;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,7 +21,10 @@ public class IdGenerateUtils {
     }
 
     public synchronized long nextUserId() {
-        Long max = userInfoMapper.selectMaxId();
+        UserInfoEntityExample example = new UserInfoEntityExample();
+        example.setOrderByClause("`id` desc");
+        List<UserInfoEntity> rows = userInfoMapper.selectByExample(example);
+        Long max = rows.isEmpty() ? null : rows.getFirst().getId();
         long start = idGenerateConfig.getStart();
         int min = idGenerateConfig.getStepMin();
         int maxStep = idGenerateConfig.getStepMax();
