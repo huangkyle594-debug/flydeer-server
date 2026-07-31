@@ -52,7 +52,18 @@ cp .env.example .env          # 修改 MYSQL_* / REDIS_* / 端口
 ./bash/run-server.sh restart
 ```
 
-## Maven 镜像
+## MyBatis Generator
+
+手写 Mapper 已废弃，表结构变更后在 repository 模块重新生成：
+
+```bash
+# 需 MySQL 已建表（doc/sql）；JDBC 见 generatorJdbc.properties
+./bash/mybatis-generate.sh
+# 仅编译 repository
+./mvnw -pl flydeer-struct-mind-repository -am compile
+```
+
+生成位置：`mysql.entity` / `mysql.mapper` / `resources/mapper`（会覆盖同名文件）。
 
 项目已通过 [`.mvn/settings.xml`](.mvn/settings.xml) + [`.mvn/maven.config`](.mvn/maven.config) 默认使用阿里云公共仓库；直接执行 `./mvnw` 即可。
 

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "https://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!--
+  MyBatis Generator（repository）
+
+  输出覆盖：
+    entity  → com.flydeer.structmind.repository.mysql.entity
+    mapper  → com.flydeer.structmind.repository.mysql.mapper
+    xml     → src/main/resources/mapper
+
+  运行：
+    ./bash/mybatis-generate.sh
+    或 ./mvnw -pl flydeer-struct-mind-repository mybatis-generator:generate
+
+  注意：overwrite=true 会覆盖同名 Java；
+  UnmergeableXmlMappersPlugin 使 XML 整文件覆盖（不合并续写）。
+  业务自定义 SQL 建议写在单独的 *Ext Mapper，避免被再次生成冲掉。
+-->
+<generatorConfiguration>
+    <properties resource="generatorJdbc.properties"/>
+
+    <context id="mysql" targetRuntime="MyBatis3">
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <plugin type="com.softwareloop.mybatis.generator.plugins.LombokPlugin">
+            <property name="data" value="true"/>
+            <property name="builder" value="false"/>
+            <property name="noArgsConstructor" value="true"/>
+            <property name="allArgsConstructor" value="false"/>
+            <property name="toString" value="false"/>
+            <property name="equalsAndHashCode" value="false"/>
+        </plugin>
+        <!-- XML 直接覆盖，禁止与旧文件合并续写 -->
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
+
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+            <property name="addRemarkComments" value="true"/>
+        </commentGenerator>
+
+        <jdbcConnection
+                driverClass="${jdbc.driverClass}"
+                connectionURL="${jdbc.url}"
+                userId="${jdbc.username}"
+                password="${jdbc.password}">
+            <property name="nullCatalogMeansCurrent" value="true"/>
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+            <property name="useJSR310Types" value="true"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator
+                targetPackage="com.flydeer.structmind.repository.mysql.entity"
+                targetProject="flydeer-struct-mind-repository/src/main/java">
+            <property name="enableSubPackages" value="false"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator
+                targetPackage="mapper"
+                targetProject="flydeer-struct-mind-repository/src/main/resources">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator
+                type="XMLMAPPER"
+                targetPackage="com.flydeer.structmind.repository.mysql.mapper"
+                targetProject="flydeer-struct-mind-repository/src/main/java">
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+
+        <table tableName="user"
+               domainObjectName="UserEntity"
+               mapperName="UserMapper"
+               delimitAllColumns="true"
+               delimitIdentifiers="true"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <property name="useActualColumnNames" value="false"/>
+            <columnOverride column="verified" javaType="java.lang.Integer"/>
+            <columnOverride column="status" javaType="java.lang.Integer"/>
+        </table>
+
+        <table tableName="user_delegate"
+               domainObjectName="UserDelegateEntity"
+               mapperName="UserDelegateMapper"
+               delimitAllColumns="true"
+               delimitIdentifiers="true"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <property name="useActualColumnNames" value="false"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+    </context>
+</generatorConfiguration>

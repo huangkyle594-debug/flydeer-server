@@ -1,28 +1,17 @@
 package com.flydeer.structmind.repository.mysql.mapper;
 
 import com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity;
-import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
-@Mapper
 public interface UserDelegateMapper {
+    int deleteByPrimaryKey(Long id);
 
-    int insert(UserDelegateEntity entity);
+    int insert(UserDelegateEntity row);
 
-    UserDelegateEntity selectActivePair(
-            @Param("grantorId") Long grantorId, @Param("granteeId") Long granteeId);
+    int insertSelective(UserDelegateEntity row);
 
-    UserDelegateEntity selectPendingBetween(
-            @Param("userId") Long userId, @Param("peerUserId") Long peerUserId);
+    UserDelegateEntity selectByPrimaryKey(Long id);
 
-    List<UserDelegateEntity> selectByUser(@Param("userId") Long userId);
+    int updateByPrimaryKeySelective(UserDelegateEntity row);
 
-    List<Long> selectAcceptedGrantorIds(@Param("granteeId") Long granteeId);
-
-    int updateStatus(
-            @Param("grantorId") Long grantorId,
-            @Param("granteeId") Long granteeId,
-            @Param("fromStatus") String fromStatus,
-            @Param("toStatus") String toStatus);
+    int updateByPrimaryKey(UserDelegateEntity row);
 }

@@ -1,23 +1,17 @@
 package com.flydeer.structmind.repository.mysql.mapper;
 
 import com.flydeer.structmind.repository.mysql.entity.UserEntity;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
-@Mapper
 public interface UserMapper {
+    int deleteByPrimaryKey(Long id);
 
-    UserEntity selectById(@Param("id") Long id);
+    int insert(UserEntity row);
 
-    UserEntity selectByChannelAndUid(@Param("channel") String channel, @Param("channelUid") String channelUid);
+    int insertSelective(UserEntity row);
 
-    UserEntity selectByPhone(@Param("phone") String phone);
+    UserEntity selectByPrimaryKey(Long id);
 
-    Long selectMaxId();
+    int updateByPrimaryKeySelective(UserEntity row);
 
-    int insert(UserEntity user);
-
-    int updateNickname(@Param("id") Long id, @Param("nickname") String nickname);
-
-    int bindPhone(@Param("id") Long id, @Param("phone") String phone);
+    int updateByPrimaryKey(UserEntity row);
 }
