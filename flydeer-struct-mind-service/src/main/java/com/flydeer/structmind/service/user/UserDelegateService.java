@@ -1,156 +1,75 @@
 package com.flydeer.structmind.service.user;
 
-import com.flydeer.structmind.common.exception.ErrorCodes;
-import com.flydeer.structmind.common.exception.business.BusinessException;
-import com.flydeer.structmind.contract.user.vo.DelegateItemResponse;
-import com.flydeer.structmind.contract.user.enums.DelegateRequestType;
-import com.flydeer.structmind.contract.user.enums.DelegateStatus;
-import com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity;
-import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
-import com.flydeer.structmind.repository.mysql.mapper.UserDelegateMapper;
-import com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper;
-import java.time.ZoneOffset;
-import java.util.List;
+import com.flydeer.structmind.common.exception.business.DelegateNotFoundException;
+import com.flydeer.structmind.common.exception.request.DelegateSelfException;
+import com.flydeer.structmind.contract.user.enums.DelegateStatusEnum;
+import com.flydeer.structmind.repository.mysql.dto.UserDelegateDTO;
+import com.flydeer.structmind.repository.mysql.option.user.UserOptions;
+import com.flydeer.structmind.repository.mysql.repository.UserDelegateRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserDelegateService {
 
-    private final UserDelegateMapper delegateMapper;
-    private final UserInfoMapper userInfoMapper;
+    private final UserDelegateRepository userDelegateRepository;
 
-    public UserDelegateService(UserDelegateMapper delegateMapper, UserInfoMapper userInfoMapper) {
-        this.delegateMapper = delegateMapper;
-        this.userInfoMapper = userInfoMapper;
-    }
-
-    @Transactional
-    public void create(Long userId, Long peerUserId, DelegateRequestType requestType) {
-        if (userId.equals(peerUserId)) {
-            throw new BusinessException(ErrorCodes.BAD_REQUEST, "cannot delegate to self");
+    public void delegate(Long userId, Long grantedUserId)
+        throws DelegateSelfException {
+        if (userId.equals(grantedUserId)) {
+            throw new DelegateSelfException();
         }
-        requireUser(peerUserId);
-        Long grantorId;
-        Long granteeId;
-        if (requestType == DelegateRequestType.GRANT) {
-            grantorId = userId;
-            granteeId = peerUserId;
-        } else {
-            grantorId = peerUserId;
-            granteeId = userId;
-        }
-        UserDelegateEntity active = delegateMapper.selectActivePair(grantorId, granteeId);
-        if (active != null) {
-            throw new BusinessException(ErrorCodes.CONFLICT, "delegate already exists");
-        }
-        UserDelegateEntity entity = new UserDelegateEntity();
-        entity.setGrantorId(grantorId);
-        entity.setGranteeId(granteeId);
-        entity.setRequestType(requestType.name());
-        entity.setStatus(DelegateStatus.PENDING.name());
-        delegateMapper.insert(entity);
-    }
 
-    @Transactional
-    public void accept(Long userId, Long peerUserId) {
-        respond(userId, peerUserId, DelegateStatus.ACCEPTED);
-    }
-
-    @Transactional
-    public void reject(Long userId, Long peerUserId) {
-        respond(userId, peerUserId, DelegateStatus.REJECTED);
-    }
-
-    @Transactional
-    public void cancel(Long userId, Long peerUserId) {
-        UserDelegateEntity pending = delegateMapper.selectPendingBetween(userId, peerUserId);
-        if (pending != null) {
-            int updated = delegateMapper.updateStatus(
-                    pending.getGrantorId(),
-                    pending.getGranteeId(),
-                    DelegateStatus.PENDING.name(),
-                    DelegateStatus.CANCELLED.name());
-            if (updated > 0) {
+        UserDelegateDTO exist = userDelegateRepository.queryDelegate(userId, grantedUserId, null);
+        if (exist != null) {
+            if (DelegateStatusEnum.PENDING.name().equals(exist.getStatus())
+                || DelegateStatusEnum.ACCEPTED.name().equals(exist.getStatus())) {
                 return;
             }
-        }
-        // cancel accepted where current user is grantor or grantee
-        UserDelegateEntity asGrantor = delegateMapper.selectActivePair(userId, peerUserId);
-        if (asGrantor != null && DelegateStatus.ACCEPTED.name().equals(asGrantor.getStatus())) {
-            delegateMapper.updateStatus(
-                    userId, peerUserId, DelegateStatus.ACCEPTED.name(), DelegateStatus.CANCELLED.name());
+            UserDelegateDTO update = new UserDelegateDTO();
+            update.setId(exist.getId());
+            update.setStatus(DelegateStatusEnum.PENDING.name());
+            userDelegateRepository.update(update, UserOptions.option());
             return;
         }
-        UserDelegateEntity asGrantee = delegateMapper.selectActivePair(peerUserId, userId);
-        if (asGrantee != null && DelegateStatus.ACCEPTED.name().equals(asGrantee.getStatus())) {
-            delegateMapper.updateStatus(
-                    peerUserId, userId, DelegateStatus.ACCEPTED.name(), DelegateStatus.CANCELLED.name());
-            return;
-        }
-        throw new BusinessException(ErrorCodes.NOT_FOUND, "delegate not found");
+
+        UserDelegateDTO insert = new UserDelegateDTO();
+        insert.setUserId(userId);
+        insert.setGrantedUserId(grantedUserId);
+        insert.setStatus(DelegateStatusEnum.PENDING.name());
+        userDelegateRepository.delegate(insert, UserOptions.option());
     }
 
-    public List<DelegateItemResponse> list(Long userId) {
-        return delegateMapper.selectByUser(userId).stream()
-                .map(entity -> toResponse(userId, entity))
-                .toList();
+    public void accept(Long userId, Long grantedUserId) throws DelegateNotFoundException {
+        UserDelegateDTO exist = userDelegateRepository.queryDelegate(userId, grantedUserId, null);
+        if (exist == null || !DelegateStatusEnum.PENDING.name().equals(exist.getStatus())) {
+            throw new DelegateNotFoundException();
+        }
+        UserDelegateDTO update = new UserDelegateDTO();
+        update.setId(exist.getId());
+        update.setStatus(DelegateStatusEnum.ACCEPTED.name());
+        userDelegateRepository.update(update, UserOptions.option());
     }
 
-    private void respond(Long userId, Long peerUserId, DelegateStatus target) {
-        UserDelegateEntity pending = delegateMapper.selectPendingBetween(userId, peerUserId);
-        if (pending == null) {
-            throw new BusinessException(ErrorCodes.NOT_FOUND, "pending delegate not found");
+    public void revoke(Long userId, Long grantedUserId) throws DelegateNotFoundException {
+        UserDelegateDTO exist = userDelegateRepository.queryDelegate(userId, grantedUserId, null);
+        if (exist == null || DelegateStatusEnum.REVOKE.name().equals(exist.getStatus())) {
+            throw new DelegateNotFoundException();
         }
-        // Only the counterparty who would be affected should accept/reject:
-        // GRANT: grantor=requester, grantee=peer → peer accepts
-        // RECEIVE: grantor=peer, grantee=requester → peer (grantor) accepts
-        boolean canRespond = pending.getGrantorId().equals(userId) || pending.getGranteeId().equals(userId);
-        if (!canRespond || userId.equals(resolveRequester(pending))) {
-            // Allow either party that is not solely the initiator? Spec: accept authorization request.
-            // The peer (non-initiator relative to request) should respond.
-            Long initiator = resolveRequester(pending);
-            if (userId.equals(initiator)) {
-                throw new BusinessException(ErrorCodes.FORBIDDEN, "initiator cannot accept/reject");
-            }
-        }
-        int updated = delegateMapper.updateStatus(
-                pending.getGrantorId(),
-                pending.getGranteeId(),
-                DelegateStatus.PENDING.name(),
-                target.name());
-        if (updated == 0) {
-            throw new BusinessException(ErrorCodes.CONFLICT, "delegate status changed");
-        }
+        UserDelegateDTO update = new UserDelegateDTO();
+        update.setId(exist.getId());
+        update.setStatus(DelegateStatusEnum.REVOKE.name());
+        userDelegateRepository.update(update, UserOptions.option());
     }
 
-    private Long resolveRequester(UserDelegateEntity pending) {
-        if (DelegateRequestType.GRANT.name().equals(pending.getRequestType())) {
-            return pending.getGrantorId();
-        }
-        return pending.getGranteeId();
+    public List<UserDelegateDTO> queryGrantedIds(Long userId) {
+        return userDelegateRepository.queryGrantorIds(userId, UserOptions.option());
     }
 
-    private DelegateItemResponse toResponse(Long userId, UserDelegateEntity entity) {
-        Long peer = entity.getGrantorId().equals(userId) ? entity.getGranteeId() : entity.getGrantorId();
-        return new DelegateItemResponse(
-                entity.getGrantorId(),
-                entity.getGranteeId(),
-                peer,
-                DelegateRequestType.valueOf(entity.getRequestType()),
-                DelegateStatus.valueOf(entity.getStatus()),
-                entity.getCreatedAt() == null
-                        ? null
-                        : entity.getCreatedAt().toInstant(ZoneOffset.UTC),
-                entity.getRespondedAt() == null
-                        ? null
-                        : entity.getRespondedAt().toInstant(ZoneOffset.UTC));
-    }
-
-    private void requireUser(Long userId) {
-        UserInfoEntity user = userInfoMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException(ErrorCodes.NOT_FOUND, "peer user not found");
-        }
+    public List<UserDelegateDTO> queryDelegateIds(Long userId) {
+        return userDelegateRepository.queryGrantorIds(userId, UserOptions.option().grantedUser());
     }
 }

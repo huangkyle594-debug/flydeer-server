@@ -9,6 +9,7 @@ import com.flydeer.structmind.common.utils.TextUtils;
 import com.flydeer.structmind.contract.user.enums.LoginChannel;
 import com.flydeer.structmind.contract.user.enums.UserStatusEnum;
 import com.flydeer.structmind.contract.user.enums.UserVerifiedStatusEnum;
+import com.flydeer.structmind.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
 import com.flydeer.structmind.repository.mysql.option.user.UserOptions;
 import com.flydeer.structmind.repository.mysql.repository.UserDelegateRepository;
@@ -39,7 +40,8 @@ public class UserService {
     }
 
     public List<Long> listDelegatedUserIds(Long userId) {
-        return userDelegateRepository.selectAcceptedGrantorIds(userId, UserOptions.option().onlyAcceptGrantedIds());
+        return userDelegateRepository.queryGrantorIds(userId, UserOptions.option().onlyAcceptGrantedIds())
+            .stream().map(UserDelegateDTO::getId).toList();
     }
 
     public UserInfoDTO loginOrRegisterPhone(String phone) throws UserInvalidException {
@@ -87,6 +89,9 @@ public class UserService {
         dto.setPhone(phone);
         userInfoRepository.update(dto, UserOptions.option());
     }
+
+    // todo
+    //  封禁账号，同时revoke所有授权关系
 
     private void ensureActive(UserInfoDTO user) throws UserInvalidException {
         if (UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {

@@ -77,7 +77,7 @@ public class SmsVerifyService {
         }
 
         @Override
-        public void sendVerifyCode(String phone) {
+        public void sendVerifyCode(String phone) throws SmsSendException {
             try (AsyncClient client = buildClient()) {
                 SendSmsVerifyCodeRequest request = SendSmsVerifyCodeRequest.builder()
                     .phoneNumber(phone)
@@ -99,7 +99,7 @@ public class SmsVerifyService {
         }
 
         @Override
-        public void checkVerifyCode(String phone, String code) {
+        public void checkVerifyCode(String phone, String code) throws SmsVerifyException {
             try (AsyncClient client = buildClient()) {
                 CheckSmsVerifyCodeRequest request = CheckSmsVerifyCodeRequest.builder()
                     .phoneNumber(phone)
@@ -110,9 +110,9 @@ public class SmsVerifyService {
                 Assert.isTrue(Boolean.TRUE.equals(response.getBody().getSuccess()), "invalid verify sms code");
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
-                throw new SmsSendException();
+                throw new SmsVerifyException();
             } catch (Exception e) {
-                throw new SmsSendException();
+                throw new SmsVerifyException();
             }
         }
 

@@ -6,4 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDelegateDTO {
+
+    private Long id;
+
+    private Long userId;
+
+    private Long grantedUserId;
+
+    private String status;
 }

@@ -3,7 +3,7 @@ package com.flydeer.structmind.repository.mysql.repository;
 import com.flydeer.structmind.common.constants.UserConstants;
 import com.flydeer.structmind.common.utils.PhoneNumberUtils;
 import com.flydeer.structmind.common.utils.TextUtils;
-import com.flydeer.structmind.contract.user.enums.DelegateStatus;
+import com.flydeer.structmind.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.structmind.contract.user.enums.LoginChannel;
 import com.flydeer.structmind.contract.user.enums.UserStatusEnum;
 import com.flydeer.structmind.contract.user.enums.UserVerifiedStatusEnum;
@@ -50,7 +50,7 @@ public class UserInfoRepository {
         UserDelegateEntityExample delegateExample = new UserDelegateEntityExample();
         delegateExample.createCriteria()
             .andGrantedUserIdEqualTo(userId)
-            .andStatusEqualTo(DelegateStatus.ACCEPTED.name());
+            .andStatusEqualTo(DelegateStatusEnum.ACCEPTED.name());
         List<UserDelegateEntity> delegates = userDelegateMapper.selectByExample(delegateExample);
         return delegates.stream().map(UserDelegateEntity::getUserId).toList();
     }

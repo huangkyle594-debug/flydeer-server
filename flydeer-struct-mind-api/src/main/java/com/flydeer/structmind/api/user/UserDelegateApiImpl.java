@@ -17,7 +17,7 @@ public class UserDelegateApiImpl implements UserDelegateApi {
     }
 
     public void create(Long userId, Long peerUserId, DelegateRequestType requestType) {
-        userDelegateService.create(userId, peerUserId, requestType);
+        userDelegateService.delegate(userId, peerUserId, requestType);
     }
 
     public void accept(Long userId, Long peerUserId) {
@@ -25,7 +25,7 @@ public class UserDelegateApiImpl implements UserDelegateApi {
     }
 
     public void reject(Long userId, Long peerUserId) {
-        userDelegateService.reject(userId, peerUserId);
+        userDelegateService.revoke(userId, peerUserId);
     }
 
     public void cancel(Long userId, Long peerUserId) {

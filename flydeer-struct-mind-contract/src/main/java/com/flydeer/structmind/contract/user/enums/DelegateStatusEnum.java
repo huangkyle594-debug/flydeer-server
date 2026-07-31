@@ -1,8 +1,7 @@
 package com.flydeer.structmind.contract.user.enums;
 
-public enum DelegateStatus {
+public enum DelegateStatusEnum {
     PENDING,
     ACCEPTED,
-    REJECTED,
-    CANCELLED
+    REVOKE
 }
