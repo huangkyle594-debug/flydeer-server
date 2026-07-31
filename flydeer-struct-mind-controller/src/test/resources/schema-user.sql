@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `user_info` (
     `id`           BIGINT       NOT NULL,
     `channel`      VARCHAR(16)  NOT NULL,
     `channel_uid`  VARCHAR(128) NOT NULL,

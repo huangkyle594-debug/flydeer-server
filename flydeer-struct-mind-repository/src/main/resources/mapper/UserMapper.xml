@@ -19,15 +19,15 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from `user`
+    from `user_info`
     where `id` = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from `user`
+    delete from `user_info`
     where `id` = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
-    insert into `user` (`id`, `channel`, `channel_uid`, 
+    insert into `user_info` (`id`, `channel`, `channel_uid`, 
       `phone`, `verified`, `nickname`, 
       `status`, `created_at`, `updated_at`
       )
@@ -37,7 +37,7 @@
       )
   </insert>
   <insert id="insertSelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
-    insert into `user`
+    insert into `user_info`
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         `id`,
@@ -98,7 +98,7 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
-    update `user`
+    update `user_info`
     <set>
       <if test="channel != null">
         `channel` = #{channel,jdbcType=VARCHAR},
@@ -128,7 +128,7 @@
     where `id` = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.flydeer.structmind.repository.mysql.entity.UserEntity">
-    update `user`
+    update `user_info`
     set `channel` = #{channel,jdbcType=VARCHAR},
       `channel_uid` = #{channelUid,jdbcType=VARCHAR},
       `phone` = #{phone,jdbcType=VARCHAR},
