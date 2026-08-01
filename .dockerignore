@@ -1,0 +1,12 @@
+.git
+.idea
+.claude
+.cursor
+bash/.run
+doc/input
+doc/generate
+**/target
+**/.DS_Store
+*.iml
+.env
+agent-transcripts

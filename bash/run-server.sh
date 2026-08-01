@@ -43,9 +43,9 @@ load_env() {
   fi
   export MYSQL_HOST="${MYSQL_HOST:-localhost}"
   export MYSQL_PORT="${MYSQL_PORT:-3306}"
-  export MYSQL_DATABASE="${MYSQL_DATABASE:-struct_mind}"
-  export MYSQL_USER="${MYSQL_USER:-struct_mind}"
-  export MYSQL_PASSWORD="${MYSQL_PASSWORD:-struct_mind}"
+  export MYSQL_DATABASE="${MYSQL_DATABASE:-flydeer}"
+  export MYSQL_USER="${MYSQL_USER:-flydeer}"
+  export MYSQL_PASSWORD="${MYSQL_PASSWORD:-flydeer}"
   export REDIS_HOST="${REDIS_HOST:-localhost}"
   export REDIS_PORT="${REDIS_PORT:-6379}"
   export SERVER_PORT="${SERVER_PORT:-8080}"
@@ -53,20 +53,25 @@ load_env() {
 }
 
 setup_java() {
-  if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
-    :
+  local candidate=""
+  if [[ -x /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/bin/java ]]; then
+    candidate="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
   elif [[ -x /usr/lib/jvm/java-21-openjdk/bin/java ]]; then
-    export JAVA_HOME="/usr/lib/jvm/java-21-openjdk"
+    candidate="/usr/lib/jvm/java-21-openjdk"
   elif [[ -x /usr/lib/jvm/java-21-openjdk-amd64/bin/java ]]; then
-    export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
-  elif [[ -x /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/bin/java ]]; then
-    export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+    candidate="/usr/lib/jvm/java-21-openjdk-amd64"
   elif command -v /usr/libexec/java_home >/dev/null 2>&1; then
-    export JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || true)"
+    candidate="$(/usr/libexec/java_home -v 21 2>/dev/null || true)"
+  elif [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
+    candidate="${JAVA_HOME}"
   fi
-  [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]] || die "未找到 JDK 21，请安装并设置 JAVA_HOME"
+  [[ -n "${candidate}" && -x "${candidate}/bin/java" ]] || die "未找到 JDK 21，请安装并设置 JAVA_HOME"
+  export JAVA_HOME="${candidate}"
   export PATH="${JAVA_HOME}/bin:${PATH}"
-  log "Java: $(java -version 2>&1 | head -n1)"
+  local ver
+  ver="$(java -version 2>&1 | head -n1)"
+  log "Java: ${ver}"
+  java -version 2>&1 | grep -q 'version "21' || die "需要 JDK 21，当前: ${ver}"
 }
 
 check_port() {
@@ -169,19 +174,18 @@ start_apps() {
 
   local i
   for i in $(seq 1 90); do
-    if curl -sf "http://127.0.0.1:${SERVER_PORT}/api/v1/ping" >/dev/null 2>&1; then
+    if curl -sf "http://127.0.0.1:${SERVER_PORT}/actuator/health" >/dev/null 2>&1; then
       break
     fi
     sleep 1
   done
 
-  if ! curl -sf "http://127.0.0.1:${SERVER_PORT}/api/v1/ping" >/dev/null 2>&1; then
+  if ! curl -sf "http://127.0.0.1:${SERVER_PORT}/actuator/health" >/dev/null 2>&1; then
     log "controller 启动失败，最近日志："
     tail -n 50 "${LOG_DIR}/controller.log" || true
     die "见 ${LOG_DIR}/controller.log"
   fi
 
-  log "ping:  $(curl -sS "http://127.0.0.1:${SERVER_PORT}/api/v1/ping")"
   log "health: $(curl -sS "http://127.0.0.1:${SERVER_PORT}/actuator/health")"
   if [[ "$WITH_TASK" -eq 1 ]]; then
     log "task health: $(curl -sS "http://127.0.0.1:${TASK_SERVER_PORT}/actuator/health" || echo '未就绪，见 bash/.run/task.log')"

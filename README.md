@@ -37,24 +37,25 @@ common  ←  contract  ←  repository  ←  service  ←  api  ←  controller 
 
 规则：上层依赖下层；禁止反向依赖（如 repository 不得依赖 service）。controller 依赖 api；task 只依赖 service。
 
-## 快速开始
+## 快速开始（Docker）
 
 ```bash
-# 1. 启动依赖并准备库表（Compose 当前提供 MySQL；Redis 需本机或自行拉起）
-./bash/run.sh                 # 一键：Compose + controller (8080)
-./bash/run.sh --with-task     # 同时启动 task (8081)
-./bash/run.sh stop            # 停止应用
-./bash/run.sh down            # 停止应用并关闭 Compose
+./bash/run.sh                 # 构建并启动 MySQL + Redis + controller
+./bash/run.sh stop            # 仅停 app
+./bash/run.sh down            # 停全部容器（保留数据卷）
+./bash/run.sh down -v         # 停全部并清空数据卷
 
-# 2. 健康检查
 curl http://localhost:8080/actuator/health
 ```
 
-首次使用请在 MySQL 中执行 [`doc/sql/02-user-service.sql`](doc/sql/02-user-service.sql)。
+| 服务 | 地址 | 说明 |
+|---|---|---|
+| App | `http://localhost:8080` | controller 容器 |
+| MySQL | `localhost:3306` | 库名 / 用户 / 密码均为 `flydeer` |
+| Redis | `localhost:6379` | AOF 持久化 |
 
-> MySQL/Redis 连通性测试：`InfrastructureConnectivityTests`（需本机 `3306` / `6379` 可用）。  
-> 运行日志：`bash/.run/`。  
-> 本地默认 `SMS_MOCK_ENABLED=true`，短信登录可在无阿里云配置下联调。
+建表 SQL 在首次初始化时自动执行（`doc/sql` → MySQL `docker-entrypoint-initdb.d`）。  
+镜像默认走 DaoCloud 代理；短信默认 `SMS_MOCK_ENABLED=true`。
 
 ## 云服务器（无 Docker）
 

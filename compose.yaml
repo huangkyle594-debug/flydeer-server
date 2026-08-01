@@ -1,16 +1,17 @@
 services:
   mysql:
-    image: mysql:8.4
+    image: docker.m.daocloud.io/library/mysql:8.4
     container_name: flydeer-struct-mind-mysql
     environment:
-      MYSQL_DATABASE: struct_mind
-      MYSQL_USER: struct_mind
-      MYSQL_PASSWORD: struct_mind
+      MYSQL_DATABASE: flydeer
+      MYSQL_USER: flydeer
+      MYSQL_PASSWORD: flydeer
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./doc/sql:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
       interval: 10s
@@ -18,5 +19,52 @@ services:
       retries: 10
       start_period: 30s
 
+  redis:
+    image: docker.m.daocloud.io/library/redis:7
+    container_name: flydeer-struct-mind-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flydeer-struct-mind-controller:local
+    container_name: flydeer-struct-mind-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: flydeer
+      MYSQL_USER: flydeer
+      MYSQL_PASSWORD: flydeer
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SERVER_PORT: 8080
+      SMS_MOCK_ENABLED: "true"
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
 volumes:
   mysql_data:
+  redis_data:

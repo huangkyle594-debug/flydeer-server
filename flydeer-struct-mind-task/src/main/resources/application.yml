@@ -2,9 +2,9 @@ spring:
   application:
     name: flydeer-struct-mind-task
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:struct_mind}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
-    username: ${MYSQL_USER:struct_mind}
-    password: ${MYSQL_PASSWORD:struct_mind}
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:flydeer}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${MYSQL_USER:flydeer}
+    password: ${MYSQL_PASSWORD:flydeer}
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
