@@ -1,4 +1,4 @@
-package com.flydeer.structmind.controller.support;
+package com.flydeer.structmind.controller.utils;
 
 import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.service.user.config.JwtTokenConfig;
@@ -58,5 +58,9 @@ public class AuthCookieUtils {
             return null;
         }
         return header.substring("Bearer ".length()).trim();
+    }
+
+    public String getRedirectUrl() {
+        return jwtTokenConfig.getRedirectUrl();
     }
 }

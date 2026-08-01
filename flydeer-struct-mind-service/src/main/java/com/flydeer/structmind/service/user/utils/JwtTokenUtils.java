@@ -3,6 +3,7 @@ package com.flydeer.structmind.service.user.utils;
 import com.flydeer.structmind.common.exception.auth.AccessTokenParseException;
 import com.flydeer.structmind.common.exception.auth.RefreshTokenParseException;
 import com.flydeer.structmind.service.user.config.JwtTokenConfig;
+import com.flydeer.structmind.service.user.model.AccessTokenClaims;
 import com.flydeer.structmind.service.user.model.IssuedTokensRecord;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,6 +21,7 @@ public class JwtTokenUtils {
 
     public static final String TYP_ACCESS = "access";
     public static final String TYP_REFRESH = "refresh";
+    public static final String CLAIM_VERIFIED = "verified";
 
     private final JwtTokenConfig jwtTokenConfig;
 
@@ -27,28 +29,42 @@ public class JwtTokenUtils {
         this.jwtTokenConfig = jwtTokenConfig;
     }
 
-    public IssuedTokensRecord issue(long userId) {
+    public IssuedTokensRecord issue(long userId, boolean verified) {
         Instant now = Instant.now();
         Instant accessExp = now.plus(jwtTokenConfig.getAccessTokenTtl());
         Instant refreshExp = now.plus(jwtTokenConfig.getRefreshTokenTtl());
-        String access = buildToken(userId, TYP_ACCESS, now, accessExp);
-        String refresh = buildToken(userId, TYP_REFRESH, now, refreshExp);
+        String access = buildAccessToken(userId, verified, now, accessExp);
+        String refresh = buildRefreshToken(userId, now, refreshExp);
         return new IssuedTokensRecord(access, refresh, jwtTokenConfig.getAccessTokenTtl().toSeconds());
     }
 
-    private String buildToken(long userId, String typ, Instant iat, Instant exp) {
+    private String buildAccessToken(long userId, boolean verified, Instant iat, Instant exp) {
         return Jwts.builder()
             .subject(String.valueOf(userId))
-            .claim("typ", typ)
+            .claim("typ", TYP_ACCESS)
+            .claim(CLAIM_VERIFIED, verified)
             .issuedAt(Date.from(iat))
             .expiration(Date.from(exp))
             .signWith(secretKey())
             .compact();
     }
 
-    public Long parseAccessToken(String token) throws AccessTokenParseException {
+    private String buildRefreshToken(long userId, Instant iat, Instant exp) {
+        return Jwts.builder()
+            .subject(String.valueOf(userId))
+            .claim("typ", TYP_REFRESH)
+            .issuedAt(Date.from(iat))
+            .expiration(Date.from(exp))
+            .signWith(secretKey())
+            .compact();
+    }
+
+    public AccessTokenClaims parseAccessToken(String token) throws AccessTokenParseException {
         try {
-            return parseUserId(token, TYP_ACCESS);
+            Claims claims = parseClaims(token, TYP_ACCESS);
+            long userId = Long.parseLong(claims.getSubject());
+            Boolean verified = claims.get(CLAIM_VERIFIED, Boolean.class);
+            return new AccessTokenClaims(userId, Boolean.TRUE.equals(verified));
         } catch (Exception e) {
             throw new AccessTokenParseException();
         }
@@ -56,13 +72,14 @@ public class JwtTokenUtils {
 
     public Long parseRefreshToken(String token) throws RefreshTokenParseException {
         try {
-            return parseUserId(token, TYP_REFRESH);
+            Claims claims = parseClaims(token, TYP_REFRESH);
+            return Long.parseLong(claims.getSubject());
         } catch (Exception e) {
             throw new RefreshTokenParseException();
         }
     }
 
-    private long parseUserId(String token, String expectedType) {
+    private Claims parseClaims(String token, String expectedType) {
         Claims claims = Jwts.parser()
             .verifyWith(secretKey())
             .build()
@@ -70,7 +87,7 @@ public class JwtTokenUtils {
             .getPayload();
         String typ = claims.get("typ", String.class);
         Assert.isTrue(expectedType.equals(typ), "token type error");
-        return Long.parseLong(claims.getSubject());
+        return claims;
     }
 
     private SecretKey secretKey() {

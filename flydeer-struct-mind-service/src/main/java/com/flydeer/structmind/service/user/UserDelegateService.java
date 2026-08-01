@@ -74,4 +74,17 @@ public class UserDelegateService {
         }
         return userDelegateRepository.queryGrantorIds(userId, status, options);
     }
+
+    /**
+     * Grantor userIds who have ACCEPTED delegating to {@code userId}.
+     */
+    public List<Long> listAcceptedGrantorIds(Long userId) {
+        return queryDelegations(
+            userId,
+            List.of(DelegateStatusEnum.ACCEPTED.name()),
+            DelegateRelationEnum.MANAGED)
+            .stream()
+            .map(UserDelegateDTO::getUserId)
+            .toList();
+    }
 }

@@ -16,6 +16,9 @@ public final class ErrorCodes {
     public static final int SMS_SEND = 30060;
     public static final int SMS_VERIFY = 30070;
 
+    public static final int NEED_LOGIN = 31010;
+    public static final int NEED_VERIFY = 31020;
+
     public static final int BAD_REQUEST = 40000;
     public static final int DELEGATE_SELF = 41010;
 

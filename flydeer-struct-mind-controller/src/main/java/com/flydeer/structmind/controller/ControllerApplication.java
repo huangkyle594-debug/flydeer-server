@@ -3,6 +3,7 @@ package com.flydeer.structmind.controller;
 import com.flydeer.structmind.api.ApiApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication
 @Import(ApiApplication.class)
+@EnableConfigurationProperties(AuthProperties.class)
 public class ControllerApplication {
 
     public static void main(String[] args) {

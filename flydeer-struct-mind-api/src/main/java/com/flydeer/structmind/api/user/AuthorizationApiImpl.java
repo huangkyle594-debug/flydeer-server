@@ -7,6 +7,7 @@ import com.flydeer.structmind.common.exception.business.UserNotFoundException;
 import com.flydeer.structmind.common.exception.frequency.LoginFrequencyException;
 import com.flydeer.structmind.common.exception.frequency.SmsFrequencyException;
 import com.flydeer.structmind.contract.user.AuthorizationApi;
+import com.flydeer.structmind.contract.user.enums.UserVerifiedStatusEnum;
 import com.flydeer.structmind.contract.user.request.*;
 import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.contract.user.vo.OauthUrlVO;
@@ -43,7 +44,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         rateLimiter.checkLogin("sms:" + request.getPhone() + ":" + request.getIp());
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterPhone(request.getPhone());
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId()));
+        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
     }
 
     @Override
@@ -57,14 +58,19 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         oauthService.validateState(request.getState());
         OauthUserRecord info = oauthService.exchange(request.getChannel(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterOauth(request.getChannel(), info);
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId()));
+        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
     }
 
     @Override
     public JwtTokenVO refresh(@Valid RefreshTokenRequest request)
         throws RefreshTokenParseException, UserNotFoundException, UserInvalidException {
         long userId = jwtTokenUtils.parseRefreshToken(request.getRefreshToken());
-        userService.requireActive(userId);
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(userId));
+        UserInfoDTO user = userService.requireActive(userId);
+        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+    }
+
+    private static boolean isVerified(UserInfoDTO user) {
+        return user.getVerified() != null
+            && user.getVerified() == UserVerifiedStatusEnum.VERIFIED.getCode();
     }
 }

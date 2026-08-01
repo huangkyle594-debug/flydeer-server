@@ -4,14 +4,20 @@ import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.enums.DelegateRelationEnum;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class DelegateOperateRequest extends ApiRequest {
 
     @NotNull(message = "ID不能为空")
     private Long operateId;
 
     private DelegateRelationEnum relation;
+
+    public DelegateOperateRequest(ApiRequest auth) {
+        super(auth);
+    }
 }

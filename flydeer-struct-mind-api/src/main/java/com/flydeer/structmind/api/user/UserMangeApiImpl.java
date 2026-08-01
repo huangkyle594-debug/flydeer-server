@@ -1,5 +1,6 @@
 package com.flydeer.structmind.api.user;
 
+import com.flydeer.structmind.api.user.mapper.AuthorizationMapper;
 import com.flydeer.structmind.common.exception.auth.SmsVerifyException;
 import com.flydeer.structmind.common.exception.business.BindPhoneExceedException;
 import com.flydeer.structmind.common.exception.business.PhoneChannelOperateException;
@@ -10,10 +11,12 @@ import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.UserMangeApi;
 import com.flydeer.structmind.contract.user.request.BindPhoneRequest;
 import com.flydeer.structmind.contract.user.request.UpdateUserRequest;
+import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.contract.user.vo.UserProfileVO;
 import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
 import com.flydeer.structmind.service.user.SmsVerifyService;
 import com.flydeer.structmind.service.user.UserService;
+import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class UserMangeApiImpl implements UserMangeApi {
 
     private final UserService userService;
     private final SmsVerifyService smsVerifyService;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @Override
     public UserProfileVO me(@Valid ApiRequest request)
@@ -45,10 +49,11 @@ public class UserMangeApiImpl implements UserMangeApi {
     }
 
     @Override
-    public void bindPhone(@Valid BindPhoneRequest request)
+    public JwtTokenVO bindPhone(@Valid BindPhoneRequest request)
         throws UserNotFoundException, SmsVerifyException, UserInvalidException,
         BindPhoneExceedException, PhoneChannelOperateException {
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         userService.bindPhone(request.getUserId(), request.getPhone());
+        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(request.getUserId(), true));
     }
 }

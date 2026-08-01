@@ -4,10 +4,12 @@ import com.flydeer.structmind.contract.base.request.ApiRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class SendSmsCodeRequest extends ApiRequest {
 
     @NotBlank(message = "手机号不能为空")
@@ -16,4 +18,8 @@ public class SendSmsCodeRequest extends ApiRequest {
 
     @NotBlank(message = "ip解析失败")
     private String ip;
+
+    public SendSmsCodeRequest(ApiRequest auth) {
+        super(auth);
+    }
 }

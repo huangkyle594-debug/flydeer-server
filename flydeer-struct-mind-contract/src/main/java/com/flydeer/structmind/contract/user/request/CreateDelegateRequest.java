@@ -3,7 +3,9 @@ package com.flydeer.structmind.contract.user.request;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.enums.DelegateRequestType;
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class CreateDelegateRequest extends ApiRequest {
 
     @NotNull
@@ -11,6 +13,10 @@ public class CreateDelegateRequest extends ApiRequest {
 
     @NotNull
     private DelegateRequestType requestType;
+
+    public CreateDelegateRequest(ApiRequest auth) {
+        super(auth);
+    }
 
     public Long getPeerUserId() {
         return peerUserId;

@@ -8,6 +8,7 @@ import com.flydeer.structmind.common.exception.business.UserNotFoundException;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.request.BindPhoneRequest;
 import com.flydeer.structmind.contract.user.request.UpdateUserRequest;
+import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.contract.user.vo.UserProfileVO;
 
 public interface UserMangeApi {
@@ -16,6 +17,6 @@ public interface UserMangeApi {
 
     UserProfileVO update(UpdateUserRequest request) throws UserNotFoundException, UserInvalidException;
 
-    void bindPhone(BindPhoneRequest request) throws UserNotFoundException, SmsVerifyException,
+    JwtTokenVO bindPhone(BindPhoneRequest request) throws UserNotFoundException, SmsVerifyException,
         UserInvalidException, BindPhoneExceedException, PhoneChannelOperateException;
 }

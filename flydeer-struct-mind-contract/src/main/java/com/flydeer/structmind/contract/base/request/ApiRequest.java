@@ -1,6 +1,7 @@
 package com.flydeer.structmind.contract.base.request;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class ApiRequest {
 
     private Long userId;
@@ -17,4 +19,13 @@ public class ApiRequest {
     private boolean verified;
 
     private List<Long> allUserIds;
+
+    public ApiRequest(ApiRequest auth) {
+        if (auth == null) {
+            return;
+        }
+        this.userId = auth.userId;
+        this.verified = auth.verified;
+        this.allUserIds = auth.allUserIds;
+    }
 }

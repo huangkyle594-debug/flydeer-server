@@ -44,8 +44,8 @@ public class UserDelegateApiImpl implements UserDelegateApi {
     @Override
     public void accept(@Valid DelegateOperateRequest request)
         throws UserNotFoundException, UserInvalidException, DelegateNotFoundException {
-        userService.requireActive(request.getUserId());
-        userDelegateService.accept(request.getUserId(), request.getOperateId());
+        userService.requireActive(request.getOperateId());
+        userDelegateService.accept(request.getOperateId(), request.getUserId());
     }
 
     @Override

@@ -1,7 +1,11 @@
 package com.flydeer.structmind.controller.advice;
 
 import com.flydeer.structmind.common.exception.ErrorCodes;
+import com.flydeer.structmind.common.exception.auth.AuthorizedException;
+import com.flydeer.structmind.common.exception.auth.NeedLoginException;
+import com.flydeer.structmind.common.exception.auth.NeedVerifyException;
 import com.flydeer.structmind.common.exception.business.BusinessException;
+import com.flydeer.structmind.common.exception.frequency.RateLimitException;
 import com.flydeer.structmind.common.exception.request.BadRequestException;
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import org.slf4j.Logger;
@@ -18,12 +22,25 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler({NeedLoginException.class, NeedVerifyException.class})
+    public ResponseEntity<ApiResult<Void>> handleAuthRequirement(AuthorizedException ex) {
+        HttpStatus status = ex instanceof NeedVerifyException ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
+        return ResponseEntity.status(status).body(ApiResult.fail(ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(AuthorizedException.class)
+    public ResponseEntity<ApiResult<Void>> handleAuthorized(AuthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResult.fail(ex.getCode(), ex.getMessage()));
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResult<Void>> handleBusiness(BusinessException ex) {
         HttpStatus status = switch (ex.getCode()) {
-            case ErrorCodes.UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
-            case ErrorCodes.FORBIDDEN -> HttpStatus.FORBIDDEN;
-            case ErrorCodes.NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case ErrorCodes.UNAUTHORIZED, ErrorCodes.NEED_LOGIN -> HttpStatus.UNAUTHORIZED;
+            case ErrorCodes.FORBIDDEN, ErrorCodes.NEED_VERIFY -> HttpStatus.FORBIDDEN;
+            case ErrorCodes.NOT_FOUND, ErrorCodes.ENTITY_NOT_FOUND, ErrorCodes.USER_NOT_FOUND,
+                 ErrorCodes.DELEGATE_NOT_FOUND -> HttpStatus.NOT_FOUND;
             case ErrorCodes.CONFLICT -> HttpStatus.CONFLICT;
             case ErrorCodes.TOO_MANY_REQUESTS -> HttpStatus.TOO_MANY_REQUESTS;
             default -> HttpStatus.BAD_REQUEST;
@@ -31,9 +48,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(ApiResult.fail(ex.getCode(), ex.getMessage()));
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class, BadRequestException.class})
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ApiResult<Void>> handleRateLimit(RateLimitException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(ApiResult.fail(ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiResult<Void>> handleBadRequest(BadRequestException ex) {
+        return ResponseEntity.badRequest().body(ApiResult.fail(ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     public ResponseEntity<ApiResult<Void>> handleValidation(Exception ex) {
-        return ResponseEntity.badRequest().body(ApiResult.fail(400, "validation failed"));
+        return ResponseEntity.badRequest().body(ApiResult.fail(ErrorCodes.BAD_REQUEST, "validation failed"));
     }
 
     @ExceptionHandler(Exception.class)
