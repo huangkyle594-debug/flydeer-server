@@ -19,7 +19,7 @@ spring:
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
-  type-aliases-package: com.flydeer.structmind.repository.mysql.entity
+  type-aliases-package: com.flydeer.repository.mysql.entity
   configuration:
     map-underscore-to-camel-case: true
     default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
@@ -44,7 +44,7 @@ management:
 logging:
   level:
     root: INFO
-    com.flydeer.structmind: DEBUG
+    com.flydeer: DEBUG
 
 app:
   jwt:

@@ -6,8 +6,8 @@
   MyBatis Generator（repository）
 
   输出覆盖：
-    entity  → com.flydeer.structmind.repository.mysql.entity
-    mapper  → com.flydeer.structmind.repository.mysql.mapper
+    entity  → com.flydeer.repository.mysql.entity
+    mapper  → com.flydeer.repository.mysql.mapper
     xml     → src/main/resources/mapper
 
   运行：
@@ -57,7 +57,7 @@
         </javaTypeResolver>
 
         <javaModelGenerator
-                targetPackage="com.flydeer.structmind.repository.mysql.entity"
+                targetPackage="com.flydeer.repository.mysql.entity"
                 targetProject="flydeer-repository/src/main/java">
             <property name="enableSubPackages" value="false"/>
             <property name="trimStrings" value="true"/>
@@ -71,7 +71,7 @@
 
         <javaClientGenerator
                 type="XMLMAPPER"
-                targetPackage="com.flydeer.structmind.repository.mysql.mapper"
+                targetPackage="com.flydeer.repository.mysql.mapper"
                 targetProject="flydeer-repository/src/main/java">
             <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>

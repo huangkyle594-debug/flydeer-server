@@ -30,4 +30,4 @@ app:
 logging:
   level:
     root: WARN
-    com.flydeer.structmind: INFO
+    com.flydeer: INFO

@@ -1,0 +1,22 @@
+package com.flydeer.contract.user;
+
+import com.flydeer.common.exception.auth.SmsVerifyException;
+import com.flydeer.common.exception.business.BindPhoneExceedException;
+import com.flydeer.common.exception.business.PhoneChannelOperateException;
+import com.flydeer.common.exception.business.UserInvalidException;
+import com.flydeer.common.exception.business.UserNotFoundException;
+import com.flydeer.contract.base.request.ApiRequest;
+import com.flydeer.contract.user.request.BindPhoneRequest;
+import com.flydeer.contract.user.request.UpdateUserRequest;
+import com.flydeer.contract.user.vo.JwtTokenVO;
+import com.flydeer.contract.user.vo.UserProfileVO;
+
+public interface UserMangeApi {
+
+    UserProfileVO me(ApiRequest request) throws UserNotFoundException, UserInvalidException;
+
+    UserProfileVO update(UpdateUserRequest request) throws UserNotFoundException, UserInvalidException;
+
+    JwtTokenVO bindPhone(BindPhoneRequest request) throws UserNotFoundException, SmsVerifyException,
+        UserInvalidException, BindPhoneExceedException, PhoneChannelOperateException;
+}

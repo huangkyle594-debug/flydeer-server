@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.flydeer.structmind.repository.mysql.mapper.UserInfoMapper">
-  <resultMap id="BaseResultMap" type="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
+<mapper namespace="com.flydeer.repository.mysql.mapper.UserInfoMapper">
+  <resultMap id="BaseResultMap" type="com.flydeer.repository.mysql.entity.UserInfoEntity">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="channel" jdbcType="VARCHAR" property="channel" />
     <result column="channel_uid" jdbcType="VARCHAR" property="channelUid" />
@@ -74,7 +74,7 @@
     `id`, `channel`, `channel_uid`, `phone`, `verified`, `name`, `status`, `created_at`, 
     `updated_at`
   </sql>
-  <select id="selectByExample" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntityExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntityExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -98,13 +98,13 @@
     delete from `user_info`
     where `id` = #{id,jdbcType=BIGINT}
   </delete>
-  <delete id="deleteByExample" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntityExample">
+  <delete id="deleteByExample" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntityExample">
     delete from `user_info`
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
+  <insert id="insert" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntity">
     insert into `user_info` (`id`, `channel`, `channel_uid`, 
       `phone`, `verified`, `name`, 
       `status`, `created_at`, `updated_at`
@@ -114,7 +114,7 @@
       #{status,jdbcType=TINYINT}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
+  <insert id="insertSelective" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntity">
     insert into `user_info`
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -175,7 +175,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntityExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntityExample" resultType="java.lang.Long">
     select count(*) from `user_info`
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -231,7 +231,7 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
+  <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntity">
     update `user_info`
     <set>
       <if test="channel != null">
@@ -261,7 +261,7 @@
     </set>
     where `id` = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.flydeer.structmind.repository.mysql.entity.UserInfoEntity">
+  <update id="updateByPrimaryKey" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntity">
     update `user_info`
     set `channel` = #{channel,jdbcType=VARCHAR},
       `channel_uid` = #{channelUid,jdbcType=VARCHAR},
