@@ -1,4 +1,4 @@
-# FlyDeer Struct Mind Server
+# FlyDeer Server
 
 Spring Boot 多模块后端：JDK 21 · Spring Boot 3.5 · Maven · MyBatis · PageHelper · MySQL · Redis。
 

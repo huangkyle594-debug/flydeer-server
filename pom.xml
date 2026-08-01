@@ -12,11 +12,11 @@
     </parent>
 
     <groupId>com.flydeer</groupId>
-    <artifactId>flydeer-struct-mind-server</artifactId>
+    <artifactId>flydeer-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>flydeer-struct-mind-server</name>
-    <description>FlyDeer Struct Mind Server (multi-module)</description>
+    <name>flydeer-server</name>
+    <description>FlyDeer Server (multi-module)</description>
 
     <modules>
         <module>flydeer-struct-mind-common</module>
