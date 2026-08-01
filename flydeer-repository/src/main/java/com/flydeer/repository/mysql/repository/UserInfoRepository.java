@@ -81,7 +81,7 @@ public class UserInfoRepository {
             user.setVerified(UserVerifiedStatusEnum.UN_VERIFIED.getCode());
             user.setName(TextUtils.trimText(name, UserConstants.MAX_USER_NAME_LENGTH));
         }
-        userInfoMapper.insert(user);
+        userInfoMapper.insertSelective(user);
         return UserInfoMapping.INSTANCE.toDto(user);
     }
 
