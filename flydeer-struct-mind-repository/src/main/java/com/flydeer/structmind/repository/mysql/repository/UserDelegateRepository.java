@@ -1,6 +1,5 @@
 package com.flydeer.structmind.repository.mysql.repository;
 
-import com.flydeer.structmind.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.structmind.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.structmind.repository.mysql.entity.UserDelegateEntity;
 import com.flydeer.structmind.repository.mysql.entity.UserDelegateEntityExample;
@@ -19,7 +18,7 @@ public class UserDelegateRepository {
 
     private final UserDelegateMapper userDelegateMapper;
 
-    public List<UserDelegateDTO> queryGrantorIds(Long userId, UserOptions options) {
+    public List<UserDelegateDTO> queryGrantorIds(Long userId, List<String> status, UserOptions options) {
         UserDelegateEntityExample example = new UserDelegateEntityExample();
         UserDelegateEntityExample.Criteria criteria = example.createCriteria();
 
@@ -28,9 +27,8 @@ public class UserDelegateRepository {
         } else {
             criteria.andUserIdEqualTo(userId);
         }
-
-        if (options.hasOnlyAcceptGrantedIds()) {
-            criteria.andStatusEqualTo(DelegateStatusEnum.ACCEPTED.name());
+        if (status != null) {
+            criteria.andStatusIn(status);
         }
 
         return userDelegateMapper.selectByExample(example).stream().map(UserDelegateMapping.INSTANCE::toDto).toList();

@@ -1,6 +1,6 @@
 package com.flydeer.structmind.controller.auth;
 
-import com.flydeer.structmind.contract.user.enums.UserLevel;
+import com.flydeer.structmind.contract.user.enums.UserLevelEnum;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RequireUserLevel {
-    UserLevel value() default UserLevel.AUTHENTICATED;
+    UserLevelEnum value() default UserLevelEnum.AUTHENTICATED;
 }

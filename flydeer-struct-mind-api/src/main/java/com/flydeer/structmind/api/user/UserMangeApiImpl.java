@@ -1,53 +1,53 @@
 package com.flydeer.structmind.api.user;
 
+import com.flydeer.structmind.common.exception.auth.SmsVerifyException;
+import com.flydeer.structmind.common.exception.business.BindPhoneExceedException;
+import com.flydeer.structmind.common.exception.business.PhoneChannelOperateException;
+import com.flydeer.structmind.common.exception.business.UserInvalidException;
+import com.flydeer.structmind.common.exception.business.UserNotFoundException;
+import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.UserMangeApi;
-import com.flydeer.structmind.contract.user.vo.TokenResponse;
-import com.flydeer.structmind.contract.user.vo.UserProfileResponse;
-import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
-import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
-import com.flydeer.structmind.service.sms.SmsVerifyClient;
+import com.flydeer.structmind.contract.user.request.BindPhoneRequest;
+import com.flydeer.structmind.contract.user.request.UpdateUserRequest;
+import com.flydeer.structmind.contract.user.vo.UserProfileVO;
+import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
+import com.flydeer.structmind.service.user.SmsVerifyService;
 import com.flydeer.structmind.service.user.UserService;
-import java.util.List;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class UserMangeApiImpl implements UserMangeApi {
 
     private final UserService userService;
-    private final SmsVerifyClient smsVerifyClient;
-    private final JwtTokenUtils jwtTokenUtils;
+    private final SmsVerifyService smsVerifyService;
 
-    public UserMangeApiImpl(
-            UserService userService, SmsVerifyClient smsVerifyClient, JwtTokenUtils jwtTokenUtils) {
-        this.userService = userService;
-        this.smsVerifyClient = smsVerifyClient;
-        this.jwtTokenUtils = jwtTokenUtils;
+    @Override
+    public UserProfileVO me(@Valid ApiRequest request)
+        throws UserNotFoundException, UserInvalidException {
+        UserInfoDTO user = userService.requireActive(request.getUserId());
+        return new UserProfileVO(
+            user.getId(),
+            user.getChannel(),
+            user.getName(),
+            user.getVerified() != null && user.getVerified() == 1,
+            user.getPhone());
     }
 
-    public UserProfileResponse me(Long userId) {
-        UserInfoEntity user = userService.requireActive(userId);
-        List<Long> delegated = userService.listDelegatedUserIds(userId);
-        return new UserProfileResponse(
-                user.getId(),
-                user.getChannel(),
-                user.getNickname(),
-                user.getVerified() != null && user.getVerified() == 1,
-                user.getPhone(),
-                delegated);
+    @Override
+    public UserProfileVO update(@Valid UpdateUserRequest request)
+        throws UserNotFoundException, UserInvalidException {
+        userService.updateUserName(request.getUserId(), request.getName());
+        return me(request);
     }
 
-    public UserProfileResponse updateNickname(Long userId, String nickName) {
-        userService.updateUserName(userId, nickName);
-        return me(userId);
-    }
-
-    public JwtTokenUtils.IssuedTokens bindPhone(Long userId, String phone, String code) {
-        smsVerifyClient.checkVerifyCode(phone, code);
-        userService.bindPhone(userId, phone);
-        return jwtTokenUtils.issue(userId);
-    }
-
-    public TokenResponse toTokenResponse(JwtTokenUtils.IssuedTokens tokens) {
-        return new TokenResponse(tokens.accessToken(), tokens.expiresInSeconds());
+    @Override
+    public void bindPhone(@Valid BindPhoneRequest request)
+        throws UserNotFoundException, SmsVerifyException, UserInvalidException,
+        BindPhoneExceedException, PhoneChannelOperateException {
+        smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
+        userService.bindPhone(request.getUserId(), request.getPhone());
     }
 }

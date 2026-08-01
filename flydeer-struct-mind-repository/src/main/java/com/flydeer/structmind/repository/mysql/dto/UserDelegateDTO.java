@@ -1,5 +1,6 @@
 package com.flydeer.structmind.repository.mysql.dto;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +15,6 @@ public class UserDelegateDTO {
     private Long grantedUserId;
 
     private String status;
+
+    private LocalDateTime updatedAt;
 }

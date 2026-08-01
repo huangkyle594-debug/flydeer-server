@@ -6,13 +6,11 @@ import com.flydeer.structmind.common.exception.business.PhoneChannelOperateExcep
 import com.flydeer.structmind.common.exception.business.UserInvalidException;
 import com.flydeer.structmind.common.exception.business.UserNotFoundException;
 import com.flydeer.structmind.common.utils.TextUtils;
-import com.flydeer.structmind.contract.user.enums.LoginChannel;
+import com.flydeer.structmind.contract.user.enums.LoginChannelEnum;
 import com.flydeer.structmind.contract.user.enums.UserStatusEnum;
 import com.flydeer.structmind.contract.user.enums.UserVerifiedStatusEnum;
-import com.flydeer.structmind.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
 import com.flydeer.structmind.repository.mysql.option.user.UserOptions;
-import com.flydeer.structmind.repository.mysql.repository.UserDelegateRepository;
 import com.flydeer.structmind.repository.mysql.repository.UserInfoRepository;
 import com.flydeer.structmind.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
@@ -26,8 +24,6 @@ public class UserService {
 
     private final UserInfoRepository userInfoRepository;
 
-    private final UserDelegateRepository userDelegateRepository;
-
     public UserInfoDTO requireActive(Long userId) throws UserNotFoundException, UserInvalidException {
         UserInfoDTO user = userInfoRepository.queryById(userId, UserOptions.option());
         if (user == null) {
@@ -39,21 +35,16 @@ public class UserService {
         return user;
     }
 
-    public List<Long> listDelegatedUserIds(Long userId) {
-        return userDelegateRepository.queryGrantorIds(userId, UserOptions.option().onlyAcceptGrantedIds())
-            .stream().map(UserDelegateDTO::getId).toList();
-    }
-
     public UserInfoDTO loginOrRegisterPhone(String phone) throws UserInvalidException {
-        UserInfoDTO exist = userInfoRepository.selectByChannelAndUid(LoginChannel.PHONE, phone);
+        UserInfoDTO exist = userInfoRepository.selectByChannelAndUid(LoginChannelEnum.PHONE, phone);
         if (exist != null) {
             ensureActive(exist);
             return exist;
         }
-        return userInfoRepository.register(LoginChannel.PHONE, phone, phone, UserOptions.option().loginUsePhone());
+        return userInfoRepository.register(LoginChannelEnum.PHONE, phone, phone, UserOptions.option().loginUsePhone());
     }
 
-    public UserInfoDTO loginOrRegisterOauth(LoginChannel channel, OauthUserRecord info) throws UserInvalidException {
+    public UserInfoDTO loginOrRegisterOauth(LoginChannelEnum channel, OauthUserRecord info) throws UserInvalidException {
         UserInfoDTO exist = userInfoRepository.selectByChannelAndUid(channel, info.channelUid());
         if (exist != null) {
             ensureActive(exist);
@@ -100,7 +91,7 @@ public class UserService {
     }
 
     public void ensureNotPhoneChannel(String channel) throws PhoneChannelOperateException {
-        if (LoginChannel.PHONE.name().equals(channel)) {
+        if (LoginChannelEnum.PHONE.name().equals(channel)) {
             throw new PhoneChannelOperateException();
         }
     }

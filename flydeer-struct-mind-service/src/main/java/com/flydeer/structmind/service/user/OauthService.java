@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flydeer.structmind.common.exception.auth.OauthExchangeException;
 import com.flydeer.structmind.common.exception.auth.OauthUrlBuildException;
 import com.flydeer.structmind.common.exception.auth.OauthValidateException;
-import com.flydeer.structmind.contract.user.enums.LoginChannel;
+import com.flydeer.structmind.contract.user.enums.LoginChannelEnum;
 import com.flydeer.structmind.service.user.config.OauthConfig;
 import com.flydeer.structmind.service.user.model.OauthProviderPojo;
 import com.flydeer.structmind.service.user.model.OauthUserRecord;
@@ -32,17 +32,17 @@ public class OauthService {
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";
     private final OauthConfig oauthConfig;
-    private final Map<LoginChannel, ThirdPlatformExchanger> exchangerMap = new HashMap<>();
+    private final Map<LoginChannelEnum, ThirdPlatformExchanger> exchangerMap = new HashMap<>();
 
     public OauthService(
         OauthConfig oauthConfig, RestClient.Builder restClientBuilder, ObjectMapper objectMapper) {
         this.oauthConfig = oauthConfig;
         RestClient restClient = restClientBuilder.build();
-        exchangerMap.put(LoginChannel.GITEE, new GiteeExchanger(objectMapper, restClient));
-        exchangerMap.put(LoginChannel.GITHUB, new GithubExchanger(objectMapper, restClient));
+        exchangerMap.put(LoginChannelEnum.GITEE, new GiteeExchanger(objectMapper, restClient));
+        exchangerMap.put(LoginChannelEnum.GITHUB, new GithubExchanger(objectMapper, restClient));
     }
 
-    public String buildAuthorizeUrl(LoginChannel channel) throws OauthUrlBuildException {
+    public String buildAuthorizeUrl(LoginChannelEnum channel) throws OauthUrlBuildException {
         try {
             OauthProviderPojo provider = oauthConfig.get(channel.name().toLowerCase(Locale.ROOT));
             String state = signState(channel.name() + ":" + System.currentTimeMillis());
@@ -76,7 +76,7 @@ public class OauthService {
         }
     }
 
-    public OauthUserRecord exchange(LoginChannel channel, String code) throws OauthExchangeException {
+    public OauthUserRecord exchange(LoginChannelEnum channel, String code) throws OauthExchangeException {
         try {
             OauthProviderPojo provider = oauthConfig.get(channel.name().toLowerCase(Locale.ROOT));
             ThirdPlatformExchanger exchanger = exchangerMap.get(channel);

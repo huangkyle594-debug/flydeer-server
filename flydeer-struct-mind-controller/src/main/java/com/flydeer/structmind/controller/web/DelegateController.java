@@ -4,8 +4,8 @@ import com.flydeer.structmind.api.user.UserDelegateApiImpl;
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.request.CreateDelegateRequest;
-import com.flydeer.structmind.contract.user.vo.DelegateItemResponse;
-import com.flydeer.structmind.contract.user.enums.UserLevel;
+import com.flydeer.structmind.contract.user.vo.DelegateVO;
+import com.flydeer.structmind.contract.user.enums.UserLevelEnum;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/delegates")
-@RequireUserLevel(UserLevel.AUTHENTICATED)
+@RequireUserLevel(UserLevelEnum.AUTHENTICATED)
 public class DelegateController {
 
     private final UserDelegateApiImpl userDelegateApiImpl;
@@ -34,7 +34,7 @@ public class DelegateController {
     }
 
     @GetMapping
-    public ApiResult<List<DelegateItemResponse>> list(ApiRequest request) {
+    public ApiResult<List<DelegateVO>> list(ApiRequest request) {
         return ApiResult.ok(userDelegateApiImpl.list(request.getUserId()));
     }
 

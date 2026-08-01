@@ -3,7 +3,7 @@ package com.flydeer.structmind.contract.user.enums;
 /**
  * Login / identity channel. Each channel produces a separate user row.
  */
-public enum LoginChannel {
+public enum LoginChannelEnum {
     GITEE,
     GITHUB,
     PHONE

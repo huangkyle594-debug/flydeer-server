@@ -4,10 +4,9 @@ import com.flydeer.structmind.api.user.UserMangeApiImpl;
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.vo.TokenResponse;
-import com.flydeer.structmind.contract.user.enums.UserLevel;
+import com.flydeer.structmind.contract.user.enums.UserLevelEnum;
 import com.flydeer.structmind.contract.user.request.BindPhoneRequest;
-import com.flydeer.structmind.contract.user.request.UpdateNicknameRequest;
-import com.flydeer.structmind.contract.user.vo.UserProfileResponse;
+import com.flydeer.structmind.contract.user.vo.UserProfileVO;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
 import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
@@ -33,19 +32,19 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    @RequireUserLevel(UserLevel.AUTHENTICATED)
-    public ApiResult<UserProfileResponse> me(ApiRequest request) {
+    @RequireUserLevel(UserLevelEnum.AUTHENTICATED)
+    public ApiResult<UserProfileVO> me(ApiRequest request) {
         return ApiResult.ok(userApiImpl.me(request.getUserId()));
     }
 
     @PatchMapping("/me")
-    @RequireUserLevel(UserLevel.AUTHENTICATED)
-    public ApiResult<UserProfileResponse> updateNickname(@Valid @RequestBody UpdateNicknameRequest request) {
-        return ApiResult.ok(userApiImpl.updateNickname(request.getUserId(), request.getNickName()));
+    @RequireUserLevel(UserLevelEnum.AUTHENTICATED)
+    public ApiResult<UserProfileVO> updateNickname(@Valid @RequestBody UpdateNicknameRequest request) {
+        return ApiResult.ok(userApiImpl.update(request.getUserId(), request.getNickName()));
     }
 
     @PostMapping("/me/phone/bind")
-    @RequireUserLevel(UserLevel.AUTHENTICATED)
+    @RequireUserLevel(UserLevelEnum.AUTHENTICATED)
     public ApiResult<TokenResponse> bindPhone(
             @Valid @RequestBody BindPhoneRequest request, HttpServletResponse response) {
         JwtTokenUtils.IssuedTokens tokens =

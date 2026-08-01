@@ -34,15 +34,6 @@ public class UserOptions extends Options<UserOption> {
         return contains(UserOption.UPDATE_TO_NULL);
     }
 
-    public UserOptions onlyAcceptGrantedIds() {
-        add(UserOption.ONLY_ACCEPT_GRANTED_IDS);
-        return this;
-    }
-
-    public Boolean hasOnlyAcceptGrantedIds() {
-        return contains(UserOption.ONLY_ACCEPT_GRANTED_IDS);
-    }
-
     public UserOptions grantedUser() {
         add(UserOption.GRANTED_USER);
         return this;

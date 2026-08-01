@@ -6,9 +6,8 @@ import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import com.flydeer.structmind.contract.user.vo.AuthorizeUrlResponse;
 import com.flydeer.structmind.contract.user.request.SmsLoginRequest;
-import com.flydeer.structmind.contract.user.request.SmsSendRequest;
 import com.flydeer.structmind.contract.user.vo.TokenResponse;
-import com.flydeer.structmind.contract.user.enums.LoginChannel;
+import com.flydeer.structmind.contract.user.enums.LoginChannelEnum;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
 import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,7 +60,7 @@ public class AuthController {
 
     @GetMapping("/{provider}/authorize")
     public ApiResult<AuthorizeUrlResponse> authorize(@PathVariable("provider") String provider) {
-        return ApiResult.ok(authServiceImpl.authorizeUrl(parseProvider(provider)));
+        return ApiResult.ok(authServiceImpl.oauthLoginUrl(parseProvider(provider)));
     }
 
     @GetMapping("/{provider}/callback")
@@ -98,10 +97,10 @@ public class AuthController {
         return ApiResult.ok();
     }
 
-    private LoginChannel parseProvider(String provider) {
+    private LoginChannelEnum parseProvider(String provider) {
         try {
-            LoginChannel channel = LoginChannel.valueOf(provider.toUpperCase(Locale.ROOT));
-            if (channel == LoginChannel.PHONE) {
+            LoginChannelEnum channel = LoginChannelEnum.valueOf(provider.toUpperCase(Locale.ROOT));
+            if (channel == LoginChannelEnum.PHONE) {
                 throw new BusinessException(ErrorCodes.BAD_REQUEST, "unsupported provider");
             }
             return channel;

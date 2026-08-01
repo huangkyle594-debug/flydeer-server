@@ -1,30 +1,22 @@
 package com.flydeer.structmind.contract.user.request;
 
+import com.flydeer.structmind.contract.base.request.ApiRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 
-public class SmsLoginRequest {
+@Setter
+@Getter
+public class SmsLoginRequest extends ApiRequest {
 
-    @NotBlank
-    @Pattern(regexp = "^1\\d{10}$", message = "invalid phone")
+    @NotBlank(message = "手机号不能为空")
+    @Pattern(regexp = "^1\\d{10}$", message = "手机号格式有误")
     private String phone;
 
-    @NotBlank
+    @NotBlank(message = "验证码不能为空")
     private String code;
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
+    @NotBlank(message = "ip解析失败")
+    private String ip;
 }

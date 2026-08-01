@@ -2,6 +2,7 @@ package com.flydeer.structmind.service.user;
 
 import com.flydeer.structmind.common.exception.business.DelegateNotFoundException;
 import com.flydeer.structmind.common.exception.request.DelegateSelfException;
+import com.flydeer.structmind.contract.user.enums.DelegateRelationEnum;
 import com.flydeer.structmind.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.structmind.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.structmind.repository.mysql.option.user.UserOptions;
@@ -65,11 +66,12 @@ public class UserDelegateService {
         userDelegateRepository.update(update, UserOptions.option());
     }
 
-    public List<UserDelegateDTO> queryGrantedIds(Long userId) {
-        return userDelegateRepository.queryGrantorIds(userId, UserOptions.option());
-    }
-
-    public List<UserDelegateDTO> queryDelegateIds(Long userId) {
-        return userDelegateRepository.queryGrantorIds(userId, UserOptions.option().grantedUser());
+    public List<UserDelegateDTO> queryDelegations(
+        Long userId, List<String> status, DelegateRelationEnum relation) {
+        UserOptions options = UserOptions.option();
+        if (DelegateRelationEnum.MANAGED.equals(relation)) {
+            options.grantedUser();
+        }
+        return userDelegateRepository.queryGrantorIds(userId, status, options);
     }
 }

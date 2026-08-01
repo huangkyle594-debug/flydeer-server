@@ -3,7 +3,7 @@ package com.flydeer.structmind.controller.aspect;
 import com.flydeer.structmind.common.exception.ErrorCodes;
 import com.flydeer.structmind.common.exception.business.BusinessException;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
-import com.flydeer.structmind.contract.user.enums.UserLevel;
+import com.flydeer.structmind.contract.user.enums.UserLevelEnum;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import com.flydeer.structmind.controller.support.AuthCookieSupport;
 import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
@@ -46,7 +46,7 @@ public class RequireUserLevelAspect {
         RequireUserLevel typeAnno =
             AnnotationUtils.findAnnotation(signature.getDeclaringType(), RequireUserLevel.class);
         RequireUserLevel anno = methodAnno != null ? methodAnno : typeAnno;
-        UserLevel required = anno != null ? anno.value() : UserLevel.AUTHENTICATED;
+        UserLevelEnum required = anno != null ? anno.value() : UserLevelEnum.AUTHENTICATED;
 
         ServletRequestAttributes attrs =
             (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -62,12 +62,12 @@ public class RequireUserLevelAspect {
             user = userService.requireActive(userId);
         }
 
-        if (required == UserLevel.AUTHENTICATED || required == UserLevel.VERIFIED) {
+        if (required == UserLevelEnum.AUTHENTICATED || required == UserLevelEnum.VERIFIED) {
             if (user == null) {
                 throw new BusinessException(ErrorCodes.UNAUTHORIZED, "login required");
             }
         }
-        if (required == UserLevel.VERIFIED) {
+        if (required == UserLevelEnum.VERIFIED) {
             if (user.getVerified() == null || user.getVerified() != 1) {
                 throw new BusinessException(ErrorCodes.FORBIDDEN, "verified user required");
             }

@@ -1,8 +1,7 @@
 package com.flydeer.structmind.contract.user.enums;
 
 /**
- * GRANT: requester asks to grant access to peer.
- * RECEIVE: requester asks peer to grant access to requester.
+ * Delegate request direction when initiating a relation.
  */
 public enum DelegateRequestType {
     GRANT,

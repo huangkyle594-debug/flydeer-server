@@ -2,21 +2,22 @@ package com.flydeer.structmind.api.user;
 
 import com.flydeer.structmind.api.user.mapper.AuthorizationMapper;
 import com.flydeer.structmind.common.exception.auth.*;
+import com.flydeer.structmind.common.exception.business.UserInvalidException;
+import com.flydeer.structmind.common.exception.business.UserNotFoundException;
 import com.flydeer.structmind.common.exception.ratelimit.LoginRateLimitException;
 import com.flydeer.structmind.common.exception.ratelimit.SmsRateLimitException;
 import com.flydeer.structmind.contract.user.AuthorizationApi;
-import com.flydeer.structmind.contract.user.enums.LoginChannel;
+import com.flydeer.structmind.contract.user.request.*;
 import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
 import com.flydeer.structmind.contract.user.vo.OauthUrlVO;
-import com.flydeer.structmind.contract.user.vo.TokenResponse;
-import com.flydeer.structmind.repository.mysql.entity.UserInfoEntity;
+import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
 import com.flydeer.structmind.service.user.OauthService;
 import com.flydeer.structmind.service.user.SmsVerifyService;
 import com.flydeer.structmind.service.user.UserService;
-import com.flydeer.structmind.service.user.model.IssuedTokensRecord;
 import com.flydeer.structmind.service.user.model.OauthUserRecord;
 import com.flydeer.structmind.service.user.utils.JwtTokenUtils;
 import com.flydeer.structmind.service.user.utils.RateLimitUtils;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,42 +32,39 @@ public class AuthorizationApiImpl implements AuthorizationApi {
     private final RateLimitUtils rateLimiter;
 
     @Override
-    public void sendSmsCode(String phone, String ip) throws SmsRateLimitException, SmsSendException {
-        rateLimiter.checkSms(phone, ip);
-        smsVerifyService.sendVerifyCode(phone);
+    public void sendSmsCode(@Valid SendSmsCodeRequest request) throws SmsRateLimitException, SmsSendException {
+        rateLimiter.checkSms(request.getPhone(), request.getIp());
+        smsVerifyService.sendVerifyCode(request.getPhone());
     }
 
     @Override
-    public JwtTokenVO loginBySms(String phone, String code, String ip)
-        throws LoginRateLimitException, SmsVerifyException {
-        rateLimiter.checkLogin("sms:" + phone + ":" + ip);
-        smsVerifyService.checkVerifyCode(phone, code);
-        UserInfoEntity user = userService.loginOrRegisterPhone(phone);
+    public JwtTokenVO loginBySms(@Valid SmsLoginRequest request)
+        throws LoginRateLimitException, SmsVerifyException, UserInvalidException {
+        rateLimiter.checkLogin("sms:" + request.getPhone() + ":" + request.getIp());
+        smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
+        UserInfoDTO user = userService.loginOrRegisterPhone(request.getPhone());
         return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId()));
     }
 
     @Override
-    public OauthUrlVO authorizeUrl(LoginChannel channel) throws OauthUrlBuildException {
-        return AuthorizationMapper.INSTANCE.oauthUrl(oauthService.buildAuthorizeUrl(channel));
+    public OauthUrlVO oauthLoginUrl(@Valid OauthLoginRequest request) throws OauthUrlBuildException {
+        return AuthorizationMapper.INSTANCE.oauthUrl(oauthService.buildAuthorizeUrl(request.getChannel()));
     }
 
     @Override
-    public JwtTokenVO oauthCallback(LoginChannel channel, String code, String state)
-        throws OauthValidateException, OauthExchangeException {
-        oauthService.validateState(state);
-        OauthUserRecord info = oauthService.exchange(channel, code);
-        UserInfoEntity user = userService.loginOrRegisterOauth(channel, info);
+    public JwtTokenVO oauthCallback(@Valid OauthCallbackRequest request)
+        throws OauthValidateException, OauthExchangeException, UserInvalidException {
+        oauthService.validateState(request.getState());
+        OauthUserRecord info = oauthService.exchange(request.getChannel(), request.getCode());
+        UserInfoDTO user = userService.loginOrRegisterOauth(request.getChannel(), info);
         return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId()));
     }
 
     @Override
-    public JwtTokenVO refresh(String refreshToken) throws RefreshTokenParseException {
-        long userId = jwtTokenUtils.parseRefreshToken(refreshToken);
+    public JwtTokenVO refresh(@Valid RefreshTokenRequest request)
+        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException {
+        long userId = jwtTokenUtils.parseRefreshToken(request.getRefreshToken());
         userService.requireActive(userId);
         return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(userId));
-    }
-
-    public TokenResponse toTokenResponse(IssuedTokensRecord tokens) {
-        return new TokenResponse(tokens.accessToken(), tokens.expiresInSeconds());
     }
 }

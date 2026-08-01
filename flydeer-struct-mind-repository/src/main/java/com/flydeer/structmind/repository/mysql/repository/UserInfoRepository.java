@@ -4,7 +4,7 @@ import com.flydeer.structmind.common.constants.UserConstants;
 import com.flydeer.structmind.common.utils.PhoneNumberUtils;
 import com.flydeer.structmind.common.utils.TextUtils;
 import com.flydeer.structmind.contract.user.enums.DelegateStatusEnum;
-import com.flydeer.structmind.contract.user.enums.LoginChannel;
+import com.flydeer.structmind.contract.user.enums.LoginChannelEnum;
 import com.flydeer.structmind.contract.user.enums.UserStatusEnum;
 import com.flydeer.structmind.contract.user.enums.UserVerifiedStatusEnum;
 import com.flydeer.structmind.repository.mysql.dto.UserInfoDTO;
@@ -55,7 +55,7 @@ public class UserInfoRepository {
         return delegates.stream().map(UserDelegateEntity::getUserId).toList();
     }
 
-    public UserInfoDTO selectByChannelAndUid(LoginChannel channel, String channelUid) {
+    public UserInfoDTO selectByChannelAndUid(LoginChannelEnum channel, String channelUid) {
         UserInfoEntityExample example = new UserInfoEntityExample();
         example.createCriteria()
             .andChannelEqualTo(channel.name())
@@ -67,7 +67,7 @@ public class UserInfoRepository {
         return UserInfoMapping.INSTANCE.toDto(rows.getFirst());
     }
 
-    public UserInfoDTO register(LoginChannel channel, String channelUid, String name, UserOptions options) {
+    public UserInfoDTO register(LoginChannelEnum channel, String channelUid, String name, UserOptions options) {
         UserInfoEntity user = new UserInfoEntity();
         user.setId(idGenerateUtils.nextUserId());
         user.setChannel(channel.name());

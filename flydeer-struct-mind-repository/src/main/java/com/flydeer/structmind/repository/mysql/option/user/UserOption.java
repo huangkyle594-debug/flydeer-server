@@ -9,7 +9,5 @@ public enum UserOption {
     UPDATE_TO_NULL,
 
     GRANTED_USER,
-
-    ONLY_ACCEPT_GRANTED_IDS,
     ;
 }
