@@ -19,7 +19,7 @@ spring:
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
-  type-aliases-package: com.flydeer.structmind.repository.entity
+  type-aliases-package: com.flydeer.structmind.repository.mysql.entity
   configuration:
     map-underscore-to-camel-case: true
     default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
@@ -51,12 +51,10 @@ app:
     secret: ${AUTH_JWT_SECRET:change-me-to-a-long-random-secret-key!!}
     access-token-ttl: ${AUTH_ACCESS_TTL:2h}
     refresh-token-ttl: ${AUTH_REFRESH_TTL:90d}
-  #oauth:
     refresh-cookie-name: ${AUTH_REFRESH_COOKIE:refresh_token}
     refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
     refresh-cookie-path: /api/v1/auth
-  auth:
-    frontend-redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:3000/auth/callback}
+    redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:3000/auth/callback}
   id:
     start: ${ID_START:10000000}
     step-min: ${ID_STEP_MIN:1}
@@ -70,25 +68,29 @@ app:
     region: ${SMS_REGION:cn-shanghai}
     endpoint: ${SMS_ENDPOINT:dypnsapi.aliyuncs.com}
     country-code: ${SMS_COUNTRY_CODE:86}
-  rate-limit:
-    sms-interval: ${SMS_INTERVAL:60s}
-    sms-daily-limit-per-phone: ${SMS_DAILY_PHONE:20}
-    sms-daily-limit-per-ip: ${SMS_DAILY_IP:50}
-    login-interval: ${LOGIN_INTERVAL:1s}
+  user:
+    ratelimit:
+      sms-interval: ${SMS_INTERVAL:60s}
+      sms-daily-limit-per-phone: ${SMS_DAILY_PHONE:20}
+      sms-daily-limit-per-ip: ${SMS_DAILY_IP:50}
+      login-interval: ${LOGIN_INTERVAL:1s}
   oauth:
-    gitee:
-      client-id: ${OAUTH_GITEE_CLIENT_ID:}
-      client-secret: ${OAUTH_GITEE_CLIENT_SECRET:}
-      redirect-uri: ${OAUTH_GITEE_REDIRECT_URI:http://localhost:8080/api/v1/auth/gitee/callback}
-      authorize-url: https://gitee.com/oauth/authorize
-      token-url: https://gitee.com/oauth/token
-      user-url: https://gitee.com/api/v5/user
-      scope: user_info
-    github:
-      client-id: ${OAUTH_GITHUB_CLIENT_ID:}
-      client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:}
-      redirect-uri: ${OAUTH_GITHUB_REDIRECT_URI:http://localhost:8080/api/v1/auth/github/callback}
-      authorize-url: https://github.com/login/oauth/authorize
-      token-url: https://github.com/login/oauth/access_token
-      user-url: https://api.github.com/user
-      scope: read:user
+    secret: ${OAUTH_STATE_SECRET:change-me-oauth-state-hmac-secret!!}
+    timeout: ${OAUTH_STATE_TIMEOUT_MS:600000}
+    oauth:
+      gitee:
+        client-id: ${OAUTH_GITEE_CLIENT_ID:}
+        client-secret: ${OAUTH_GITEE_CLIENT_SECRET:}
+        redirect-uri: ${OAUTH_GITEE_REDIRECT_URI:http://localhost:8080/api/v1/auth/gitee/callback}
+        authorize-url: https://gitee.com/oauth/authorize
+        token-url: https://gitee.com/oauth/token
+        user-url: https://gitee.com/api/v5/user
+        scope: user_info
+      github:
+        client-id: ${OAUTH_GITHUB_CLIENT_ID:}
+        client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:}
+        redirect-uri: ${OAUTH_GITHUB_REDIRECT_URI:http://localhost:8080/api/v1/auth/github/callback}
+        authorize-url: https://github.com/login/oauth/authorize
+        token-url: https://github.com/login/oauth/access_token
+        user-url: https://api.github.com/user
+        scope: read:user

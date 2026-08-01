@@ -1,6 +1,7 @@
 package com.flydeer.structmind.contract.base.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.flydeer.structmind.common.exception.ErrorCodes;
 
 /**
  * Uniform API envelope used across modules.
@@ -8,14 +9,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiResult<T>(int code, String message, T data) {
 
-    public static final int SUCCESS_CODE = 0;
-
     public static <T> ApiResult<T> ok(T data) {
-        return new ApiResult<>(SUCCESS_CODE, "ok", data);
+        return new ApiResult<>(ErrorCodes.SUCCESS, "ok", data);
     }
 
     public static ApiResult<Void> ok() {
-        return new ApiResult<>(SUCCESS_CODE, "ok", null);
+        return new ApiResult<>(ErrorCodes.SUCCESS, "ok", null);
     }
 
     public static ApiResult<Void> fail(int code, String message) {
