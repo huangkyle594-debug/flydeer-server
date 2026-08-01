@@ -9,6 +9,7 @@ import com.flydeer.common.exception.business.BusinessException;
 import com.flydeer.common.exception.frequency.FrequencyException;
 import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.contract.base.response.ApiResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -56,6 +58,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResult<Void>> handleOther(Exception ex) {
+        log.info("handleOther", ex);
         return ResponseEntity.internalServerError().body(ApiResult.fail(ErrorCodes.UNKNOWN, "系统异常"));
     }
 }
