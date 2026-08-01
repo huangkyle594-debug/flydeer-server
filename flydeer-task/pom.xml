@@ -10,22 +10,22 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>flydeer-struct-mind-task</artifactId>
-    <name>flydeer-struct-mind-task</name>
+    <artifactId>flydeer-task</artifactId>
+    <name>flydeer-task</name>
     <description>Scheduled and async background tasks (standalone Spring Boot app)</description>
 
     <dependencies>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-common</artifactId>
+            <artifactId>flydeer-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-contract</artifactId>
+            <artifactId>flydeer-contract</artifactId>
         </dependency>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-service</artifactId>
+            <artifactId>flydeer-service</artifactId>
         </dependency>
 
         <dependency>

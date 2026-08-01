@@ -28,13 +28,13 @@ common  ←  contract  ←  repository  ←  service  ←  api  ←  controller 
 
 | 模块 | Artifact | 职责 |
 |---|---|---|
-| common | `flydeer-struct-mind-common` | 工具、异常、统一响应、Jackson |
-| contract | `flydeer-struct-mind-contract` | DTO / 枚举 / 跨模块接口 |
-| repository | `flydeer-struct-mind-repository` | MyBatis Mapper / Entity / PageHelper |
-| service | `flydeer-struct-mind-service` | 可复用业务逻辑、事务、Redis、JWT、短信 |
-| api | `flydeer-struct-mind-api` | 面向业务的用例编排 |
-| task | `flydeer-struct-mind-task` | 独立定时任务应用（端口 8081） |
-| controller | `flydeer-struct-mind-controller` | HTTP API + 可运行 Boot 应用（端口 8080） |
+| common | `flydeer-common` | 工具、异常、统一响应、Jackson |
+| contract | `flydeer-contract` | DTO / 枚举 / 跨模块接口 |
+| repository | `flydeer-repository` | MyBatis Mapper / Entity / PageHelper |
+| service | `flydeer-service` | 可复用业务逻辑、事务、Redis、JWT、短信 |
+| api | `flydeer-api` | 面向业务的用例编排 |
+| task | `flydeer-task` | 独立定时任务应用（端口 8081） |
+| controller | `flydeer-controller` | HTTP API + 可运行 Boot 应用（端口 8080） |
 
 规则：上层依赖下层；禁止反向依赖（如 repository 不得依赖 service）。controller 依赖 api；task 只依赖 service。
 
@@ -90,7 +90,7 @@ cp .env.example .env          # 修改 MYSQL_* / REDIS_* / 端口，并配置 JW
 # 需 MySQL 已建表（doc/sql）；JDBC 见 generatorJdbc.properties
 ./bash/mybatis-generate.sh
 # 仅编译 repository
-./mvnw -pl flydeer-struct-mind-repository -am compile
+./mvnw -pl flydeer-repository -am compile
 ```
 
 生成位置：`mysql.entity` / `mysql.mapper` / `resources/mapper`（会覆盖同名文件）。
@@ -102,5 +102,5 @@ cp .env.example .env          # 修改 MYSQL_* / REDIS_* / 端口，并配置 JW
 ```bash
 ./mvnw clean verify
 ./mvnw spotless:apply
-./mvnw -pl flydeer-struct-mind-controller -am test
+./mvnw -pl flydeer-controller -am test
 ```

@@ -10,22 +10,22 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>flydeer-struct-mind-controller</artifactId>
-    <name>flydeer-struct-mind-controller</name>
+    <artifactId>flydeer-controller</artifactId>
+    <name>flydeer-controller</name>
     <description>HTTP API layer and Spring Boot runnable application</description>
 
     <dependencies>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-common</artifactId>
+            <artifactId>flydeer-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-contract</artifactId>
+            <artifactId>flydeer-contract</artifactId>
         </dependency>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-api</artifactId>
+            <artifactId>flydeer-api</artifactId>
         </dependency>
 
         <dependency>

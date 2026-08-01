@@ -1,7 +1,7 @@
 services:
   mysql:
     image: docker.m.daocloud.io/library/mysql:8.4
-    container_name: flydeer-struct-mind-mysql
+    container_name: flydeer-mysql
     environment:
       MYSQL_DATABASE: flydeer
       MYSQL_USER: flydeer
@@ -21,7 +21,7 @@ services:
 
   redis:
     image: docker.m.daocloud.io/library/redis:7
-    container_name: flydeer-struct-mind-redis
+    container_name: flydeer-redis
     ports:
       - "6379:6379"
     volumes:
@@ -38,8 +38,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: flydeer-struct-mind-controller:local
-    container_name: flydeer-struct-mind-app
+    image: flydeer-controller:local
+    container_name: flydeer-app
     depends_on:
       mysql:
         condition: service_healthy

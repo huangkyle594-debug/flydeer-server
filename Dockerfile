@@ -5,25 +5,25 @@ WORKDIR /src
 
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
-COPY flydeer-struct-mind-common/pom.xml flydeer-struct-mind-common/
-COPY flydeer-struct-mind-contract/pom.xml flydeer-struct-mind-contract/
-COPY flydeer-struct-mind-repository/pom.xml flydeer-struct-mind-repository/
-COPY flydeer-struct-mind-service/pom.xml flydeer-struct-mind-service/
-COPY flydeer-struct-mind-api/pom.xml flydeer-struct-mind-api/
-COPY flydeer-struct-mind-task/pom.xml flydeer-struct-mind-task/
-COPY flydeer-struct-mind-controller/pom.xml flydeer-struct-mind-controller/
+COPY flydeer-common/pom.xml flydeer-common/
+COPY flydeer-contract/pom.xml flydeer-contract/
+COPY flydeer-repository/pom.xml flydeer-repository/
+COPY flydeer-service/pom.xml flydeer-service/
+COPY flydeer-api/pom.xml flydeer-api/
+COPY flydeer-task/pom.xml flydeer-task/
+COPY flydeer-controller/pom.xml flydeer-controller/
 
 RUN chmod +x mvnw \
-  && ./mvnw -B -pl flydeer-struct-mind-controller -am dependency:go-offline -DskipTests
+  && ./mvnw -B -pl flydeer-controller -am dependency:go-offline -DskipTests
 
-COPY flydeer-struct-mind-common flydeer-struct-mind-common
-COPY flydeer-struct-mind-contract flydeer-struct-mind-contract
-COPY flydeer-struct-mind-repository flydeer-struct-mind-repository
-COPY flydeer-struct-mind-service flydeer-struct-mind-service
-COPY flydeer-struct-mind-api flydeer-struct-mind-api
-COPY flydeer-struct-mind-controller flydeer-struct-mind-controller
+COPY flydeer-common flydeer-common
+COPY flydeer-contract flydeer-contract
+COPY flydeer-repository flydeer-repository
+COPY flydeer-service flydeer-service
+COPY flydeer-api flydeer-api
+COPY flydeer-controller flydeer-controller
 
-RUN ./mvnw -B -pl flydeer-struct-mind-controller -am package -DskipTests -q
+RUN ./mvnw -B -pl flydeer-controller -am package -DskipTests -q
 
 FROM docker.m.daocloud.io/library/eclipse-temurin:21-jre
 WORKDIR /app
@@ -32,7 +32,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends curl \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /src/flydeer-struct-mind-controller/target/flydeer-struct-mind-controller-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /src/flydeer-controller/target/flydeer-controller-0.0.1-SNAPSHOT.jar app.jar
 
 ENV JAVA_OPTS="" \
     SPRING_DOCKER_COMPOSE_ENABLED=false \

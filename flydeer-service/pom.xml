@@ -10,22 +10,22 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>flydeer-struct-mind-service</artifactId>
-    <name>flydeer-struct-mind-service</name>
+    <artifactId>flydeer-service</artifactId>
+    <name>flydeer-service</name>
     <description>Business logic and orchestration</description>
 
     <dependencies>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-common</artifactId>
+            <artifactId>flydeer-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-contract</artifactId>
+            <artifactId>flydeer-contract</artifactId>
         </dependency>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-repository</artifactId>
+            <artifactId>flydeer-repository</artifactId>
         </dependency>
 
         <dependency>

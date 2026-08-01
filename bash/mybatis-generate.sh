@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-PROPS="${ROOT}/flydeer-struct-mind-repository/src/main/resources/generatorJdbc.properties"
+PROPS="${ROOT}/flydeer-repository/src/main/resources/generatorJdbc.properties"
 EXAMPLE="${PROPS}.example"
 
 if [[ ! -f "$PROPS" ]]; then
@@ -20,5 +20,5 @@ if [[ -S "${HOME}/.colima/default/docker.sock" ]]; then
   export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
 fi
 
-./mvnw -pl flydeer-struct-mind-repository mybatis-generator:generate
+./mvnw -pl flydeer-repository mybatis-generator:generate
 echo "[mybatis-generate] 完成"

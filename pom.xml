@@ -19,13 +19,13 @@
     <description>FlyDeer Server (multi-module)</description>
 
     <modules>
-        <module>flydeer-struct-mind-common</module>
-        <module>flydeer-struct-mind-contract</module>
-        <module>flydeer-struct-mind-repository</module>
-        <module>flydeer-struct-mind-service</module>
-        <module>flydeer-struct-mind-api</module>
-        <module>flydeer-struct-mind-task</module>
-        <module>flydeer-struct-mind-controller</module>
+        <module>flydeer-common</module>
+        <module>flydeer-contract</module>
+        <module>flydeer-repository</module>
+        <module>flydeer-service</module>
+        <module>flydeer-api</module>
+        <module>flydeer-task</module>
+        <module>flydeer-controller</module>
     </modules>
 
     <properties>
@@ -53,37 +53,37 @@
 
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-common</artifactId>
+                <artifactId>flydeer-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-contract</artifactId>
+                <artifactId>flydeer-contract</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-repository</artifactId>
+                <artifactId>flydeer-repository</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-service</artifactId>
+                <artifactId>flydeer-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-api</artifactId>
+                <artifactId>flydeer-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-task</artifactId>
+                <artifactId>flydeer-task</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-struct-mind-controller</artifactId>
+                <artifactId>flydeer-controller</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -15,8 +15,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-CONTROLLER_MODULE="flydeer-struct-mind-controller"
-TASK_MODULE="flydeer-struct-mind-task"
+CONTROLLER_MODULE="flydeer-controller"
+TASK_MODULE="flydeer-task"
 CONTROLLER_JAR="${ROOT}/${CONTROLLER_MODULE}/target/${CONTROLLER_MODULE}-0.0.1-SNAPSHOT.jar"
 TASK_JAR="${ROOT}/${TASK_MODULE}/target/${TASK_MODULE}-0.0.1-SNAPSHOT.jar"
 PID_DIR="${ROOT}/bash/.run"

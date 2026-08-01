@@ -10,14 +10,14 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>flydeer-struct-mind-contract</artifactId>
-    <name>flydeer-struct-mind-contract</name>
+    <artifactId>flydeer-contract</artifactId>
+    <name>flydeer-contract</name>
     <description>API contracts: DTOs, enums, and service interfaces</description>
 
     <dependencies>
         <dependency>
             <groupId>com.flydeer</groupId>
-            <artifactId>flydeer-struct-mind-common</artifactId>
+            <artifactId>flydeer-common</artifactId>
         </dependency>
     </dependencies>
 </project>

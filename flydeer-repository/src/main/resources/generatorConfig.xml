@@ -12,7 +12,7 @@
 
   运行：
     ./bash/mybatis-generate.sh
-    或 ./mvnw -pl flydeer-struct-mind-repository mybatis-generator:generate
+    或 ./mvnw -pl flydeer-repository mybatis-generator:generate
 
   注意：overwrite=true 会覆盖同名 Java；
   UnmergeableXmlMappersPlugin 使 XML 整文件覆盖（不合并续写）。
@@ -58,21 +58,21 @@
 
         <javaModelGenerator
                 targetPackage="com.flydeer.structmind.repository.mysql.entity"
-                targetProject="flydeer-struct-mind-repository/src/main/java">
+                targetProject="flydeer-repository/src/main/java">
             <property name="enableSubPackages" value="false"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
         <sqlMapGenerator
                 targetPackage="mapper"
-                targetProject="flydeer-struct-mind-repository/src/main/resources">
+                targetProject="flydeer-repository/src/main/resources">
             <property name="enableSubPackages" value="false"/>
         </sqlMapGenerator>
 
         <javaClientGenerator
                 type="XMLMAPPER"
                 targetPackage="com.flydeer.structmind.repository.mysql.mapper"
-                targetProject="flydeer-struct-mind-repository/src/main/java">
+                targetProject="flydeer-repository/src/main/java">
             <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>
 
