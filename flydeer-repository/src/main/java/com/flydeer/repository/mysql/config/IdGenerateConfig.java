@@ -10,7 +10,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 @RefreshScope
 @ConfigurationProperties(prefix = "app.id")
 public class IdGenerateConfig {
-    private long start = 10_000_000L;
-    private int stepMin = 1;
-    private int stepMax = 99;
+    private long start;
+    private int stepMin;
+    private int stepMax;
 }

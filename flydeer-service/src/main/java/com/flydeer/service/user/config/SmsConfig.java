@@ -11,12 +11,12 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 @ConfigurationProperties(prefix = "app.sms")
 public class SmsConfig {
 
-    private String accessKeyId = "";
-    private String accessKeySecret = "";
-    private String signName = "";
-    private String templateCode = "";
-    private String region = "cn-shanghai";
-    private String endpoint = "dypnsapi.aliyuncs.com";
-    private String countryCode = "86";
-    private boolean mockEnabled = true;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String signName;
+    private String templateCode;
+    private String region;
+    private String endpoint;
+    private String countryCode;
+    private boolean mockEnabled;
 }

@@ -1,3 +1,51 @@
+# Required env placeholders from application.yml (no defaults in main config)
+MYSQL_HOST: localhost
+MYSQL_PORT: 3306
+MYSQL_DATABASE: flydeer
+MYSQL_USER: flydeer
+MYSQL_PASSWORD: flydeer
+REDIS_HOST: localhost
+REDIS_PORT: 6379
+SERVER_PORT: 0
+AUTH_JWT_SECRET: test-jwt-secret-key-at-least-32-bytes!!
+AUTH_ACCESS_TTL: 2h
+AUTH_REFRESH_TTL: 90d
+AUTH_REFRESH_COOKIE: refresh_token
+AUTH_REFRESH_COOKIE_SECURE: false
+AUTH_REFRESH_COOKIE_PATH: /api/v1/auth
+AUTH_FRONTEND_REDIRECT: http://localhost:5173/oauth/callback
+ID_START: 10000000
+ID_STEP_MIN: 1
+ID_STEP_MAX: 99
+SMS_MOCK_ENABLED: true
+SMS_ACCESS_KEY_ID: ""
+SMS_ACCESS_KEY_SECRET: ""
+SMS_SIGN_NAME: ""
+SMS_TEMPLATE_CODE: ""
+SMS_REGION: cn-shanghai
+SMS_ENDPOINT: dypnsapi.aliyuncs.com
+SMS_COUNTRY_CODE: "86"
+SMS_INTERVAL: 60s
+SMS_DAILY_PHONE: 20
+SMS_DAILY_IP: 50
+LOGIN_INTERVAL: 1s
+OAUTH_STATE_SECRET: test-oauth-state-hmac-secret!!
+OAUTH_STATE_TIMEOUT_MS: 600000
+OAUTH_GITEE_CLIENT_ID: test-gitee-client-id
+OAUTH_GITEE_CLIENT_SECRET: test-gitee-client-secret
+OAUTH_GITEE_REDIRECT_URI: http://localhost:8080/api/v1/auth/gitee/callback
+OAUTH_GITEE_AUTHORIZE_URL: https://gitee.com/oauth/authorize
+OAUTH_GITEE_TOKEN_URL: https://gitee.com/oauth/token
+OAUTH_GITEE_USER_URL: https://gitee.com/api/v5/user
+OAUTH_GITEE_SCOPE: user_info
+OAUTH_GITHUB_CLIENT_ID: test-github-client-id
+OAUTH_GITHUB_CLIENT_SECRET: test-github-client-secret
+OAUTH_GITHUB_REDIRECT_URI: http://localhost:8080/api/v1/auth/github/callback
+OAUTH_GITHUB_AUTHORIZE_URL: https://github.com/login/oauth/authorize
+OAUTH_GITHUB_TOKEN_URL: https://github.com/login/oauth/access_token
+OAUTH_GITHUB_USER_URL: https://api.github.com/user
+OAUTH_GITHUB_SCOPE: "read:user"
+
 spring:
   autoconfigure:
     exclude:
@@ -18,14 +66,6 @@ spring:
 
 pagehelper:
   helper-dialect: h2
-
-app:
-  auth:
-    jwt-secret: test-jwt-secret-key-at-least-32-bytes!!
-    access-token-ttl: 2h
-    refresh-token-ttl: 90d
-  sms:
-    mock-enabled: true
 
 logging:
   level:

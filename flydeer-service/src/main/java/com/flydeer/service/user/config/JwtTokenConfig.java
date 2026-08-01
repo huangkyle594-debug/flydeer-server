@@ -13,13 +13,13 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "app.jwt")
 public class JwtTokenConfig {
 
-    private String secret = "change-me-to-a-long-random-secret-key!!";
-    private Duration accessTokenTtl = Duration.ofHours(2);
-    private Duration refreshTokenTtl = Duration.ofDays(90);
+    private String secret;
+    private Duration accessTokenTtl;
+    private Duration refreshTokenTtl;
 
-    private String refreshCookieName = "refresh_token";
-    private Boolean refreshCookieSecure = false;
-    private String refreshCookiePath = "/api/v1/auth";
+    private String refreshCookieName;
+    private Boolean refreshCookieSecure;
+    private String refreshCookiePath;
 
-    private String redirectUrl = "http://localhost:5173/oauth/callback";
+    private String redirectUrl;
 }

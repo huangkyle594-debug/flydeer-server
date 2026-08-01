@@ -1,15 +1,17 @@
 spring:
   application:
     name: flydeer-server
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:flydeer}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
-    username: ${MYSQL_USER:flydeer}
-    password: ${MYSQL_PASSWORD:flydeer}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   docker:
     compose:
       enabled: false
@@ -30,7 +32,7 @@ pagehelper:
   support-methods-arguments: true
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT}
 
 management:
   endpoints:
@@ -48,49 +50,49 @@ logging:
 
 app:
   jwt:
-    secret: ${AUTH_JWT_SECRET:change-me-to-a-long-random-secret-key!!}
-    access-token-ttl: ${AUTH_ACCESS_TTL:2h}
-    refresh-token-ttl: ${AUTH_REFRESH_TTL:90d}
-    refresh-cookie-name: ${AUTH_REFRESH_COOKIE:refresh_token}
-    refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
-    refresh-cookie-path: /api/v1/auth
-    redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:5173/oauth/callback}
+    secret: ${AUTH_JWT_SECRET}
+    access-token-ttl: ${AUTH_ACCESS_TTL}
+    refresh-token-ttl: ${AUTH_REFRESH_TTL}
+    refresh-cookie-name: ${AUTH_REFRESH_COOKIE}
+    refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE}
+    refresh-cookie-path: ${AUTH_REFRESH_COOKIE_PATH}
+    redirect-url: ${AUTH_FRONTEND_REDIRECT}
   id:
-    start: ${ID_START:10000000}
-    step-min: ${ID_STEP_MIN:1}
-    step-max: ${ID_STEP_MAX:99}
+    start: ${ID_START}
+    step-min: ${ID_STEP_MIN}
+    step-max: ${ID_STEP_MAX}
   sms:
-    mock-enabled: ${SMS_MOCK_ENABLED:true}
-    access-key-id: ${SMS_ACCESS_KEY_ID:}
-    access-key-secret: ${SMS_ACCESS_KEY_SECRET:}
-    sign-name: ${SMS_SIGN_NAME:}
-    template-code: ${SMS_TEMPLATE_CODE:}
-    region: ${SMS_REGION:cn-shanghai}
-    endpoint: ${SMS_ENDPOINT:dypnsapi.aliyuncs.com}
-    country-code: ${SMS_COUNTRY_CODE:86}
+    mock-enabled: ${SMS_MOCK_ENABLED}
+    access-key-id: ${SMS_ACCESS_KEY_ID}
+    access-key-secret: ${SMS_ACCESS_KEY_SECRET}
+    sign-name: ${SMS_SIGN_NAME}
+    template-code: ${SMS_TEMPLATE_CODE}
+    region: ${SMS_REGION}
+    endpoint: ${SMS_ENDPOINT}
+    country-code: ${SMS_COUNTRY_CODE}
   user:
     ratelimit:
-      sms-interval: ${SMS_INTERVAL:60s}
-      sms-daily-limit-per-phone: ${SMS_DAILY_PHONE:20}
-      sms-daily-limit-per-ip: ${SMS_DAILY_IP:50}
-      login-interval: ${LOGIN_INTERVAL:1s}
+      sms-interval: ${SMS_INTERVAL}
+      sms-daily-limit-per-phone: ${SMS_DAILY_PHONE}
+      sms-daily-limit-per-ip: ${SMS_DAILY_IP}
+      login-interval: ${LOGIN_INTERVAL}
   oauth:
-    secret: ${OAUTH_STATE_SECRET:change-me-oauth-state-hmac-secret!!}
-    timeout: ${OAUTH_STATE_TIMEOUT_MS:600000}
+    secret: ${OAUTH_STATE_SECRET}
+    timeout: ${OAUTH_STATE_TIMEOUT_MS}
     oauth:
       gitee:
-        client-id: ${OAUTH_GITEE_CLIENT_ID:}
-        client-secret: ${OAUTH_GITEE_CLIENT_SECRET:}
-        redirect-uri: ${OAUTH_GITEE_REDIRECT_URI:http://localhost:8080/api/v1/auth/gitee/callback}
-        authorize-url: https://gitee.com/oauth/authorize
-        token-url: https://gitee.com/oauth/token
-        user-url: https://gitee.com/api/v5/user
-        scope: user_info
+        client-id: ${OAUTH_GITEE_CLIENT_ID}
+        client-secret: ${OAUTH_GITEE_CLIENT_SECRET}
+        redirect-uri: ${OAUTH_GITEE_REDIRECT_URI}
+        authorize-url: ${OAUTH_GITEE_AUTHORIZE_URL}
+        token-url: ${OAUTH_GITEE_TOKEN_URL}
+        user-url: ${OAUTH_GITEE_USER_URL}
+        scope: ${OAUTH_GITEE_SCOPE}
       github:
-        client-id: ${OAUTH_GITHUB_CLIENT_ID:}
-        client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:}
-        redirect-uri: ${OAUTH_GITHUB_REDIRECT_URI:http://localhost:8080/api/v1/auth/github/callback}
-        authorize-url: https://github.com/login/oauth/authorize
-        token-url: https://github.com/login/oauth/access_token
-        user-url: https://api.github.com/user
-        scope: read:user
+        client-id: ${OAUTH_GITHUB_CLIENT_ID}
+        client-secret: ${OAUTH_GITHUB_CLIENT_SECRET}
+        redirect-uri: ${OAUTH_GITHUB_REDIRECT_URI}
+        authorize-url: ${OAUTH_GITHUB_AUTHORIZE_URL}
+        token-url: ${OAUTH_GITHUB_TOKEN_URL}
+        user-url: ${OAUTH_GITHUB_USER_URL}
+        scope: ${OAUTH_GITHUB_SCOPE}

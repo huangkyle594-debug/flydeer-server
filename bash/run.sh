@@ -34,11 +34,14 @@ setup_docker() {
 }
 
 wait_app_healthy() {
+  # shellcheck disable=SC1091
+  set -a && source "${ROOT}/.env" && set +a
+  local port="${SERVER_PORT}"
   local i
-  log "等待 app healthy..."
+  log "等待 app healthy (port=${port})..."
   for i in $(seq 1 90); do
-    if curl -sf "http://127.0.0.1:8080/actuator/health" >/dev/null 2>&1; then
-      log "health: $(curl -sS http://127.0.0.1:8080/actuator/health)"
+    if curl -sf "http://127.0.0.1:${port}/actuator/health" >/dev/null 2>&1; then
+      log "health: $(curl -sS "http://127.0.0.1:${port}/actuator/health")"
       return 0
     fi
     sleep 2
@@ -62,11 +65,13 @@ cmd_down() {
   log "完成"
 }
 
+require_env() {
+  [[ -f "${ROOT}/.env" ]] || die "未找到 .env，请先: cp .env.example .env"
+}
+
 cmd_reload() {
   setup_docker
-  if [[ ! -f "${ROOT}/.env" ]]; then
-    log "未找到 .env（可选 cp .env.example .env）"
-  fi
+  require_env
   log "重建 app 容器以重载 .env（不重新编译镜像）..."
   docker compose up -d --force-recreate --no-deps app
   wait_app_healthy
@@ -75,16 +80,15 @@ cmd_reload() {
 
 cmd_start() {
   setup_docker
-  if [[ -f "${ROOT}/.env" ]]; then
-    log "将通过 compose env_file 加载 .env（容器内 MYSQL/REDIS 仍用 compose 内网地址）"
-  else
-    log "未找到 .env，仅使用 compose 默认环境（可 cp .env.example .env）"
-  fi
+  require_env
+  log "将通过 compose env_file 加载 .env（容器内 MYSQL_HOST/REDIS_HOST 覆盖为内网地址）"
   log "构建并启动 Compose（mysql / redis / app）..."
   # --force-recreate：改 .env 后重新注入环境变量
   docker compose up -d --build --force-recreate app
   wait_app_healthy
-  log "MySQL=flydeer@localhost:3306  Redis=localhost:6379  App=http://localhost:8080"
+  # shellcheck disable=SC1091
+  set -a && source "${ROOT}/.env" && set +a
+  log "MySQL=${MYSQL_USER}@localhost:${MYSQL_PORT}  Redis=localhost:${REDIS_PORT}  App=http://localhost:${SERVER_PORT}"
   log "停止 app: ./bash/run.sh stop"
   log "重载 .env: ./bash/run.sh reload"
   log "全部停止: ./bash/run.sh down"

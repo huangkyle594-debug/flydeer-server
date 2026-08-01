@@ -15,8 +15,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "app.oauth")
 public class OauthConfig {
 
-    private String secret = "";
-    private Long timeout = 10 * 60 * 1000L;
+    private String secret;
+    private Long timeout;
     private Map<String, OauthProviderPojo> oauth = new HashMap<>();
 
     public OauthProviderPojo get(String provider) {

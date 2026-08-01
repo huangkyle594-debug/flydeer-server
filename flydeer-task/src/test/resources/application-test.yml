@@ -1,3 +1,13 @@
+# Required env placeholders from application.yml (no defaults in main config)
+MYSQL_HOST: localhost
+MYSQL_PORT: 3306
+MYSQL_DATABASE: flydeer
+MYSQL_USER: flydeer
+MYSQL_PASSWORD: flydeer
+REDIS_HOST: localhost
+REDIS_PORT: 6379
+TASK_SERVER_PORT: 0
+
 spring:
   autoconfigure:
     exclude:

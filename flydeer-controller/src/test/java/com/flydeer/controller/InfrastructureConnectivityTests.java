@@ -35,18 +35,52 @@ class InfrastructureConnectivityTests {
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
-        registry.add(
-                "spring.datasource.url",
-                () -> "jdbc:mysql://"
-                        + MYSQL_HOST
-                        + ":"
-                        + MYSQL_PORT
-                        + "/struct_mind?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false");
-        registry.add("spring.datasource.username", () -> "struct_mind");
-        registry.add("spring.datasource.password", () -> "struct_mind");
-        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
-        registry.add("spring.data.redis.host", () -> REDIS_HOST);
-        registry.add("spring.data.redis.port", () -> String.valueOf(REDIS_PORT));
+        registry.add("MYSQL_HOST", () -> MYSQL_HOST);
+        registry.add("MYSQL_PORT", () -> String.valueOf(MYSQL_PORT));
+        registry.add("MYSQL_DATABASE", () -> "flydeer");
+        registry.add("MYSQL_USER", () -> "flydeer");
+        registry.add("MYSQL_PASSWORD", () -> "flydeer");
+        registry.add("REDIS_HOST", () -> REDIS_HOST);
+        registry.add("REDIS_PORT", () -> String.valueOf(REDIS_PORT));
+        registry.add("SERVER_PORT", () -> "0");
+        registry.add("AUTH_JWT_SECRET", () -> "test-jwt-secret-key-at-least-32-bytes!!");
+        registry.add("AUTH_ACCESS_TTL", () -> "2h");
+        registry.add("AUTH_REFRESH_TTL", () -> "90d");
+        registry.add("AUTH_REFRESH_COOKIE", () -> "refresh_token");
+        registry.add("AUTH_REFRESH_COOKIE_SECURE", () -> "false");
+        registry.add("AUTH_REFRESH_COOKIE_PATH", () -> "/api/v1/auth");
+        registry.add("AUTH_FRONTEND_REDIRECT", () -> "http://localhost:5173/oauth/callback");
+        registry.add("ID_START", () -> "10000000");
+        registry.add("ID_STEP_MIN", () -> "1");
+        registry.add("ID_STEP_MAX", () -> "99");
+        registry.add("SMS_MOCK_ENABLED", () -> "true");
+        registry.add("SMS_ACCESS_KEY_ID", () -> "");
+        registry.add("SMS_ACCESS_KEY_SECRET", () -> "");
+        registry.add("SMS_SIGN_NAME", () -> "");
+        registry.add("SMS_TEMPLATE_CODE", () -> "");
+        registry.add("SMS_REGION", () -> "cn-shanghai");
+        registry.add("SMS_ENDPOINT", () -> "dypnsapi.aliyuncs.com");
+        registry.add("SMS_COUNTRY_CODE", () -> "86");
+        registry.add("SMS_INTERVAL", () -> "60s");
+        registry.add("SMS_DAILY_PHONE", () -> "20");
+        registry.add("SMS_DAILY_IP", () -> "50");
+        registry.add("LOGIN_INTERVAL", () -> "1s");
+        registry.add("OAUTH_STATE_SECRET", () -> "test-oauth-state-hmac-secret!!");
+        registry.add("OAUTH_STATE_TIMEOUT_MS", () -> "600000");
+        registry.add("OAUTH_GITEE_CLIENT_ID", () -> "test-gitee-client-id");
+        registry.add("OAUTH_GITEE_CLIENT_SECRET", () -> "test-gitee-client-secret");
+        registry.add("OAUTH_GITEE_REDIRECT_URI", () -> "http://localhost:8080/api/v1/auth/gitee/callback");
+        registry.add("OAUTH_GITEE_AUTHORIZE_URL", () -> "https://gitee.com/oauth/authorize");
+        registry.add("OAUTH_GITEE_TOKEN_URL", () -> "https://gitee.com/oauth/token");
+        registry.add("OAUTH_GITEE_USER_URL", () -> "https://gitee.com/api/v5/user");
+        registry.add("OAUTH_GITEE_SCOPE", () -> "user_info");
+        registry.add("OAUTH_GITHUB_CLIENT_ID", () -> "test-github-client-id");
+        registry.add("OAUTH_GITHUB_CLIENT_SECRET", () -> "test-github-client-secret");
+        registry.add("OAUTH_GITHUB_REDIRECT_URI", () -> "http://localhost:8080/api/v1/auth/github/callback");
+        registry.add("OAUTH_GITHUB_AUTHORIZE_URL", () -> "https://github.com/login/oauth/authorize");
+        registry.add("OAUTH_GITHUB_TOKEN_URL", () -> "https://github.com/login/oauth/access_token");
+        registry.add("OAUTH_GITHUB_USER_URL", () -> "https://api.github.com/user");
+        registry.add("OAUTH_GITHUB_SCOPE", () -> "read:user");
         registry.add("spring.docker.compose.enabled", () -> "false");
         registry.add("pagehelper.helper-dialect", () -> "mysql");
     }

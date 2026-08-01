@@ -32,24 +32,23 @@ log() { printf '[run-server] %s\n' "$*"; }
 die() { printf '[run-server] 错误：%s\n' "$*" >&2; exit 1; }
 
 load_env() {
-  if [[ -f "${ROOT}/.env" ]]; then
-    set -a
-    # shellcheck disable=SC1091
-    source "${ROOT}/.env"
-    set +a
-    log "已加载 .env"
-  else
-    log "未找到 .env，使用默认配置（可复制 .env.example）"
-  fi
-  export MYSQL_HOST="${MYSQL_HOST:-localhost}"
-  export MYSQL_PORT="${MYSQL_PORT:-3306}"
-  export MYSQL_DATABASE="${MYSQL_DATABASE:-flydeer}"
-  export MYSQL_USER="${MYSQL_USER:-flydeer}"
-  export MYSQL_PASSWORD="${MYSQL_PASSWORD:-flydeer}"
-  export REDIS_HOST="${REDIS_HOST:-localhost}"
-  export REDIS_PORT="${REDIS_PORT:-6379}"
-  export SERVER_PORT="${SERVER_PORT:-8080}"
-  export TASK_SERVER_PORT="${TASK_SERVER_PORT:-8081}"
+  [[ -f "${ROOT}/.env" ]] || die "未找到 .env，请先: cp .env.example .env"
+  set -a
+  # shellcheck disable=SC1091
+  source "${ROOT}/.env"
+  set +a
+  log "已加载 .env"
+  : "${MYSQL_HOST:?MYSQL_HOST 未配置}"
+  : "${MYSQL_PORT:?MYSQL_PORT 未配置}"
+  : "${MYSQL_DATABASE:?MYSQL_DATABASE 未配置}"
+  : "${MYSQL_USER:?MYSQL_USER 未配置}"
+  : "${MYSQL_PASSWORD:?MYSQL_PASSWORD 未配置}"
+  : "${REDIS_HOST:?REDIS_HOST 未配置}"
+  : "${REDIS_PORT:?REDIS_PORT 未配置}"
+  : "${SERVER_PORT:?SERVER_PORT 未配置}"
+  : "${TASK_SERVER_PORT:?TASK_SERVER_PORT 未配置}"
+  : "${AUTH_JWT_SECRET:?AUTH_JWT_SECRET 未配置}"
+  : "${OAUTH_STATE_SECRET:?OAUTH_STATE_SECRET 未配置}"
 }
 
 setup_java() {
@@ -128,8 +127,8 @@ cmd_status() {
   else
     log "task: stopped"
   fi
-  if curl -sf "http://127.0.0.1:${SERVER_PORT:-8080}/actuator/health" >/dev/null 2>&1; then
-    log "health: $(curl -sS "http://127.0.0.1:${SERVER_PORT:-8080}/actuator/health")"
+  if [[ -n "${SERVER_PORT:-}" ]] && curl -sf "http://127.0.0.1:${SERVER_PORT}/actuator/health" >/dev/null 2>&1; then
+    log "health: $(curl -sS "http://127.0.0.1:${SERVER_PORT}/actuator/health")"
   fi
   [[ "$ok" -eq 1 ]] || return 1
 }

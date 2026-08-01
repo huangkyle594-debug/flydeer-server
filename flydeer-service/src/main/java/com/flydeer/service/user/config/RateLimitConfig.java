@@ -13,8 +13,8 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "app.user.ratelimit")
 public class RateLimitConfig {
 
-    private Duration smsInterval = Duration.ofSeconds(60);
-    private int smsDailyLimitPerPhone = 20;
-    private int smsDailyLimitPerIp = 50;
-    private Duration loginInterval = Duration.ofSeconds(1);
+    private Duration smsInterval;
+    private int smsDailyLimitPerPhone;
+    private int smsDailyLimitPerIp;
+    private Duration loginInterval;
 }
