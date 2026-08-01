@@ -21,5 +21,5 @@ public class JwtTokenConfig {
     private Boolean refreshCookieSecure = false;
     private String refreshCookiePath = "/api/v1/auth";
 
-    private String redirectUrl = "http://localhost:3000/auth/callback";
+    private String redirectUrl = "http://localhost:5173/oauth/callback";
 }

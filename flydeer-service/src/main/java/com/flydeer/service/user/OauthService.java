@@ -49,7 +49,7 @@ public class OauthService {
             StringBuilder sb = new StringBuilder();
             sb.append(provider.getAuthorizeUrl())
                 .append("?client_id=").append(enc(provider.getClientId()))
-                .append("&redirect_uri").append(enc(provider.getRedirectUri()))
+                .append("&redirect_uri=").append(enc(provider.getRedirectUri()))
                 .append("&response_type=code")
                 .append("&state=").append(enc(state));
             if (StringUtils.hasText(provider.getScope())) {
@@ -70,7 +70,7 @@ public class OauthService {
             String[] payloadParts = payload.split(":", 2);
             Assert.isTrue(payloadParts.length == 2, "invalid oauth state payload");
             long ts = Long.parseLong(payloadParts[1]);
-            Assert.isTrue(System.currentTimeMillis() - ts > oauthConfig.getTimeout(), "oauth state expired");
+            Assert.isTrue(System.currentTimeMillis() - ts <= oauthConfig.getTimeout(), "oauth state expired");
         } catch (Exception e) {
             throw new OauthValidateException();
         }

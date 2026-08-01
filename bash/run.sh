@@ -2,6 +2,7 @@
 # 一键启动：Docker Compose（MySQL + Redis + controller）
 # 用法：
 #   ./bash/run.sh              # 构建并启动全栈 (8080)
+#   ./bash/run.sh reload       # 仅重建 app 容器以重载 .env（不重新编译）
 #   ./bash/run.sh stop         # 停止 app 容器（保留 MySQL/Redis）
 #   ./bash/run.sh down         # docker compose down（保留数据卷）
 #   ./bash/run.sh down -v      # 同时删除数据卷
@@ -61,22 +62,41 @@ cmd_down() {
   log "完成"
 }
 
+cmd_reload() {
+  setup_docker
+  if [[ ! -f "${ROOT}/.env" ]]; then
+    log "未找到 .env（可选 cp .env.example .env）"
+  fi
+  log "重建 app 容器以重载 .env（不重新编译镜像）..."
+  docker compose up -d --force-recreate --no-deps app
+  wait_app_healthy
+  log "已重载环境变量"
+}
+
 cmd_start() {
   setup_docker
+  if [[ -f "${ROOT}/.env" ]]; then
+    log "将通过 compose env_file 加载 .env（容器内 MYSQL/REDIS 仍用 compose 内网地址）"
+  else
+    log "未找到 .env，仅使用 compose 默认环境（可 cp .env.example .env）"
+  fi
   log "构建并启动 Compose（mysql / redis / app）..."
-  docker compose up -d --build
+  # --force-recreate：改 .env 后重新注入环境变量
+  docker compose up -d --build --force-recreate app
   wait_app_healthy
   log "MySQL=flydeer@localhost:3306  Redis=localhost:6379  App=http://localhost:8080"
   log "停止 app: ./bash/run.sh stop"
+  log "重载 .env: ./bash/run.sh reload"
   log "全部停止: ./bash/run.sh down"
 }
 
 main() {
   case "${1:-}" in
+    reload|env) cmd_reload; exit 0 ;;
     stop) cmd_stop; exit 0 ;;
     down) shift; cmd_down "$@"; exit 0 ;;
     -h|--help)
-      sed -n '2,8p' "$0"
+      sed -n '2,9p' "$0"
       exit 0
       ;;
     ""|--with-task)
@@ -86,7 +106,7 @@ main() {
       fi
       cmd_start
       ;;
-    *) die "未知参数: ${1}（支持 stop | down | --with-task）" ;;
+    *) die "未知参数: ${1}（支持 reload | stop | down | --with-task）" ;;
   esac
 }
 

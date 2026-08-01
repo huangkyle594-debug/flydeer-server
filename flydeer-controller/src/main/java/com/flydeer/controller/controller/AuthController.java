@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @RestController
 @AllArgsConstructor
@@ -71,7 +72,7 @@ public class AuthController {
         throws OauthUrlBuildException {
 
         OauthLoginRequest request = new OauthLoginRequest(apiRequest);
-        request.setChannel(LoginChannelEnum.valueOf(provider));
+        request.setChannel(LoginChannelEnum.valueOf(provider.toUpperCase(Locale.ROOT)));
         return ApiResult.ok(authorizationApi.oauthLoginUrl(request));
     }
 
@@ -85,7 +86,7 @@ public class AuthController {
         throws IOException, OauthValidateException, OauthExchangeException, UserInvalidException {
 
         OauthCallbackRequest request = new OauthCallbackRequest(apiRequest);
-        request.setChannel(LoginChannelEnum.valueOf(provider));
+        request.setChannel(LoginChannelEnum.valueOf(provider.toUpperCase(Locale.ROOT)));
         request.setCode(code);
         request.setState(state);
         JwtTokenVO tokens = authorizationApi.oauthCallback(request);

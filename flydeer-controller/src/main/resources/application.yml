@@ -54,7 +54,7 @@ app:
     refresh-cookie-name: ${AUTH_REFRESH_COOKIE:refresh_token}
     refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
     refresh-cookie-path: /api/v1/auth
-    redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:5173/auth/callback}
+    redirect-url: ${AUTH_FRONTEND_REDIRECT:http://localhost:5173/oauth/callback}
   id:
     start: ${ID_START:10000000}
     step-min: ${ID_STEP_MIN:1}

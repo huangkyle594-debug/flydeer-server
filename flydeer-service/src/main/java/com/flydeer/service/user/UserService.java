@@ -85,7 +85,7 @@ public class UserService {
     //  封禁账号，同时revoke所有授权关系
 
     private void ensureActive(UserInfoDTO user) throws UserInvalidException {
-        if (UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
+        if (!UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
             throw new UserInvalidException();
         }
     }

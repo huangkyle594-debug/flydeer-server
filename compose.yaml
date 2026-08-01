@@ -45,6 +45,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    # 加载项目根目录 .env（OAuth / JWT / 短信等）；下面 environment 会覆盖容器内网地址
+    env_file:
+      - path: .env
+        required: false
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
