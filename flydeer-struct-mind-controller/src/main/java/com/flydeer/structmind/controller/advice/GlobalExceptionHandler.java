@@ -36,15 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResult<Void>> handleBusiness(BusinessException ex) {
-        HttpStatus status = switch (ex.getCode()) {
-            case ErrorCodes.UNAUTHORIZED, ErrorCodes.NEED_LOGIN -> HttpStatus.UNAUTHORIZED;
-            case ErrorCodes.FORBIDDEN, ErrorCodes.NEED_VERIFY -> HttpStatus.FORBIDDEN;
-            case ErrorCodes.NOT_FOUND, ErrorCodes.ENTITY_NOT_FOUND, ErrorCodes.USER_NOT_FOUND,
-                 ErrorCodes.DELEGATE_NOT_FOUND -> HttpStatus.NOT_FOUND;
-            case ErrorCodes.CONFLICT -> HttpStatus.CONFLICT;
-            case ErrorCodes.TOO_MANY_REQUESTS -> HttpStatus.TOO_MANY_REQUESTS;
-            default -> HttpStatus.BAD_REQUEST;
-        };
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return ResponseEntity.status(status).body(ApiResult.fail(ex.getCode(), ex.getMessage()));
     }
 
