@@ -1,7 +1,7 @@
 # 12-用户服务-api
 
 > 面向前端 / 前端 AI 联调的接口说明。覆盖 `AuthController`、`UserController`、`DelegateController`。  
-> **暂不包含错误码清单**（尚未定稿）。HTTP 状态与统一响应结构见本文「约定」一节。
+> 错误码与 HTTP 映射见 [14-错误码.md](./14-错误码.md)。HTTP 状态与统一响应结构见本文「约定」一节。
 
 **Base URL（本地默认）**：`http://localhost:8080`
 
@@ -23,7 +23,7 @@
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| `code` | int | `0` 表示成功；非 0 为业务/错误码（细节后续补充） |
+| `code` | int | `0` 表示成功；非 0 为业务错误码，见 [14-错误码](./14-错误码.md) |
 | `message` | string | 提示文案 |
 | `data` | object / array / null | 成功时的载荷；无数据时可为 `null` |
 

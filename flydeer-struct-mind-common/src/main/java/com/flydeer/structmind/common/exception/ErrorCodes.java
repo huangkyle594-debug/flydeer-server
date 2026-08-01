@@ -42,6 +42,8 @@ public final class ErrorCodes {
     public static final int SMS_RATE_FREQUENCY = 91010;
     public static final int LOGIN_RATE_FREQUENCY = 91020;
 
+    public static final int UNKNOWN = 999999;
+
     private ErrorCodes() {
     }
 }

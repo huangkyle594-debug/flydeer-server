@@ -14,6 +14,7 @@ Spring Boot 多模块后端：JDK 21 · Spring Boot 3.5 · Maven · MyBatis · P
 | [11-用户服务-业务流程](doc/generate/11-用户服务-业务流程.md) | 登录方式与业务主流程（不含实现细节） |
 | [12-用户服务-api](doc/generate/12-用户服务-api.md) | Auth / User / Delegate 接口说明（面向前端联调） |
 | [13-用户服务-技术方案](doc/generate/13-用户服务-技术方案.md) | 开发规范、本地/远程流程、表结构与业务用法 |
+| [14-错误码](doc/generate/14-错误码.md) | ErrorCodes + GlobalExceptionHandler 错误码与 HTTP 映射 |
 
 建表 SQL：[`doc/sql/02-user-service.sql`](doc/sql/02-user-service.sql)。
 
