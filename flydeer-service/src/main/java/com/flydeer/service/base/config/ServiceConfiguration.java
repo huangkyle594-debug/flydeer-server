@@ -11,9 +11,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -25,10 +29,18 @@ public class ServiceConfiguration {
 
     @Bean
     public RestClient.Builder restClientBuilder() {
-        return RestClient.builder();
+        // GitHub 等站点在 JDK HttpClient + HTTP/2 下偶发 EOF；强制 HTTP/1.1 更稳
+        HttpClient httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(Duration.ofSeconds(30));
+        return RestClient.builder().requestFactory(requestFactory);
     }
 
     @Bean
+    @Primary
     @ConditionalOnMissingBean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -55,18 +67,31 @@ public class ServiceConfiguration {
                 }
             }
         );
+        module.addSerializer(Instant.class,
+            new JsonSerializer<>() {
+                @Override
+                public void serialize(Instant value, JsonGenerator gen,
+                                      SerializerProvider provider) throws IOException {
+                    gen.writeNumber(value.toEpochMilli());
+                }
+            }
+        );
+        module.addDeserializer(Instant.class,
+            new JsonDeserializer<>() {
+                @Override
+                public Instant deserialize(JsonParser p, DeserializationContext ctxt)
+                    throws IOException {
+                    return Instant.ofEpochMilli(p.getValueAsLong());
+                }
+            }
+        );
         mapper.registerModule(module);
-        mapper.registerModule(new JavaTimeModule());
         mapper.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
-
         mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
         mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        // mapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
-
-        return new ObjectMapper();
+        return mapper;
     }
 }

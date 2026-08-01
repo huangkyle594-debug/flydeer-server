@@ -11,13 +11,19 @@ import com.flydeer.service.user.config.OauthConfig;
 import com.flydeer.service.user.model.OauthProviderPojo;
 import com.flydeer.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -27,6 +33,7 @@ import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class OauthService {
 
@@ -79,10 +86,14 @@ public class OauthService {
     public OauthUserRecord exchange(LoginChannelEnum channel, String code) throws OauthExchangeException {
         try {
             OauthProviderPojo provider = oauthConfig.get(channel.name().toLowerCase(Locale.ROOT));
+            Assert.notNull(provider, "oauth provider not configured: " + channel);
+            Assert.hasText(provider.getClientId(), "oauth client-id missing: " + channel);
+            Assert.hasText(provider.getClientSecret(), "oauth client-secret missing: " + channel);
             ThirdPlatformExchanger exchanger = exchangerMap.get(channel);
             String accessToken = exchanger.fetchAccessToken(provider, code);
             return exchanger.fetchUser(provider, accessToken);
         } catch (Exception e) {
+            log.warn("oauth exchange failed, channel={}", channel, e);
             throw new OauthExchangeException();
         }
     }
@@ -124,22 +135,30 @@ public class OauthService {
 
         @Override
         public String tokenBody(OauthProviderPojo provider, String code) {
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("grant_type", "authorization_code");
+            form.add("client_id", provider.getClientId());
+            form.add("client_secret", provider.getClientSecret());
+            form.add("code", code);
+            form.add("redirect_uri", provider.getRedirectUri());
             return restClient.post()
-                .uri(provider.getTokenUrl()
-                    + "?grant_type=authorization_code"
-                    + "&client_id=" + enc(provider.getClientId())
-                    + "&client_secret=" + enc(provider.getClientSecret())
-                    + "&code=" + enc(code)
-                    + "&redirect_uri=" + enc(provider.getRedirectUri()))
+                .uri(URI.create(provider.getTokenUrl()))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(form)
                 .retrieve()
                 .body(String.class);
         }
 
         @Override
         public String userBody(OauthProviderPojo provider, String accessToken) {
+            URI uri = UriComponentsBuilder
+                .fromUriString(provider.getUserUrl())
+                .queryParam("access_token", accessToken)
+                .build()
+                .toUri();
             return restClient
                 .get()
-                .uri(provider.getUserUrl() + "?access_token=" + enc(accessToken))
+                .uri(uri)
                 .retrieve()
                 .body(String.class);
         }
@@ -157,13 +176,16 @@ public class OauthService {
 
         @Override
         public String tokenBody(OauthProviderPojo provider, String code) {
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("client_id", provider.getClientId());
+            form.add("client_secret", provider.getClientSecret());
+            form.add("code", code);
+            form.add("redirect_uri", provider.getRedirectUri());
             return restClient.post()
-                .uri(provider.getTokenUrl())
+                .uri(URI.create(provider.getTokenUrl()))
                 .header("Accept", "application/json")
-                .body(Map.of("client_id", provider.getClientId(),
-                    "client_secret", provider.getClientSecret(),
-                    "code", code,
-                    "redirect_uri", provider.getRedirectUri()))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(form)
                 .retrieve()
                 .body(String.class);
         }
@@ -171,7 +193,7 @@ public class OauthService {
         @Override
         public String userBody(OauthProviderPojo provider, String accessToken) {
             return restClient.get()
-                .uri(provider.getUserUrl())
+                .uri(URI.create(provider.getUserUrl()))
                 .header("Authorization", "Bearer " + accessToken)
                 .header("Accept", "application/vnd.github+json")
                 .retrieve()
