@@ -14,7 +14,6 @@ import com.flydeer.structmind.contract.user.request.DelegateOperateRequest;
 import com.flydeer.structmind.contract.user.request.QueryDelegateRequest;
 import com.flydeer.structmind.contract.user.vo.DelegateVO;
 import com.flydeer.structmind.controller.aop.AuthCheck;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,7 +67,7 @@ public class DelegateController {
     @PostMapping("/revoke")
     public ApiResult<Void> revoke(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
-        @Valid @RequestBody DelegateOperateRequest body)
+        @RequestBody DelegateOperateRequest body)
         throws DelegateNotFoundException, BadRequestException {
 
         DelegateOperateRequest request = new DelegateOperateRequest(apiRequest);

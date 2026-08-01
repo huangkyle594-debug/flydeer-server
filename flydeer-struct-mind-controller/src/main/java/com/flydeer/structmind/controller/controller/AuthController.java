@@ -17,7 +17,6 @@ import com.flydeer.structmind.controller.aop.AuthCheck;
 import com.flydeer.structmind.controller.utils.AuthCookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +50,7 @@ public class AuthController {
     @PostMapping("/sms/login")
     public ApiResult<JwtTokenVO> smsLogin(
         @AuthCheck ApiRequest apiRequest,
-        @Valid @RequestBody SmsLoginRequest body,
+        @RequestBody SmsLoginRequest body,
         HttpServletRequest http,
         HttpServletResponse response)
         throws SmsVerifyException, UserInvalidException, LoginFrequencyException {
