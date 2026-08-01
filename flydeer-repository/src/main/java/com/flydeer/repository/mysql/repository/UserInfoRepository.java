@@ -1,6 +1,7 @@
 package com.flydeer.repository.mysql.repository;
 
 import com.flydeer.common.constants.UserConstants;
+import com.flydeer.common.utils.PhoneNumberUtils;
 import com.flydeer.common.utils.TextUtils;
 import com.flydeer.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.contract.user.enums.LoginChannelEnum;
@@ -75,7 +76,7 @@ public class UserInfoRepository {
         if (options.hasLoginUsePhone()) {
             user.setPhone(channelUid);
             user.setVerified(UserVerifiedStatusEnum.VERIFIED.getCode());
-            user.setName(channelUid);
+            user.setName(PhoneNumberUtils.maskPhone(channelUid));
         } else {
             user.setPhone(null);
             user.setVerified(UserVerifiedStatusEnum.UN_VERIFIED.getCode());
