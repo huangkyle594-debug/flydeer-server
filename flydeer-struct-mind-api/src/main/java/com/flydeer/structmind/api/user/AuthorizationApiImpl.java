@@ -4,8 +4,8 @@ import com.flydeer.structmind.api.user.mapper.AuthorizationMapper;
 import com.flydeer.structmind.common.exception.auth.*;
 import com.flydeer.structmind.common.exception.business.UserInvalidException;
 import com.flydeer.structmind.common.exception.business.UserNotFoundException;
-import com.flydeer.structmind.common.exception.ratelimit.LoginRateLimitException;
-import com.flydeer.structmind.common.exception.ratelimit.SmsRateLimitException;
+import com.flydeer.structmind.common.exception.frequency.LoginFrequencyException;
+import com.flydeer.structmind.common.exception.frequency.SmsFrequencyException;
 import com.flydeer.structmind.contract.user.AuthorizationApi;
 import com.flydeer.structmind.contract.user.request.*;
 import com.flydeer.structmind.contract.user.vo.JwtTokenVO;
@@ -32,14 +32,14 @@ public class AuthorizationApiImpl implements AuthorizationApi {
     private final RateLimitUtils rateLimiter;
 
     @Override
-    public void sendSmsCode(@Valid SendSmsCodeRequest request) throws SmsRateLimitException, SmsSendException {
+    public void sendSmsCode(@Valid SendSmsCodeRequest request) throws SmsFrequencyException, SmsSendException {
         rateLimiter.checkSms(request.getPhone(), request.getIp());
         smsVerifyService.sendVerifyCode(request.getPhone());
     }
 
     @Override
     public JwtTokenVO loginBySms(@Valid SmsLoginRequest request)
-        throws LoginRateLimitException, SmsVerifyException, UserInvalidException {
+        throws LoginFrequencyException, SmsVerifyException, UserInvalidException {
         rateLimiter.checkLogin("sms:" + request.getPhone() + ":" + request.getIp());
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterPhone(request.getPhone());

@@ -6,7 +6,7 @@ public class PhoneNumberUtils {
 
     public static String maskPhone(String phone) {
         if (!StringUtils.hasText(phone) || phone.length() < 7) {
-            return "user";
+            return null;
         }
         return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
     }

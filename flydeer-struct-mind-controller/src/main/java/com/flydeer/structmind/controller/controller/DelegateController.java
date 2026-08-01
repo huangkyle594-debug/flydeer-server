@@ -1,11 +1,11 @@
-package com.flydeer.structmind.controller.web;
+package com.flydeer.structmind.controller.controller;
 
 import com.flydeer.structmind.api.user.UserDelegateApiImpl;
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.request.CreateDelegateRequest;
 import com.flydeer.structmind.contract.user.vo.DelegateVO;
-import com.flydeer.structmind.contract.user.enums.UserLevelEnum;
+import com.flydeer.structmind.common.enums.AuthRequiredLevel;
 import com.flydeer.structmind.controller.auth.RequireUserLevel;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/delegates")
-@RequireUserLevel(UserLevelEnum.AUTHENTICATED)
+@RequireUserLevel(AuthRequiredLevel.AUTHENTICATED)
 public class DelegateController {
 
     private final UserDelegateApiImpl userDelegateApiImpl;

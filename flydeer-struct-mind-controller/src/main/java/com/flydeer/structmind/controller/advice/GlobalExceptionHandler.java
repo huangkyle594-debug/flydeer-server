@@ -2,6 +2,7 @@ package com.flydeer.structmind.controller.advice;
 
 import com.flydeer.structmind.common.exception.ErrorCodes;
 import com.flydeer.structmind.common.exception.business.BusinessException;
+import com.flydeer.structmind.common.exception.request.BadRequestException;
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(ApiResult.fail(ex.getCode(), ex.getMessage()));
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class, BadRequestException.class})
     public ResponseEntity<ApiResult<Void>> handleValidation(Exception ex) {
         return ResponseEntity.badRequest().body(ApiResult.fail(400, "validation failed"));
     }
@@ -39,6 +40,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResult<Void>> handleOther(Exception ex) {
         log.error("Unhandled error", ex);
         return ResponseEntity.internalServerError()
-                .body(ApiResult.fail(500, "internal server error"));
+            .body(ApiResult.fail(500, "internal server error"));
     }
 }

@@ -16,4 +16,8 @@ public class JwtTokenConfig {
     private String secret = "change-me-to-a-long-random-secret-key!!";
     private Duration accessTokenTtl = Duration.ofHours(2);
     private Duration refreshTokenTtl = Duration.ofDays(90);
+
+    private String refreshCookieName = "refresh_token";
+    private Boolean refreshCookieSecure = false;
+    private String refreshCookiePath = "/api/v1/auth";
 }

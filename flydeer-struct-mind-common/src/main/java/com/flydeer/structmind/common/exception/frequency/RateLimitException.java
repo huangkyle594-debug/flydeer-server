@@ -1,4 +1,4 @@
-package com.flydeer.structmind.common.exception.ratelimit;
+package com.flydeer.structmind.common.exception.frequency;
 
 import lombok.Getter;
 

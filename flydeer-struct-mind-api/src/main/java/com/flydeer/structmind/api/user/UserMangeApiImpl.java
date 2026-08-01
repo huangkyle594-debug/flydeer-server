@@ -5,6 +5,7 @@ import com.flydeer.structmind.common.exception.business.BindPhoneExceedException
 import com.flydeer.structmind.common.exception.business.PhoneChannelOperateException;
 import com.flydeer.structmind.common.exception.business.UserInvalidException;
 import com.flydeer.structmind.common.exception.business.UserNotFoundException;
+import com.flydeer.structmind.common.utils.PhoneNumberUtils;
 import com.flydeer.structmind.contract.base.request.ApiRequest;
 import com.flydeer.structmind.contract.user.UserMangeApi;
 import com.flydeer.structmind.contract.user.request.BindPhoneRequest;
@@ -33,7 +34,7 @@ public class UserMangeApiImpl implements UserMangeApi {
             user.getChannel(),
             user.getName(),
             user.getVerified() != null && user.getVerified() == 1,
-            user.getPhone());
+            PhoneNumberUtils.maskPhone(user.getPhone()));
     }
 
     @Override

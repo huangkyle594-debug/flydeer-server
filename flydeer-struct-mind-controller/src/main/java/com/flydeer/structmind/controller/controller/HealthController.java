@@ -1,4 +1,4 @@
-package com.flydeer.structmind.controller.web;
+package com.flydeer.structmind.controller.controller;
 
 import com.flydeer.structmind.contract.base.response.ApiResult;
 import org.springframework.web.bind.annotation.GetMapping;

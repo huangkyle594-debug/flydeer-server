@@ -3,7 +3,6 @@ package com.flydeer.structmind.contract.base.request;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,5 +16,5 @@ public class ApiRequest {
 
     private boolean verified;
 
-    private List<Long> delegatedUserIds = new ArrayList<>();
+    private List<Long> allUserIds;
 }

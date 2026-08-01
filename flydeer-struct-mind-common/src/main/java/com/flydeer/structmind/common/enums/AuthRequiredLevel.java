@@ -1,9 +1,9 @@
-package com.flydeer.structmind.contract.user.enums;
+package com.flydeer.structmind.common.enums;
 
 /**
  * Required user auth level for an endpoint.
  */
-public enum UserLevelEnum {
+public enum AuthRequiredLevel {
     ANONYMOUS,
     AUTHENTICATED,
     VERIFIED

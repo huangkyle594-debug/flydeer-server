@@ -1,7 +1,7 @@
 package com.flydeer.structmind.service.user.utils;
 
-import com.flydeer.structmind.common.exception.ratelimit.LoginRateLimitException;
-import com.flydeer.structmind.common.exception.ratelimit.SmsRateLimitException;
+import com.flydeer.structmind.common.exception.frequency.LoginFrequencyException;
+import com.flydeer.structmind.common.exception.frequency.SmsFrequencyException;
 import com.flydeer.structmind.service.user.config.RateLimitConfig;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -24,21 +24,21 @@ public class RateLimitUtils {
         this.dailyCache = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).build();
     }
 
-    public void checkSms(String phone, String ip) throws SmsRateLimitException {
+    public void checkSms(String phone, String ip) throws SmsFrequencyException {
         try {
             checkInterval("sms:phone:" + phone, rateLimitConfig.getSmsInterval());
             checkDaily("sms:day:phone:" + phone, rateLimitConfig.getSmsDailyLimitPerPhone());
             checkDaily("sms:day:ip:" + ip, rateLimitConfig.getSmsDailyLimitPerIp());
         } catch (Exception e) {
-            throw new SmsRateLimitException();
+            throw new SmsFrequencyException();
         }
     }
 
-    public void checkLogin(String key) throws LoginRateLimitException {
+    public void checkLogin(String key) throws LoginFrequencyException {
         try {
             checkInterval("login:" + key, rateLimitConfig.getLoginInterval());
         } catch (Exception e) {
-            throw new LoginRateLimitException();
+            throw new LoginFrequencyException();
         }
     }
 
