@@ -94,5 +94,15 @@
             <property name="useActualColumnNames" value="false"/>
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
+
+        <table tableName="atlas"
+               domainObjectName="AtlasEntity"
+               mapperName="AtlasMapper"
+               delimitAllColumns="true"
+               delimitIdentifiers="true">
+            <property name="useActualColumnNames" value="false"/>
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+            <columnOverride column="tags_json" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        </table>
     </context>
 </generatorConfiguration>

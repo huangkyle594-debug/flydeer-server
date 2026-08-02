@@ -22,3 +22,16 @@ CREATE TABLE IF NOT EXISTS `user_delegate` (
     PRIMARY KEY (`id`),
     UNIQUE (`delegator_id`, `delegated_id`)
 );
+
+CREATE TABLE IF NOT EXISTS `atlas` (
+    `id`           BIGINT       NOT NULL AUTO_INCREMENT,
+    `name`         VARCHAR(64)  NOT NULL,
+    `description`  VARCHAR(500) NOT NULL DEFAULT '',
+    `author_id`    BIGINT       NOT NULL,
+    `author_name`  VARCHAR(64)  NOT NULL DEFAULT '',
+    `status`       VARCHAR(16)  NOT NULL,
+    `tags_json`    VARCHAR(2000) NOT NULL DEFAULT '[]',
+    `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
