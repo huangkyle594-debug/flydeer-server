@@ -18,13 +18,13 @@ public class UserDelegateService {
 
     private final UserDelegateRepository userDelegateRepository;
 
-    public void delegate(Long userId, Long grantedUserId)
+    public void delegate(Long delegatorId, Long delegatedId)
         throws DelegateSelfException {
-        if (userId.equals(grantedUserId)) {
+        if (delegatorId.equals(delegatedId)) {
             throw new DelegateSelfException();
         }
 
-        UserDelegateDTO exist = userDelegateRepository.queryDelegate(userId, grantedUserId, null);
+        UserDelegateDTO exist = userDelegateRepository.queryDelegate(delegatorId, delegatedId, null);
         if (exist != null) {
             if (DelegateStatusEnum.PENDING.name().equals(exist.getStatus())
                 || DelegateStatusEnum.ACCEPTED.name().equals(exist.getStatus())) {
@@ -38,14 +38,14 @@ public class UserDelegateService {
         }
 
         UserDelegateDTO insert = new UserDelegateDTO();
-        insert.setUserId(userId);
-        insert.setGrantedUserId(grantedUserId);
+        insert.setDelegatorId(delegatorId);
+        insert.setDelegatedId(delegatedId);
         insert.setStatus(DelegateStatusEnum.PENDING.name());
         userDelegateRepository.delegate(insert, UserOptions.option());
     }
 
-    public void accept(Long userId, Long grantedUserId) throws DelegateNotFoundException {
-        UserDelegateDTO exist = userDelegateRepository.queryDelegate(userId, grantedUserId, null);
+    public void accept(Long delegatorId, Long delegatedId) throws DelegateNotFoundException {
+        UserDelegateDTO exist = userDelegateRepository.queryDelegate(delegatorId, delegatedId, null);
         if (exist == null || !DelegateStatusEnum.PENDING.name().equals(exist.getStatus())) {
             throw new DelegateNotFoundException();
         }
@@ -55,8 +55,8 @@ public class UserDelegateService {
         userDelegateRepository.update(update, UserOptions.option());
     }
 
-    public void revoke(Long userId, Long grantedUserId) throws DelegateNotFoundException {
-        UserDelegateDTO exist = userDelegateRepository.queryDelegate(userId, grantedUserId, null);
+    public void revoke(Long delegatorId, Long delegatedId) throws DelegateNotFoundException {
+        UserDelegateDTO exist = userDelegateRepository.queryDelegate(delegatorId, delegatedId, null);
         if (exist == null || DelegateStatusEnum.REVOKE.name().equals(exist.getStatus())) {
             throw new DelegateNotFoundException();
         }
@@ -69,22 +69,9 @@ public class UserDelegateService {
     public List<UserDelegateDTO> queryDelegations(
         Long userId, List<String> status, DelegateRelationEnum relation) {
         UserOptions options = UserOptions.option();
-        if (DelegateRelationEnum.MANAGED.equals(relation)) {
-            options.grantedUser();
+        if (DelegateRelationEnum.DELEGATED.equals(relation)) {
+            options.delegated();
         }
-        return userDelegateRepository.queryGrantorIds(userId, status, options);
-    }
-
-    /**
-     * Grantor userIds who have ACCEPTED delegating to {@code userId}.
-     */
-    public List<Long> listAcceptedGrantorIds(Long userId) {
-        return queryDelegations(
-            userId,
-            List.of(DelegateStatusEnum.ACCEPTED.name()),
-            DelegateRelationEnum.MANAGED)
-            .stream()
-            .map(UserDelegateDTO::getUserId)
-            .toList();
+        return userDelegateRepository.queryDelegate(userId, status, options);
     }
 }

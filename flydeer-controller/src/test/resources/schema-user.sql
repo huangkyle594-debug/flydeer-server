@@ -13,12 +13,12 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 );
 
 CREATE TABLE IF NOT EXISTS `user_delegate` (
-    `id`              BIGINT       NOT NULL AUTO_INCREMENT,
-    `user_id`         BIGINT       NOT NULL,
-    `granted_user_id` BIGINT       NOT NULL,
-    `status`          VARCHAR(16)  NOT NULL,
-    `created_at`      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at`      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `id`           BIGINT       NOT NULL AUTO_INCREMENT,
+    `delegator_id` BIGINT       NOT NULL,
+    `delegated_id` BIGINT       NOT NULL,
+    `status`       VARCHAR(16)  NOT NULL,
+    `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE (`user_id`, `granted_user_id`)
+    UNIQUE (`delegator_id`, `delegated_id`)
 );

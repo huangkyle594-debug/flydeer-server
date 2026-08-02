@@ -10,9 +10,9 @@ public class UserDelegateDTO {
 
     private Long id;
 
-    private Long userId;
+    private Long delegatorId;
 
-    private Long grantedUserId;
+    private Long delegatedId;
 
     private String status;
 

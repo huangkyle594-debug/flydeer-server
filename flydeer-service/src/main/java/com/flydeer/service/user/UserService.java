@@ -9,8 +9,10 @@ import com.flydeer.common.utils.TextUtils;
 import com.flydeer.contract.user.enums.LoginChannelEnum;
 import com.flydeer.contract.user.enums.UserStatusEnum;
 import com.flydeer.contract.user.enums.UserVerifiedStatusEnum;
+import com.flydeer.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.repository.mysql.dto.UserInfoDTO;
 import com.flydeer.repository.mysql.option.user.UserOptions;
+import com.flydeer.repository.mysql.repository.UserDelegateRepository;
 import com.flydeer.repository.mysql.repository.UserInfoRepository;
 import com.flydeer.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
@@ -24,13 +26,24 @@ public class UserService {
 
     private final UserInfoRepository userInfoRepository;
 
+    private final UserDelegateRepository userDelegateRepository;
+
     public UserInfoDTO requireActive(Long userId) throws UserNotFoundException, UserInvalidException {
-        UserInfoDTO user = userInfoRepository.queryById(userId, UserOptions.option());
+        return requireActive(userId, UserOptions.option());
+    }
+
+    public UserInfoDTO requireActive(Long userId, UserOptions options) throws UserNotFoundException, UserInvalidException {
+        UserInfoDTO user = userInfoRepository.queryById(userId);
         if (user == null) {
             throw new UserNotFoundException();
         }
         if (!UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
             throw new UserInvalidException();
+        }
+        if (options.hasDelegated()) {
+            List<Long> delegators = userDelegateRepository.queryDelegate(userId, null, UserOptions.option())
+                .stream().map(UserDelegateDTO::getDelegatedId).toList();
+            user.setDelegatorIds(delegators);
         }
         return user;
     }

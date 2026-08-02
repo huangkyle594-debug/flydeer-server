@@ -54,10 +54,10 @@ public class UserDelegateApiImpl implements UserDelegateApi {
             throw new BadRequestException("身份不能为空");
         }
         switch (request.getRelation()) {
-            case MANAGING:
+            case DELEGATOR:
                 userDelegateService.revoke(request.getUserId(), request.getOperateId());
                 break;
-            case MANAGED:
+            case DELEGATED:
                 userDelegateService.revoke(request.getOperateId(), request.getUserId());
                 break;
             default:

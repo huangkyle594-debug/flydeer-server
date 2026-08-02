@@ -45,7 +45,7 @@ public class UserController {
 
     @PostMapping("/me/update")
     public ApiResult<UserProfileVO> updateUser(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody UpdateUserRequest body)
         throws UserNotFoundException, UserInvalidException {
 

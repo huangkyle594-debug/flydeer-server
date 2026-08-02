@@ -18,14 +18,14 @@ public class UserDelegateRepository {
 
     private final UserDelegateMapper userDelegateMapper;
 
-    public List<UserDelegateDTO> queryGrantorIds(Long userId, List<String> status, UserOptions options) {
+    public List<UserDelegateDTO> queryDelegate(Long userId, List<String> status, UserOptions options) {
         UserDelegateEntityExample example = new UserDelegateEntityExample();
         UserDelegateEntityExample.Criteria criteria = example.createCriteria();
 
-        if (options.hasGrantedUser()) {
-            criteria.andGrantedUserIdEqualTo(userId);
+        if (options.hasDelegated()) {
+            criteria.andDelegatedIdEqualTo(userId);
         } else {
-            criteria.andUserIdEqualTo(userId);
+            criteria.andDelegatorIdEqualTo(userId);
         }
         if (status != null) {
             criteria.andStatusIn(status);
@@ -34,11 +34,11 @@ public class UserDelegateRepository {
         return userDelegateMapper.selectByExample(example).stream().map(UserDelegateMapping.INSTANCE::toDto).toList();
     }
 
-    public UserDelegateDTO queryDelegate(Long userId, Long grantedUserId, String status) {
+    public UserDelegateDTO queryDelegate(Long delegatorId, Long delegatedId, String status) {
         UserDelegateEntityExample example = new UserDelegateEntityExample();
         UserDelegateEntityExample.Criteria criteria = example.createCriteria()
-            .andUserIdEqualTo(userId)
-            .andGrantedUserIdEqualTo(grantedUserId);
+            .andDelegatorIdEqualTo(delegatorId)
+            .andDelegatedIdEqualTo(delegatedId);
         if (StringUtils.isNotBlank(status)) {
             criteria.andStatusEqualTo(status);
         }

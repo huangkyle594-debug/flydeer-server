@@ -2,12 +2,12 @@ package com.flydeer.repository.mysql.option.user;
 
 public enum UserOption {
 
-    WITH_GRANTED_IDS,
+    WITH_DELEGATOR_IDS,
 
     LOGIN_USE_PHONE,
 
     UPDATE_TO_NULL,
 
-    GRANTED_USER,
+    DELEGATED,
     ;
 }

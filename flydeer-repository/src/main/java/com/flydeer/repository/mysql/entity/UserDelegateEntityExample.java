@@ -165,123 +165,123 @@ public class UserDelegateEntityExample {
             return (Criteria) this;
         }
 
-        public Criteria andUserIdIsNull() {
-            addCriterion("`user_id` is null");
+        public Criteria andDelegatorIdIsNull() {
+            addCriterion("`delegator_id` is null");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdIsNotNull() {
-            addCriterion("`user_id` is not null");
+        public Criteria andDelegatorIdIsNotNull() {
+            addCriterion("`delegator_id` is not null");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdEqualTo(Long value) {
-            addCriterion("`user_id` =", value, "userId");
+        public Criteria andDelegatorIdEqualTo(Long value) {
+            addCriterion("`delegator_id` =", value, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdNotEqualTo(Long value) {
-            addCriterion("`user_id` <>", value, "userId");
+        public Criteria andDelegatorIdNotEqualTo(Long value) {
+            addCriterion("`delegator_id` <>", value, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdGreaterThan(Long value) {
-            addCriterion("`user_id` >", value, "userId");
+        public Criteria andDelegatorIdGreaterThan(Long value) {
+            addCriterion("`delegator_id` >", value, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdGreaterThanOrEqualTo(Long value) {
-            addCriterion("`user_id` >=", value, "userId");
+        public Criteria andDelegatorIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("`delegator_id` >=", value, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdLessThan(Long value) {
-            addCriterion("`user_id` <", value, "userId");
+        public Criteria andDelegatorIdLessThan(Long value) {
+            addCriterion("`delegator_id` <", value, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdLessThanOrEqualTo(Long value) {
-            addCriterion("`user_id` <=", value, "userId");
+        public Criteria andDelegatorIdLessThanOrEqualTo(Long value) {
+            addCriterion("`delegator_id` <=", value, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdIn(List<Long> values) {
-            addCriterion("`user_id` in", values, "userId");
+        public Criteria andDelegatorIdIn(List<Long> values) {
+            addCriterion("`delegator_id` in", values, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdNotIn(List<Long> values) {
-            addCriterion("`user_id` not in", values, "userId");
+        public Criteria andDelegatorIdNotIn(List<Long> values) {
+            addCriterion("`delegator_id` not in", values, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdBetween(Long value1, Long value2) {
-            addCriterion("`user_id` between", value1, value2, "userId");
+        public Criteria andDelegatorIdBetween(Long value1, Long value2) {
+            addCriterion("`delegator_id` between", value1, value2, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andUserIdNotBetween(Long value1, Long value2) {
-            addCriterion("`user_id` not between", value1, value2, "userId");
+        public Criteria andDelegatorIdNotBetween(Long value1, Long value2) {
+            addCriterion("`delegator_id` not between", value1, value2, "delegatorId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdIsNull() {
-            addCriterion("`granted_user_id` is null");
+        public Criteria andDelegatedIdIsNull() {
+            addCriterion("`delegated_id` is null");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdIsNotNull() {
-            addCriterion("`granted_user_id` is not null");
+        public Criteria andDelegatedIdIsNotNull() {
+            addCriterion("`delegated_id` is not null");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdEqualTo(Long value) {
-            addCriterion("`granted_user_id` =", value, "grantedUserId");
+        public Criteria andDelegatedIdEqualTo(Long value) {
+            addCriterion("`delegated_id` =", value, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdNotEqualTo(Long value) {
-            addCriterion("`granted_user_id` <>", value, "grantedUserId");
+        public Criteria andDelegatedIdNotEqualTo(Long value) {
+            addCriterion("`delegated_id` <>", value, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdGreaterThan(Long value) {
-            addCriterion("`granted_user_id` >", value, "grantedUserId");
+        public Criteria andDelegatedIdGreaterThan(Long value) {
+            addCriterion("`delegated_id` >", value, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdGreaterThanOrEqualTo(Long value) {
-            addCriterion("`granted_user_id` >=", value, "grantedUserId");
+        public Criteria andDelegatedIdGreaterThanOrEqualTo(Long value) {
+            addCriterion("`delegated_id` >=", value, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdLessThan(Long value) {
-            addCriterion("`granted_user_id` <", value, "grantedUserId");
+        public Criteria andDelegatedIdLessThan(Long value) {
+            addCriterion("`delegated_id` <", value, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdLessThanOrEqualTo(Long value) {
-            addCriterion("`granted_user_id` <=", value, "grantedUserId");
+        public Criteria andDelegatedIdLessThanOrEqualTo(Long value) {
+            addCriterion("`delegated_id` <=", value, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdIn(List<Long> values) {
-            addCriterion("`granted_user_id` in", values, "grantedUserId");
+        public Criteria andDelegatedIdIn(List<Long> values) {
+            addCriterion("`delegated_id` in", values, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdNotIn(List<Long> values) {
-            addCriterion("`granted_user_id` not in", values, "grantedUserId");
+        public Criteria andDelegatedIdNotIn(List<Long> values) {
+            addCriterion("`delegated_id` not in", values, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdBetween(Long value1, Long value2) {
-            addCriterion("`granted_user_id` between", value1, value2, "grantedUserId");
+        public Criteria andDelegatedIdBetween(Long value1, Long value2) {
+            addCriterion("`delegated_id` between", value1, value2, "delegatedId");
             return (Criteria) this;
         }
 
-        public Criteria andGrantedUserIdNotBetween(Long value1, Long value2) {
-            addCriterion("`granted_user_id` not between", value1, value2, "grantedUserId");
+        public Criteria andDelegatedIdNotBetween(Long value1, Long value2) {
+            addCriterion("`delegated_id` not between", value1, value2, "delegatedId");
             return (Criteria) this;
         }
 

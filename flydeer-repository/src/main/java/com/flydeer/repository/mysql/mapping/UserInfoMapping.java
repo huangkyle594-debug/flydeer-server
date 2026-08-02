@@ -11,7 +11,7 @@ public interface UserInfoMapping {
 
     UserInfoMapping INSTANCE = Mappers.getMapper(UserInfoMapping.class);
 
-    @Mapping(target = "grantedIds", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "delegatorIds", expression = "java(new java.util.ArrayList<>())")
     UserInfoDTO toDto(UserInfoEntity entity);
 
     @Mapping(target = "createdAt", ignore = true)

@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 public class UserDelegateEntity {
     private Long id;
 
-    private Long userId;
+    private Long delegatorId;
 
-    private Long grantedUserId;
+    private Long delegatedId;
 
     private String status;
 

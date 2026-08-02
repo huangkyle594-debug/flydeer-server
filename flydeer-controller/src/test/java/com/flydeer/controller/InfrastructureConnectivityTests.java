@@ -42,6 +42,7 @@ class InfrastructureConnectivityTests {
         registry.add("MYSQL_PASSWORD", () -> "flydeer");
         registry.add("REDIS_HOST", () -> REDIS_HOST);
         registry.add("REDIS_PORT", () -> String.valueOf(REDIS_PORT));
+        registry.add("REDIS_PASSWORD", () -> "");
         registry.add("SERVER_PORT", () -> "0");
         registry.add("AUTH_JWT_SECRET", () -> "test-jwt-secret-key-at-least-32-bytes!!");
         registry.add("AUTH_ACCESS_TTL", () -> "2h");

@@ -3,8 +3,8 @@
 <mapper namespace="com.flydeer.repository.mysql.mapper.UserDelegateMapper">
   <resultMap id="BaseResultMap" type="com.flydeer.repository.mysql.entity.UserDelegateEntity">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="user_id" jdbcType="BIGINT" property="userId" />
-    <result column="granted_user_id" jdbcType="BIGINT" property="grantedUserId" />
+    <result column="delegator_id" jdbcType="BIGINT" property="delegatorId" />
+    <result column="delegated_id" jdbcType="BIGINT" property="delegatedId" />
     <result column="status" jdbcType="VARCHAR" property="status" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
@@ -68,7 +68,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    `id`, `user_id`, `granted_user_id`, `status`, `created_at`, `updated_at`
+    `id`, `delegator_id`, `delegated_id`, `status`, `created_at`, `updated_at`
   </sql>
   <select id="selectByExample" parameterType="com.flydeer.repository.mysql.entity.UserDelegateEntityExample" resultMap="BaseResultMap">
     select
@@ -104,9 +104,9 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into `user_delegate` (`user_id`, `granted_user_id`, `status`, 
+    insert into `user_delegate` (`delegator_id`, `delegated_id`, `status`, 
       `created_at`, `updated_at`)
-    values (#{userId,jdbcType=BIGINT}, #{grantedUserId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, 
+    values (#{delegatorId,jdbcType=BIGINT}, #{delegatedId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, 
       #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.flydeer.repository.mysql.entity.UserDelegateEntity">
@@ -115,11 +115,11 @@
     </selectKey>
     insert into `user_delegate`
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="userId != null">
-        `user_id`,
+      <if test="delegatorId != null">
+        `delegator_id`,
       </if>
-      <if test="grantedUserId != null">
-        `granted_user_id`,
+      <if test="delegatedId != null">
+        `delegated_id`,
       </if>
       <if test="status != null">
         `status`,
@@ -132,11 +132,11 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="userId != null">
-        #{userId,jdbcType=BIGINT},
+      <if test="delegatorId != null">
+        #{delegatorId,jdbcType=BIGINT},
       </if>
-      <if test="grantedUserId != null">
-        #{grantedUserId,jdbcType=BIGINT},
+      <if test="delegatedId != null">
+        #{delegatedId,jdbcType=BIGINT},
       </if>
       <if test="status != null">
         #{status,jdbcType=VARCHAR},
@@ -161,11 +161,11 @@
       <if test="row.id != null">
         `id` = #{row.id,jdbcType=BIGINT},
       </if>
-      <if test="row.userId != null">
-        `user_id` = #{row.userId,jdbcType=BIGINT},
+      <if test="row.delegatorId != null">
+        `delegator_id` = #{row.delegatorId,jdbcType=BIGINT},
       </if>
-      <if test="row.grantedUserId != null">
-        `granted_user_id` = #{row.grantedUserId,jdbcType=BIGINT},
+      <if test="row.delegatedId != null">
+        `delegated_id` = #{row.delegatedId,jdbcType=BIGINT},
       </if>
       <if test="row.status != null">
         `status` = #{row.status,jdbcType=VARCHAR},
@@ -184,8 +184,8 @@
   <update id="updateByExample" parameterType="map">
     update `user_delegate`
     set `id` = #{row.id,jdbcType=BIGINT},
-      `user_id` = #{row.userId,jdbcType=BIGINT},
-      `granted_user_id` = #{row.grantedUserId,jdbcType=BIGINT},
+      `delegator_id` = #{row.delegatorId,jdbcType=BIGINT},
+      `delegated_id` = #{row.delegatedId,jdbcType=BIGINT},
       `status` = #{row.status,jdbcType=VARCHAR},
       `created_at` = #{row.createdAt,jdbcType=TIMESTAMP},
       `updated_at` = #{row.updatedAt,jdbcType=TIMESTAMP}
@@ -196,11 +196,11 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.flydeer.repository.mysql.entity.UserDelegateEntity">
     update `user_delegate`
     <set>
-      <if test="userId != null">
-        `user_id` = #{userId,jdbcType=BIGINT},
+      <if test="delegatorId != null">
+        `delegator_id` = #{delegatorId,jdbcType=BIGINT},
       </if>
-      <if test="grantedUserId != null">
-        `granted_user_id` = #{grantedUserId,jdbcType=BIGINT},
+      <if test="delegatedId != null">
+        `delegated_id` = #{delegatedId,jdbcType=BIGINT},
       </if>
       <if test="status != null">
         `status` = #{status,jdbcType=VARCHAR},
@@ -216,8 +216,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.flydeer.repository.mysql.entity.UserDelegateEntity">
     update `user_delegate`
-    set `user_id` = #{userId,jdbcType=BIGINT},
-      `granted_user_id` = #{grantedUserId,jdbcType=BIGINT},
+    set `delegator_id` = #{delegatorId,jdbcType=BIGINT},
+      `delegated_id` = #{delegatedId,jdbcType=BIGINT},
       `status` = #{status,jdbcType=VARCHAR},
       `created_at` = #{createdAt,jdbcType=TIMESTAMP},
       `updated_at` = #{updatedAt,jdbcType=TIMESTAMP}

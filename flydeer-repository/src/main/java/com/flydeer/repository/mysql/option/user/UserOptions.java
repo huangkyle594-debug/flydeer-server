@@ -7,13 +7,13 @@ public class UserOptions extends Options<UserOption> {
         return new UserOptions();
     }
 
-    public UserOptions withGrantedIds() {
-        add(UserOption.WITH_GRANTED_IDS);
+    public UserOptions withDelegatorIds() {
+        add(UserOption.WITH_DELEGATOR_IDS);
         return this;
     }
 
-    public Boolean hasWithGrantedUserIds() {
-        return contains(UserOption.WITH_GRANTED_IDS);
+    public Boolean hasWithDelegatorIds() {
+        return contains(UserOption.WITH_DELEGATOR_IDS);
     }
 
     public UserOptions loginUsePhone() {
@@ -34,12 +34,12 @@ public class UserOptions extends Options<UserOption> {
         return contains(UserOption.UPDATE_TO_NULL);
     }
 
-    public UserOptions grantedUser() {
-        add(UserOption.GRANTED_USER);
+    public UserOptions delegated() {
+        add(UserOption.DELEGATED);
         return this;
     }
 
-    public Boolean hasGrantedUser() {
-        return contains(UserOption.GRANTED_USER);
+    public Boolean hasDelegated() {
+        return contains(UserOption.DELEGATED);
     }
 }

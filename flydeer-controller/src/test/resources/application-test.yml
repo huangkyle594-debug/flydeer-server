@@ -6,6 +6,7 @@ MYSQL_USER: flydeer
 MYSQL_PASSWORD: flydeer
 REDIS_HOST: localhost
 REDIS_PORT: 6379
+REDIS_PASSWORD: ""
 SERVER_PORT: 0
 AUTH_JWT_SECRET: test-jwt-secret-key-at-least-32-bytes!!
 AUTH_ACCESS_TTL: 2h

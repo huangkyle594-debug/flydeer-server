@@ -17,13 +17,13 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `user_delegate` (
-    `id`              BIGINT       NOT NULL AUTO_INCREMENT,
-    `user_id`         BIGINT       NOT NULL COMMENT 'user id',
-    `granted_user_id` BIGINT       NOT NULL COMMENT 'granted user id',
-    `status`          VARCHAR(16)  NOT NULL COMMENT 'PENDING | ACCEPTED | REVOKED',
-    `created_at`      DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at`      DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    `id`           BIGINT       NOT NULL AUTO_INCREMENT,
+    `delegator_id` BIGINT       NOT NULL COMMENT 'delegator user id',
+    `delegated_id` BIGINT       NOT NULL COMMENT 'delegated user id',
+    `status`       VARCHAR(16)  NOT NULL COMMENT 'PENDING | ACCEPTED | REVOKED',
+    `created_at`   DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at`   DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_user_granted` (`user_id`, `granted_user_id`),
-    KEY `idx_granted_user_id` (`granted_user_id`)
+    UNIQUE KEY `uk_delegator_delegated` (`delegator_id`, `delegated_id`),
+    KEY `idx_delegated_id` (`delegated_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

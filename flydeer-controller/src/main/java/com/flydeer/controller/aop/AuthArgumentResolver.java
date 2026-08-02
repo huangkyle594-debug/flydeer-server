@@ -113,16 +113,16 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
             return;
         }
         if (resolveLevel == AuthResolveLevel.DELEGATE) {
-            List<Long> grantedUserIds = userDelegateService.queryDelegations(
+            List<Long> delegatedIds = userDelegateService.queryDelegations(
                     claims.userId(),
                     List.of(DelegateStatusEnum.ACCEPTED.name()),
-                    DelegateRelationEnum.MANAGING)
+                    DelegateRelationEnum.DELEGATOR)
                 .stream()
-                .map(UserDelegateDTO::getGrantedUserId)
+                .map(UserDelegateDTO::getDelegatedId)
                 .toList();
-            List<Long> allUserIds = new ArrayList<>(grantedUserIds.size() + 1);
+            List<Long> allUserIds = new ArrayList<>(delegatedIds.size() + 1);
             allUserIds.add(claims.userId());
-            allUserIds.addAll(grantedUserIds);
+            allUserIds.addAll(delegatedIds);
             apiRequest.setAllUserIds(allUserIds);
         }
     }
