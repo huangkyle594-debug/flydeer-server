@@ -6,7 +6,6 @@ import com.flydeer.repository.mysql.dto.AtlasDTO;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,8 +28,6 @@ public final class AtlasVoMapper {
             dto.getAuthorName() == null ? "" : dto.getAuthorName(),
             dto.getStatus(),
             dto.getTags() == null ? List.of() : dto.getTags(),
-            Collections.emptyList(),
-            "",
             toEpochMilli(dto.getCreatedAt()),
             toEpochMilli(dto.getUpdatedAt())
         );
@@ -49,8 +46,6 @@ public final class AtlasVoMapper {
             dto.getAuthorName() == null ? "" : dto.getAuthorName(),
             dto.getStatus(),
             dto.getTags() == null ? List.of() : dto.getTags(),
-            Collections.emptyList(),
-            "",
             toEpochMilli(dto.getCreatedAt()),
             toEpochMilli(dto.getUpdatedAt()),
             editable

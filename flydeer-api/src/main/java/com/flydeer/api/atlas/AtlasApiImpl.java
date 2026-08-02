@@ -1,6 +1,5 @@
 package com.flydeer.api.atlas;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.flydeer.api.atlas.mapper.AtlasVoMapper;
 import com.flydeer.common.constants.AtlasConstants;
 import com.flydeer.common.exception.auth.NeedLoginException;
@@ -12,7 +11,6 @@ import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.contract.atlas.AtlasApi;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
 import com.flydeer.contract.atlas.request.AtlasIdRequest;
-import com.flydeer.contract.atlas.request.AtlasImportRequest;
 import com.flydeer.contract.atlas.request.AtlasQueryRequest;
 import com.flydeer.contract.atlas.request.AtlasUpdateRequest;
 import com.flydeer.contract.atlas.vo.AtlasListItemVO;
@@ -29,7 +27,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -108,55 +105,8 @@ public class AtlasApiImpl implements AtlasApi {
     }
 
     @Override
-    public AtlasVO importAtlas(@Valid AtlasImportRequest request)
-        throws UserNotFoundException, UserInvalidException, BadRequestException {
-        if (!AtlasConstants.IMPORT_FORMAT.equals(request.getFormat())
-            || request.getVersion() == null
-            || request.getVersion() != AtlasConstants.IMPORT_VERSION) {
-            throw new BadRequestException("导入格式无效，需要 format=struct-mind/atlas 且 version=1");
-        }
-        JsonNode atlasNode = request.getAtlas();
-        if (atlasNode == null || !atlasNode.isObject()) {
-            throw new BadRequestException("导入内容缺少 atlas 对象");
-        }
-        String name = textOrEmpty(atlasNode.get("name"));
-        if (!StringUtils.hasText(name)) {
-            throw new BadRequestException("导入图集名称不能为空");
-        }
-        if (name.length() > AtlasConstants.MAX_NAME_LENGTH) {
-            name = name.substring(0, AtlasConstants.MAX_NAME_LENGTH);
-        }
-        String description = textOrEmpty(atlasNode.get("description"));
-        if (description.length() > AtlasConstants.MAX_DESCRIPTION_LENGTH) {
-            description = description.substring(0, AtlasConstants.MAX_DESCRIPTION_LENGTH);
-        }
-        List<String> tags = readTags(atlasNode.get("tags"));
-
-        UserInfoDTO user = userService.requireActive(request.getUserId());
-        AtlasDTO created = atlasService.create(name, description, tags, user.getId(), user.getName());
-        return AtlasVoMapper.toVO(created);
-    }
-
-    @Override
     public AtlasVO getAtlas(@Valid AtlasIdRequest request)
         throws AtlasNotFoundException, AtlasForbiddenException {
         return AtlasVoMapper.toVO(atlasService.getVisible(request.getAtlasId(), request.getUserId()));
-    }
-
-    private static String textOrEmpty(JsonNode node) {
-        return node == null || node.isNull() ? "" : node.asText("");
-    }
-
-    private static List<String> readTags(JsonNode node) {
-        if (node == null || !node.isArray()) {
-            return List.of();
-        }
-        List<String> tags = new ArrayList<>();
-        node.forEach(item -> {
-            if (item != null && item.isTextual() && StringUtils.hasText(item.asText())) {
-                tags.add(item.asText().trim());
-            }
-        });
-        return tags;
     }
 }

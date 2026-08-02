@@ -11,7 +11,6 @@ import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.contract.atlas.AtlasApi;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
 import com.flydeer.contract.atlas.request.AtlasIdRequest;
-import com.flydeer.contract.atlas.request.AtlasImportRequest;
 import com.flydeer.contract.atlas.request.AtlasQueryRequest;
 import com.flydeer.contract.atlas.request.AtlasUpdateRequest;
 import com.flydeer.contract.atlas.vo.AtlasPageVO;
@@ -106,20 +105,6 @@ public class AtlasController {
         request.setAtlasId(body.getAtlasId());
         atlasApi.deleteAtlas(request);
         return ApiResult.ok();
-    }
-
-    @PostMapping("/atlases/import")
-    public ApiResult<AtlasVO> importAtlas(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
-        @RequestBody AtlasImportRequest body)
-        throws UserNotFoundException, UserInvalidException, BadRequestException {
-
-        AtlasImportRequest request = new AtlasImportRequest(apiRequest);
-        request.setFormat(body.getFormat());
-        request.setVersion(body.getVersion());
-        request.setAtlas(body.getAtlas());
-        request.setGraphs(body.getGraphs());
-        return ApiResult.ok(atlasApi.importAtlas(request));
     }
 
     @PostMapping("/atlases/detail")

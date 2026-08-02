@@ -10,8 +10,6 @@ public record AtlasVO(
     String authorName,
     String status,
     List<String> tags,
-    List<String> graphIds,
-    String rootGraphId,
     Long createdAt,
     Long updatedAt) {
 }

@@ -10,8 +10,6 @@ public record AtlasListItemVO(
     String authorName,
     String status,
     List<String> tags,
-    List<String> graphIds,
-    String rootGraphId,
     Long createdAt,
     Long updatedAt,
     boolean editable) {
