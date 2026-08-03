@@ -42,7 +42,7 @@ public class AtlasController {
         AtlasQueryRequest request = new AtlasQueryRequest(apiRequest);
         if (body != null) {
             request.setKeyword(body.getKeyword());
-            request.setEditable(body.getEditable());
+            request.setScope(body.getScope());
             request.setTags(body.getTags());
             request.setPage(body.getPage());
             request.setPageSize(body.getPageSize());

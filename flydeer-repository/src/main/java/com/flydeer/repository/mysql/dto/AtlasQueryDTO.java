@@ -10,7 +10,8 @@ public class AtlasQueryDTO {
 
     private Long viewerId;
 
-    private Boolean editableOnly;
+    /** ALL | CREATED | MANAGED */
+    private String scope;
 
     private String keyword;
 

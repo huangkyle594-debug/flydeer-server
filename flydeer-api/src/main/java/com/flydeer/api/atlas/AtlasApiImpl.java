@@ -9,6 +9,7 @@ import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
 import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.contract.atlas.AtlasApi;
+import com.flydeer.contract.atlas.enums.AtlasPermissionScope;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
 import com.flydeer.contract.atlas.request.AtlasIdRequest;
 import com.flydeer.contract.atlas.request.AtlasQueryRequest;
@@ -38,7 +39,9 @@ public class AtlasApiImpl implements AtlasApi {
 
     @Override
     public AtlasPageVO listAtlases(@Valid AtlasQueryRequest request) throws NeedLoginException {
-        if (Boolean.TRUE.equals(request.getEditable()) && request.getUserId() == null) {
+        AtlasPermissionScope scope = request.resolvedScope();
+        if ((scope == AtlasPermissionScope.CREATED || scope == AtlasPermissionScope.MANAGED)
+            && request.getUserId() == null) {
             throw new NeedLoginException();
         }
         int page = request.getPage() <= 0 ? AtlasConstants.DEFAULT_PAGE : request.getPage();
@@ -49,7 +52,7 @@ public class AtlasApiImpl implements AtlasApi {
 
         AtlasQueryDTO query = new AtlasQueryDTO();
         query.setViewerId(request.getUserId());
-        query.setEditableOnly(Boolean.TRUE.equals(request.getEditable()));
+        query.setScope(scope.name());
         if (StringUtils.hasText(request.getKeyword())) {
             query.setKeyword(request.getKeyword().trim());
         }

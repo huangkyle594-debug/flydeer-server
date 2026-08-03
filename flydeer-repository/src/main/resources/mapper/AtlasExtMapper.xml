@@ -21,7 +21,8 @@
     FROM `atlas`
     <where>
       <choose>
-        <when test="query.editableOnly != null and query.editableOnly">
+        <!-- CREATED / MANAGED：协作未上线前均按作者=当前用户 -->
+        <when test="query.scope == 'CREATED' or query.scope == 'MANAGED'">
           AND `author_id` = #{query.viewerId}
         </when>
         <when test="query.viewerId != null">

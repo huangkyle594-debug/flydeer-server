@@ -134,23 +134,31 @@ draft  --提交审核-->  pending  --人审通过-->  published
 
 - **路由**：`POST /api/struct-mind/v1/atlases/query`
 - **鉴权**：匿名；带 Token 时按登录用户计算可见范围与 `editable`
-- **逻辑**：可见范围过滤 → 筛选 → 按 `updatedAt` 降序分页 → 填充 `editable`
-- **注意**：`editable=true` 且未登录 → **401**
+- **逻辑**：可见范围过滤 → 按 `scope` 筛选 → 其它筛选 → 按 `updatedAt` 降序分页 → 填充 `editable`
+- **注意**：`scope` 为 `CREATED` / `MANAGED` 且未登录 → **401**（`code=31010`）
 
 **Request Body**（可省略整个 body，等价于默认分页）
 
 | 字段 | 类型 | 必填 | 说明 |
 |---|---|---|---|
 | `keyword` | string | 否 | 模糊匹配标题 / 简介 / 作者名 |
-| `editable` | boolean | 否 | `true` 时仅返回当前用户可编辑的图集 |
+| `scope` | string | 否 | 权限筛选，见下表；默认 / 省略 / `ALL` = 不额外按权限收窄 |
 | `tags` | string[] | 否 | 命中**任一**标签即保留 |
 | `page` | int | 否 | 从 1 起，默认 1 |
 | `pageSize` | int | 否 | 默认 10，上限 50 |
 
+**`scope` 枚举**
+
+| 值 | 含义 | 过滤规则 |
+|---|---|---|
+| `ALL`（默认） | 全部 | 仅应用既有可见范围（已发布 + 自己的草稿/待审等），不按权限再滤 |
+| `CREATED` | 我创建的 | `authorId` = 当前用户 |
+| `MANAGED` | 我管理的 | 当前用户对图集有管理/编辑权限；协作未上线前等价于「作者为当前用户」 |
+
 ```json
 {
   "keyword": "",
-  "editable": false,
+  "scope": "CREATED",
   "tags": ["安全", "计算机"],
   "page": 1,
   "pageSize": 10
@@ -403,7 +411,7 @@ Access Token 存储键与主站一致：`localStorage['fd_access_token']`。
 | code | 含义 | 典型场景 |
 |---|---|---|
 | `0` | 成功 | — |
-| `31010` | 需要登陆态 | 写操作未登录；`editable=true` 列表未登录 |
+| `31010` | 需要登陆态 | 写操作未登录；`scope` 为 `CREATED` / `MANAGED` 且未登录 |
 | `40000` | 请求不合法 | 参数校验失败；非草稿提交审核 |
 | `51030` | 图集不存在 | `ATLAS_NOT_FOUND` |
 | `52030` | 无权操作该图集 | `ATLAS_FORBIDDEN`（非作者等） |

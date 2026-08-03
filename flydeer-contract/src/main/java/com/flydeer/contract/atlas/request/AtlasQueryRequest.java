@@ -1,5 +1,6 @@
 package com.flydeer.contract.atlas.request;
 
+import com.flydeer.contract.atlas.enums.AtlasPermissionScope;
 import com.flydeer.contract.base.request.ApiRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,8 @@ public class AtlasQueryRequest extends ApiRequest {
 
     private String keyword;
 
-    private Boolean editable;
+    /** 权限范围；默认 ALL */
+    private AtlasPermissionScope scope;
 
     private List<String> tags;
 
@@ -24,5 +26,9 @@ public class AtlasQueryRequest extends ApiRequest {
 
     public AtlasQueryRequest(ApiRequest auth) {
         super(auth);
+    }
+
+    public AtlasPermissionScope resolvedScope() {
+        return scope == null ? AtlasPermissionScope.ALL : scope;
     }
 }
