@@ -20,6 +20,9 @@ replay_pid*
 *.ipr
 .idea_modules/
 
+# IDE — JetBrains AI Assistant / agent skills (local symlinks)
+.agents/
+
 # IDE — Eclipse / STS
 .apt_generated
 .classpath
