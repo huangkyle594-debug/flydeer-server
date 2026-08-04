@@ -11,6 +11,7 @@ import com.flydeer.common.exception.auth.SmsSendException;
 import com.flydeer.common.exception.auth.SmsVerifyException;
 import com.flydeer.service.user.config.SmsConfig;
 import darabonba.core.client.ClientOverrideConfiguration;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,19 +43,12 @@ public class SmsVerifyService {
 
     private interface SmsProvider {
 
-        SmsConfig getSmsConfig();
-
         void sendVerifyCode(String phone) throws SmsSendException;
 
         void checkVerifyCode(String phone, String code) throws SmsVerifyException;
     }
 
     private static class MockSmsProvider implements SmsProvider {
-
-        @Override
-        public SmsConfig getSmsConfig() {
-            return null;
-        }
 
         @Override
         public void sendVerifyCode(String phone) {
@@ -67,14 +61,11 @@ public class SmsVerifyService {
         }
     }
 
+    @AllArgsConstructor
     private static class AliyunSmsProvider implements SmsProvider {
 
         @Getter
         private final SmsConfig smsConfig;
-
-        public AliyunSmsProvider(SmsConfig smsConfig) {
-            this.smsConfig = smsConfig;
-        }
 
         @Override
         public void sendVerifyCode(String phone) throws SmsSendException {

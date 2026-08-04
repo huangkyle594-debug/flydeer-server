@@ -1,4 +1,6 @@
 # Docker Compose profile — activated by SPRING_PROFILES_ACTIVE=docker
+# 业务配置与 application-dev.yml 同步；连接地址与 OAuth 回调适配 Docker 网关
+
 spring:
   datasource:
     url: jdbc:mysql://mysql:3306/flydeer?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
@@ -12,3 +14,57 @@ spring:
   docker:
     compose:
       enabled: false
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: a1b2c3d4e5f67890ghijklmnopqrstuv
+    access-token-ttl: 2h
+    refresh-token-ttl: 90d
+    refresh-cookie-name: refresh_token
+    refresh-cookie-secure: false
+    refresh-cookie-path: /api/v1/auth
+    redirect-url: http://localhost/oauth/callback
+  id:
+    start: 10000000
+    step-min: 1
+    step-max: 99
+  sms:
+    mock-enabled: true
+    access-key-id:
+    access-key-secret:
+    sign-name:
+    template-code:
+    region: cn-shanghai
+    endpoint: dypnsapi.aliyuncs.com
+    country-code: "86"
+  user:
+    phone-hash-salt: change-me-phone-hash-salt!!
+    admin-ids: []
+    ratelimit:
+      sms-interval: 60s
+      sms-daily-limit-per-phone: 20
+      sms-daily-limit-per-ip: 50
+      login-interval: 1s
+  oauth:
+    secret: a1b2c3d4e5f67890ghijklmnopqrstuv
+    timeout: 600000
+    oauth:
+      gitee:
+        client-id: f4d0f3a16b09c2fa716c0f0359ebfa54f07acaf4fec12d3c66494fd2c8683766
+        client-secret: 910741827ef729eb176fcb999167bb54f2a3d3efb41cf4a74590abb54df1f1a5
+        redirect-uri: http://localhost/api/v1/auth/gitee/callback
+        authorize-url: https://gitee.com/oauth/authorize
+        token-url: https://gitee.com/oauth/token
+        user-url: https://gitee.com/api/v5/user
+        scope: user_info
+      github:
+        client-id: Ov23liBxCrWErD4VZFEP
+        client-secret: d1a54c6be69cb523e8a6459ba4b140c469e59f2f
+        redirect-uri: http://localhost/api/v1/auth/github/callback
+        authorize-url: https://github.com/login/oauth/authorize
+        token-url: https://github.com/login/oauth/access_token
+        user-url: https://api.github.com/user
+        scope: read:user
