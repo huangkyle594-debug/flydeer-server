@@ -19,23 +19,20 @@ import com.flydeer.contract.base.request.ApiRequest;
 import com.flydeer.contract.base.response.ApiResult;
 import com.flydeer.controller.aop.AuthCheck;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/struct-mind/v1")
+@RequestMapping("/api/v1/struct-mind/atlases")
 public class AtlasController {
 
     private final AtlasApi atlasApi;
 
-    @PostMapping("/atlases/query")
+    @PostMapping("/query")
     public ApiResult<AtlasPageVO> list(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.ANONYMOUS) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.DELEGATE) ApiRequest apiRequest,
         @RequestBody(required = false) AtlasQueryRequest body)
         throws NeedLoginException {
 
@@ -50,14 +47,14 @@ public class AtlasController {
         return ApiResult.ok(atlasApi.listAtlases(request));
     }
 
-    @PostMapping("/tags/query")
+    @GetMapping("/tags")
     public ApiResult<List<String>> tags() {
         return ApiResult.ok(atlasApi.listTags());
     }
 
-    @PostMapping("/atlases/create")
+    @PostMapping("/create")
     public ApiResult<AtlasVO> create(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasCreateRequest body)
         throws UserNotFoundException, UserInvalidException {
 
@@ -68,9 +65,9 @@ public class AtlasController {
         return ApiResult.ok(atlasApi.createAtlas(request));
     }
 
-    @PostMapping("/atlases/update")
+    @PostMapping("/update")
     public ApiResult<AtlasVO> update(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.DELEGATE, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasUpdateRequest body)
         throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException {
 
@@ -82,9 +79,9 @@ public class AtlasController {
         return ApiResult.ok(atlasApi.updateAtlas(request));
     }
 
-    @PostMapping("/atlases/submit-review")
+    @PostMapping("/submit-review")
     public ApiResult<Void> submitReview(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.DELEGATE, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasIdRequest body)
         throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException {
 
@@ -94,9 +91,9 @@ public class AtlasController {
         return ApiResult.ok();
     }
 
-    @PostMapping("/atlases/delete")
+    @PostMapping("/delete")
     public ApiResult<Void> delete(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.DELEGATE, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasIdRequest body)
         throws AtlasNotFoundException, AtlasForbiddenException {
 
@@ -106,7 +103,7 @@ public class AtlasController {
         return ApiResult.ok();
     }
 
-    @PostMapping("/atlases/detail")
+    @PostMapping("/detail")
     public ApiResult<AtlasVO> detail(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.ANONYMOUS) ApiRequest apiRequest,
         @RequestBody AtlasIdRequest body)
