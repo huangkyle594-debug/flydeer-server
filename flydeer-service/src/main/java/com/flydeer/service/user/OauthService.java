@@ -51,7 +51,7 @@ public class OauthService {
 
     public String buildAuthorizeUrl(LoginChannelEnum channel) throws OauthUrlBuildException {
         try {
-            OauthProviderPojo provider = oauthConfig.get(channel.name().toLowerCase(Locale.ROOT));
+            OauthProviderPojo provider = oauthConfig.get(channel.name());
             String state = signState(channel.name() + ":" + System.currentTimeMillis());
             StringBuilder sb = new StringBuilder();
             sb.append(provider.getAuthorizeUrl())

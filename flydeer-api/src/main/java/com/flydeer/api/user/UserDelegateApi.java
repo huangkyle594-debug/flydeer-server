@@ -6,7 +6,6 @@ import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
 import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.common.exception.request.DelegateSelfException;
-import com.flydeer.contract.user.UserDelegateApi;
 import com.flydeer.contract.user.request.DelegateOperateRequest;
 import com.flydeer.contract.user.request.QueryDelegateRequest;
 import com.flydeer.contract.user.vo.DelegateVO;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class UserDelegateApiImpl implements UserDelegateApi {
+public class UserDelegateApi implements com.flydeer.contract.user.UserDelegateApi {
 
     private final UserDelegateService userDelegateService;
 

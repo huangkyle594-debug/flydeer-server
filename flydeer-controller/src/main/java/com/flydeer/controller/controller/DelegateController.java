@@ -1,6 +1,6 @@
 package com.flydeer.controller.controller;
 
-import com.flydeer.api.user.UserDelegateApiImpl;
+import com.flydeer.api.user.UserDelegateApi;
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping("/api/v1/user/delegate")
 public class DelegateController {
 
-    private final UserDelegateApiImpl userDelegateApi;
+    private final UserDelegateApi userDelegateApi;
 
     @PostMapping("/query")
     public ApiResult<List<DelegateVO>> list(
