@@ -6,6 +6,7 @@
     <result column="channel" jdbcType="VARCHAR" property="channel" />
     <result column="channel_uid" jdbcType="VARCHAR" property="channelUid" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="phone_hash" jdbcType="VARCHAR" property="phoneHash" />
     <result column="verified" jdbcType="TINYINT" property="verified" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="status" jdbcType="TINYINT" property="status" />
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    `id`, `channel`, `channel_uid`, `phone`, `verified`, `name`, `status`, `created_at`, 
+    `id`, `channel`, `channel_uid`, `phone`, `phone_hash`, `verified`, `name`, `status`, `created_at`, 
     `updated_at`
   </sql>
   <select id="selectByExample" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntityExample" resultMap="BaseResultMap">
@@ -106,11 +107,11 @@
   </delete>
   <insert id="insert" parameterType="com.flydeer.repository.mysql.entity.UserInfoEntity">
     insert into `user_info` (`id`, `channel`, `channel_uid`, 
-      `phone`, `verified`, `name`, 
+      `phone`, `phone_hash`, `verified`, `name`, 
       `status`, `created_at`, `updated_at`
       )
     values (#{id,jdbcType=BIGINT}, #{channel,jdbcType=VARCHAR}, #{channelUid,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR}, #{verified,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{phoneHash,jdbcType=VARCHAR}, #{verified,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
       #{status,jdbcType=TINYINT}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -128,6 +129,9 @@
       </if>
       <if test="phone != null">
         `phone`,
+      </if>
+      <if test="phoneHash != null">
+        `phone_hash`,
       </if>
       <if test="verified != null">
         `verified`,
@@ -157,6 +161,9 @@
       </if>
       <if test="phone != null">
         #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneHash != null">
+        #{phoneHash,jdbcType=VARCHAR},
       </if>
       <if test="verified != null">
         #{verified,jdbcType=TINYINT},
@@ -196,6 +203,9 @@
       <if test="row.phone != null">
         `phone` = #{row.phone,jdbcType=VARCHAR},
       </if>
+      <if test="row.phoneHash != null">
+        `phone_hash` = #{row.phoneHash,jdbcType=VARCHAR},
+      </if>
       <if test="row.verified != null">
         `verified` = #{row.verified,jdbcType=TINYINT},
       </if>
@@ -222,6 +232,7 @@
       `channel` = #{row.channel,jdbcType=VARCHAR},
       `channel_uid` = #{row.channelUid,jdbcType=VARCHAR},
       `phone` = #{row.phone,jdbcType=VARCHAR},
+      `phone_hash` = #{row.phoneHash,jdbcType=VARCHAR},
       `verified` = #{row.verified,jdbcType=TINYINT},
       `name` = #{row.name,jdbcType=VARCHAR},
       `status` = #{row.status,jdbcType=TINYINT},
@@ -242,6 +253,9 @@
       </if>
       <if test="phone != null">
         `phone` = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneHash != null">
+        `phone_hash` = #{phoneHash,jdbcType=VARCHAR},
       </if>
       <if test="verified != null">
         `verified` = #{verified,jdbcType=TINYINT},
@@ -266,6 +280,7 @@
     set `channel` = #{channel,jdbcType=VARCHAR},
       `channel_uid` = #{channelUid,jdbcType=VARCHAR},
       `phone` = #{phone,jdbcType=VARCHAR},
+      `phone_hash` = #{phoneHash,jdbcType=VARCHAR},
       `verified` = #{verified,jdbcType=TINYINT},
       `name` = #{name,jdbcType=VARCHAR},
       `status` = #{status,jdbcType=TINYINT},

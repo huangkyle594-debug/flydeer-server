@@ -375,6 +375,76 @@ public class UserInfoEntityExample {
             return (Criteria) this;
         }
 
+        public Criteria andPhoneHashIsNull() {
+            addCriterion("`phone_hash` is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashIsNotNull() {
+            addCriterion("`phone_hash` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashEqualTo(String value) {
+            addCriterion("`phone_hash` =", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashNotEqualTo(String value) {
+            addCriterion("`phone_hash` <>", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashGreaterThan(String value) {
+            addCriterion("`phone_hash` >", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashGreaterThanOrEqualTo(String value) {
+            addCriterion("`phone_hash` >=", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashLessThan(String value) {
+            addCriterion("`phone_hash` <", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashLessThanOrEqualTo(String value) {
+            addCriterion("`phone_hash` <=", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashLike(String value) {
+            addCriterion("`phone_hash` like", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashNotLike(String value) {
+            addCriterion("`phone_hash` not like", value, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashIn(List<String> values) {
+            addCriterion("`phone_hash` in", values, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashNotIn(List<String> values) {
+            addCriterion("`phone_hash` not in", values, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashBetween(String value1, String value2) {
+            addCriterion("`phone_hash` between", value1, value2, "phoneHash");
+            return (Criteria) this;
+        }
+
+        public Criteria andPhoneHashNotBetween(String value1, String value2) {
+            addCriterion("`phone_hash` not between", value1, value2, "phoneHash");
+            return (Criteria) this;
+        }
+
         public Criteria andVerifiedIsNull() {
             addCriterion("`verified` is null");
             return (Criteria) this;

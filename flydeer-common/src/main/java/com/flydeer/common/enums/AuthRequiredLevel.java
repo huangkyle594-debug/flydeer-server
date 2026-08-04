@@ -6,5 +6,7 @@ package com.flydeer.common.enums;
 public enum AuthRequiredLevel {
     ANONYMOUS,
     AUTHENTICATED,
-    VERIFIED
+    VERIFIED,
+    /** Logged-in user whose id is in {@code app.user.admin-ids}. */
+    ADMIN
 }

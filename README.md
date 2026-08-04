@@ -22,8 +22,6 @@ Spring Boot 多模块后端：JDK 21 · Spring Boot 3.5 · Maven · MyBatis · P
 
 ```
 common  ←  contract  ←  repository  ←  service  ←  api  ←  controller  (HTTP Boot)
-                                    ↘
-                                      task  (定时任务 Boot，不依赖 api)
 ```
 
 | 模块 | Artifact | 职责 |
@@ -33,15 +31,14 @@ common  ←  contract  ←  repository  ←  service  ←  api  ←  controller 
 | repository | `flydeer-repository` | MyBatis Mapper / Entity / PageHelper |
 | service | `flydeer-service` | 可复用业务逻辑、事务、Redis、JWT、短信 |
 | api | `flydeer-api` | 面向业务的用例编排 |
-| task | `flydeer-task` | 独立定时任务应用（端口 8081） |
 | controller | `flydeer-controller` | HTTP API + 可运行 Boot 应用（端口 8080） |
 
-规则：上层依赖下层；禁止反向依赖（如 repository 不得依赖 service）。controller 依赖 api；task 只依赖 service。
+规则：上层依赖下层；禁止反向依赖（如 repository 不得依赖 service）。controller 依赖 api。
 
 ## 快速开始（Docker）
 
 ```bash
-./bash/run.sh                 # 构建并启动 MySQL + Redis + controller
+./bash/run.sh                 # 构建并启动 MySQL + Redis + controller（profile=docker）
 ./bash/run.sh stop            # 仅停 app
 ./bash/run.sh down            # 停全部容器（保留数据卷）
 ./bash/run.sh down -v         # 停全部并清空数据卷
@@ -51,21 +48,39 @@ curl http://localhost:8080/actuator/health
 
 | 服务 | 地址 | 说明 |
 |---|---|---|
-| App | `http://localhost:8080` | controller 容器 |
+| App | `http://localhost:8080` | controller 容器，`SPRING_PROFILES_ACTIVE=docker` |
 | MySQL | `localhost:3306` | 库名 / 用户 / 密码均为 `flydeer` |
 | Redis | `localhost:6379` | AOF 持久化 |
 
 建表 SQL 在首次初始化时自动执行（`doc/sql` → MySQL `docker-entrypoint-initdb.d`）。  
-镜像默认走 DaoCloud 代理；短信默认 `SMS_MOCK_ENABLED=true`。
+短信默认 `app.sms.mock-enabled: true`。
+
+## 本地 IDE / 无 Docker
+
+配置走 Spring Profile，不再使用 `.env`：
+
+| Profile | 文件 | 说明 |
+|---|---|---|
+| `dev`（默认） | `application.yml` + `application-dev.yml` | 本机开发 |
+| `docker` | `application-docker.yml` | Compose 内网主机名 |
+| `prod` | `application-prod.yml`（gitignore） | 生产，从 `.example` 复制 |
+
+```bash
+# 可选：从模板生成开发密钥配置（gitignore）
+cp flydeer-controller/src/main/resources/application-dev.yml.example \
+   flydeer-controller/src/main/resources/application-dev.yml
+```
 
 ## 云服务器（无 Docker）
 
-前提：服务器已安装 **JDK 21**，以及可连的 **MySQL / Redis**（本机安装或云托管均可）。
+前提：服务器已安装 **JDK 21**，以及可连的 **MySQL / Redis**。
 
 ```bash
-cp .env.example .env          # 修改 MYSQL_* / REDIS_* / 端口，并配置 JWT / OAuth / 短信等
-./bash/run-server.sh          # 构建并启动 controller
-./bash/run-server.sh --with-task
+cp flydeer-controller/src/main/resources/application-prod.yml.example \
+   flydeer-controller/src/main/resources/application-prod.yml
+# 编辑 datasource / Redis / JWT / OAuth / 短信等
+
+SPRING_PROFILES_ACTIVE=prod ./bash/run-server.sh
 ./bash/run-server.sh --skip-build   # 已有 jar 时跳过编译
 ./bash/run-server.sh status
 ./bash/run-server.sh stop

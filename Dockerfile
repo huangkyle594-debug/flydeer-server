@@ -10,7 +10,6 @@ COPY flydeer-contract/pom.xml flydeer-contract/
 COPY flydeer-repository/pom.xml flydeer-repository/
 COPY flydeer-service/pom.xml flydeer-service/
 COPY flydeer-api/pom.xml flydeer-api/
-COPY flydeer-task/pom.xml flydeer-task/
 COPY flydeer-controller/pom.xml flydeer-controller/
 
 RUN chmod +x mvnw \
@@ -35,8 +34,8 @@ RUN apt-get update \
 COPY --from=build /src/flydeer-controller/target/flydeer-controller-0.0.1-SNAPSHOT.jar app.jar
 
 ENV JAVA_OPTS="" \
-    SPRING_DOCKER_COMPOSE_ENABLED=false \
-    SERVER_PORT=8080
+    SPRING_PROFILES_ACTIVE=docker \
+    SPRING_DOCKER_COMPOSE_ENABLED=false
 
 EXPOSE 8080
 

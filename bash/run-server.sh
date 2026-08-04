@@ -3,9 +3,17 @@
 # 前提：机器上已安装 JDK 21，以及可连的 MySQL / Redis（本机或云托管均可）
 #
 # 用法：
-#   cp .env.example .env   # 按服务器实际修改数据库/Redis
-#   ./bash/run-server.sh              # 构建并启动 controller
-#   ./bash/run-server.sh --with-task  # 同时启动 task
+#   # 开发：复制并填写 application-dev.yml（默认 profile=dev）
+#   cp flydeer-controller/src/main/resources/application-dev.yml.example \
+#      flydeer-controller/src/main/resources/application-dev.yml
+#   ./bash/run-server.sh
+#
+#   # 生产：
+#   cp flydeer-controller/src/main/resources/application-prod.yml.example \
+#      flydeer-controller/src/main/resources/application-prod.yml
+#   SPRING_PROFILES_ACTIVE=prod ./bash/run-server.sh
+#
+#   ./bash/run-server.sh              # 默认 profile=dev
 #   ./bash/run-server.sh --skip-build # 使用已有 jar，不重新编译
 #   ./bash/run-server.sh stop
 #   ./bash/run-server.sh status
@@ -16,39 +24,38 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 CONTROLLER_MODULE="flydeer-controller"
-TASK_MODULE="flydeer-task"
 CONTROLLER_JAR="${ROOT}/${CONTROLLER_MODULE}/target/${CONTROLLER_MODULE}-0.0.1-SNAPSHOT.jar"
-TASK_JAR="${ROOT}/${TASK_MODULE}/target/${TASK_MODULE}-0.0.1-SNAPSHOT.jar"
 PID_DIR="${ROOT}/bash/.run"
 CONTROLLER_PID_FILE="${PID_DIR}/controller.pid"
-TASK_PID_FILE="${PID_DIR}/task.pid"
 LOG_DIR="${PID_DIR}"
 
-WITH_TASK=0
 SKIP_BUILD=0
 ACTION="start"
+PROFILE="${SPRING_PROFILES_ACTIVE:-dev}"
+CONTROLLER_PORT=8080
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+REDIS_HOST=localhost
+REDIS_PORT=6379
 
 log() { printf '[run-server] %s\n' "$*"; }
 die() { printf '[run-server] 错误：%s\n' "$*" >&2; exit 1; }
 
-load_env() {
-  [[ -f "${ROOT}/.env" ]] || die "未找到 .env，请先: cp .env.example .env"
-  set -a
-  # shellcheck disable=SC1091
-  source "${ROOT}/.env"
-  set +a
-  log "已加载 .env"
-  : "${MYSQL_HOST:?MYSQL_HOST 未配置}"
-  : "${MYSQL_PORT:?MYSQL_PORT 未配置}"
-  : "${MYSQL_DATABASE:?MYSQL_DATABASE 未配置}"
-  : "${MYSQL_USER:?MYSQL_USER 未配置}"
-  : "${MYSQL_PASSWORD:?MYSQL_PASSWORD 未配置}"
-  : "${REDIS_HOST:?REDIS_HOST 未配置}"
-  : "${REDIS_PORT:?REDIS_PORT 未配置}"
-  : "${SERVER_PORT:?SERVER_PORT 未配置}"
-  : "${TASK_SERVER_PORT:?TASK_SERVER_PORT 未配置}"
-  : "${AUTH_JWT_SECRET:?AUTH_JWT_SECRET 未配置}"
-  : "${OAUTH_STATE_SECRET:?OAUTH_STATE_SECRET 未配置}"
+require_profile() {
+  local ctrl_yml="${ROOT}/${CONTROLLER_MODULE}/src/main/resources/application-${PROFILE}.yml"
+  local ctrl_example="${ctrl_yml}.example"
+  if [[ "${PROFILE}" == "dev" || "${PROFILE}" == "docker" ]]; then
+    log "profile=${PROFILE}"
+    return 0
+  fi
+  if [[ -f "${ctrl_yml}" ]]; then
+    log "profile=${PROFILE} (${ctrl_yml})"
+    return 0
+  fi
+  if [[ -f "${ctrl_example}" ]]; then
+    die "未找到 ${ctrl_yml}，请先: cp ${ctrl_example} ${ctrl_yml}"
+  fi
+  die "未找到 profile 配置: application-${PROFILE}.yml"
 }
 
 setup_java() {
@@ -107,9 +114,7 @@ stop_pid_file() {
 
 cmd_stop() {
   stop_pid_file "$CONTROLLER_PID_FILE" "controller"
-  stop_pid_file "$TASK_PID_FILE" "task"
   pkill -f "${CONTROLLER_MODULE}-0.0.1-SNAPSHOT.jar" 2>/dev/null || true
-  pkill -f "${TASK_MODULE}-0.0.1-SNAPSHOT.jar" 2>/dev/null || true
   log "已停止"
 }
 
@@ -121,14 +126,8 @@ cmd_status() {
   else
     log "controller: stopped"
   fi
-  if [[ -f "$TASK_PID_FILE" ]] && kill -0 "$(cat "$TASK_PID_FILE")" 2>/dev/null; then
-    log "task: running (pid=$(cat "$TASK_PID_FILE"))"
-    ok=1
-  else
-    log "task: stopped"
-  fi
-  if [[ -n "${SERVER_PORT:-}" ]] && curl -sf "http://127.0.0.1:${SERVER_PORT}/actuator/health" >/dev/null 2>&1; then
-    log "health: $(curl -sS "http://127.0.0.1:${SERVER_PORT}/actuator/health")"
+  if curl -sf "http://127.0.0.1:${CONTROLLER_PORT}/actuator/health" >/dev/null 2>&1; then
+    log "health: $(curl -sS "http://127.0.0.1:${CONTROLLER_PORT}/actuator/health")"
   fi
   [[ "$ok" -eq 1 ]] || return 1
 }
@@ -137,63 +136,45 @@ build_jars() {
   if [[ "$SKIP_BUILD" -eq 1 ]]; then
     log "跳过构建 (--skip-build)"
     [[ -f "$CONTROLLER_JAR" ]] || die "未找到 ${CONTROLLER_JAR}，请先构建或去掉 --skip-build"
-    if [[ "$WITH_TASK" -eq 1 ]]; then
-      [[ -f "$TASK_JAR" ]] || die "未找到 ${TASK_JAR}，请先构建或去掉 --skip-build"
-    fi
     return 0
   fi
   [[ -x "${ROOT}/mvnw" ]] || die "未找到 mvnw"
   log "构建 ${CONTROLLER_MODULE}..."
   ./mvnw -pl "${CONTROLLER_MODULE}" -am package -DskipTests -q
   [[ -f "$CONTROLLER_JAR" ]] || die "构建失败：${CONTROLLER_JAR}"
-  if [[ "$WITH_TASK" -eq 1 ]]; then
-    log "构建 ${TASK_MODULE}..."
-    ./mvnw -pl "${TASK_MODULE}" -am package -DskipTests -q
-    [[ -f "$TASK_JAR" ]] || die "构建失败：${TASK_JAR}"
-  fi
 }
 
 start_apps() {
   mkdir -p "$PID_DIR"
   cmd_stop
 
-  log "启动 controller (:${SERVER_PORT})..."
+  log "启动 controller (:${CONTROLLER_PORT}, profile=${PROFILE})..."
   nohup java -jar "$CONTROLLER_JAR" \
+    --spring.profiles.active="${PROFILE}" \
     --spring.docker.compose.enabled=false \
     >"${LOG_DIR}/controller.log" 2>&1 &
   echo $! >"$CONTROLLER_PID_FILE"
 
-  if [[ "$WITH_TASK" -eq 1 ]]; then
-    log "启动 task (:${TASK_SERVER_PORT})..."
-    nohup java -jar "$TASK_JAR" \
-      --spring.docker.compose.enabled=false \
-      >"${LOG_DIR}/task.log" 2>&1 &
-    echo $! >"$TASK_PID_FILE"
-  fi
-
   local i
   for i in $(seq 1 90); do
-    if curl -sf "http://127.0.0.1:${SERVER_PORT}/actuator/health" >/dev/null 2>&1; then
+    if curl -sf "http://127.0.0.1:${CONTROLLER_PORT}/actuator/health" >/dev/null 2>&1; then
       break
     fi
     sleep 1
   done
 
-  if ! curl -sf "http://127.0.0.1:${SERVER_PORT}/actuator/health" >/dev/null 2>&1; then
+  if ! curl -sf "http://127.0.0.1:${CONTROLLER_PORT}/actuator/health" >/dev/null 2>&1; then
     log "controller 启动失败，最近日志："
     tail -n 50 "${LOG_DIR}/controller.log" || true
     die "见 ${LOG_DIR}/controller.log"
   fi
 
-  log "health: $(curl -sS "http://127.0.0.1:${SERVER_PORT}/actuator/health")"
-  if [[ "$WITH_TASK" -eq 1 ]]; then
-    log "task health: $(curl -sS "http://127.0.0.1:${TASK_SERVER_PORT}/actuator/health" || echo '未就绪，见 bash/.run/task.log')"
-  fi
+  log "health: $(curl -sS "http://127.0.0.1:${CONTROLLER_PORT}/actuator/health")"
   log "日志: ${LOG_DIR}/"
 }
 
 cmd_start() {
-  load_env
+  require_profile
   setup_java
   check_port "$MYSQL_HOST" "$MYSQL_PORT" "MySQL"
   check_port "$REDIS_HOST" "$REDIS_PORT" "Redis"
@@ -209,10 +190,9 @@ main() {
       stop) ACTION="stop" ;;
       status) ACTION="status" ;;
       restart) ACTION="restart" ;;
-      --with-task) WITH_TASK=1 ;;
       --skip-build) SKIP_BUILD=1 ;;
       -h|--help)
-        sed -n '2,14p' "$0"
+        sed -n '2,18p' "$0"
         exit 0
         ;;
       *) die "未知参数: ${arg}" ;;
@@ -221,9 +201,9 @@ main() {
 
   case "$ACTION" in
     start) cmd_start ;;
-    stop) load_env; cmd_stop ;;
-    status) load_env; cmd_status ;;
-    restart) load_env; setup_java; cmd_stop; SKIP_BUILD=1; build_jars; start_apps ;;
+    stop) cmd_stop ;;
+    status) cmd_status ;;
+    restart) require_profile; setup_java; cmd_stop; SKIP_BUILD=1; build_jars; start_apps ;;
   esac
 }
 

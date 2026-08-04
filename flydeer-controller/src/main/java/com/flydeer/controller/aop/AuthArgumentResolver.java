@@ -3,6 +3,7 @@ package com.flydeer.controller.aop;
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
 import com.flydeer.common.exception.auth.AccessTokenParseException;
+import com.flydeer.common.exception.auth.NeedAdminException;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.contract.base.request.ApiRequest;
@@ -11,6 +12,7 @@ import com.flydeer.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.controller.utils.AuthCookieUtils;
 import com.flydeer.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.service.user.UserDelegateService;
+import com.flydeer.service.user.config.UserConfig;
 import com.flydeer.service.user.model.AccessTokenClaims;
 import com.flydeer.service.user.utils.JwtTokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,14 +39,17 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
     private final JwtTokenUtils jwtTokenUtils;
     private final UserDelegateService userDelegateService;
     private final AuthCookieUtils authCookieUtils;
+    private final UserConfig userConfig;
 
     public AuthArgumentResolver(
         JwtTokenUtils jwtTokenUtils,
         UserDelegateService userDelegateService,
-        AuthCookieUtils authCookieUtils) {
+        AuthCookieUtils authCookieUtils,
+        UserConfig userConfig) {
         this.jwtTokenUtils = jwtTokenUtils;
         this.userDelegateService = userDelegateService;
         this.authCookieUtils = authCookieUtils;
+        this.userConfig = userConfig;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   @NonNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory)
-        throws AccessTokenParseException, NeedLoginException, NeedVerifyException {
+        throws AccessTokenParseException, NeedLoginException, NeedVerifyException, NeedAdminException {
 
         AuthCheck authCheck = parameter.getParameterAnnotation(AuthCheck.class);
         if (authCheck == null) {
@@ -91,7 +96,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
     }
 
     private void enforceRequired(AuthRequiredLevel required, AccessTokenClaims claims)
-        throws NeedLoginException, NeedVerifyException {
+        throws NeedLoginException, NeedVerifyException, NeedAdminException {
 
         if (required == AuthRequiredLevel.ANONYMOUS) {
             return;
@@ -101,6 +106,9 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
         }
         if (required == AuthRequiredLevel.VERIFIED && !claims.verified()) {
             throw new NeedVerifyException();
+        }
+        if (required == AuthRequiredLevel.ADMIN && !userConfig.isAdmin(claims.userId())) {
+            throw new NeedAdminException();
         }
     }
 

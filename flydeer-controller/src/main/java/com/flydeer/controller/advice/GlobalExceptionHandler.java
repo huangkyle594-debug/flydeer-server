@@ -2,6 +2,7 @@ package com.flydeer.controller.advice;
 
 import com.flydeer.common.exception.ErrorCodes;
 import com.flydeer.common.exception.auth.AuthorizedException;
+import com.flydeer.common.exception.auth.NeedAdminException;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.auth.SmsVerifyException;
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResult.fail(ex.getCode(), ex.getMessage()));
     }
 
-    @ExceptionHandler({NeedVerifyException.class, SmsVerifyException.class})
+    @ExceptionHandler({NeedVerifyException.class, NeedAdminException.class, SmsVerifyException.class})
     public ResponseEntity<ApiResult<Void>> handleAuthRequirement(AuthorizedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResult.fail(ex.getCode(), ex.getMessage()));
     }

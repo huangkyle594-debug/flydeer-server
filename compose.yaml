@@ -3,17 +3,17 @@ services:
     image: docker.m.daocloud.io/library/mysql:8.4
     container_name: flydeer-mysql
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: flydeer
+      MYSQL_USER: flydeer
+      MYSQL_PASSWORD: flydeer
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./doc/sql:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -23,7 +23,7 @@ services:
     image: docker.m.daocloud.io/library/redis:7
     container_name: flydeer-redis
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6379:6379"
     volumes:
       - redis_data:/data
     command: ["redis-server", "--appendonly", "yes"]
@@ -37,7 +37,6 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
     image: flydeer-controller:local
     container_name: flydeer-app
     depends_on:
@@ -45,18 +44,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    # 加载项目根目录 .env；下面 environment 覆盖为 Compose 内网地址
-    env_file:
-      - path: .env
-        required: true
     environment:
-      MYSQL_HOST: mysql
-      REDIS_HOST: redis
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "8080:8080"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:$${SERVER_PORT}/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:8080/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12

@@ -24,7 +24,6 @@
         <module>flydeer-repository</module>
         <module>flydeer-service</module>
         <module>flydeer-api</module>
-        <module>flydeer-task</module>
         <module>flydeer-controller</module>
     </modules>
 
@@ -78,11 +77,6 @@
             </dependency>
             <dependency>
                 <groupId>com.flydeer</groupId>
-                <artifactId>flydeer-task</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.flydeer</groupId>
                 <artifactId>flydeer-controller</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -129,6 +123,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>3.18.0</version>
         </dependency>
     </dependencies>
 

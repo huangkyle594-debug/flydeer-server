@@ -1,56 +1,21 @@
+# Dev profile template — migrated from .env.dev
+# Copy to application-dev.yml (gitignored) and adjust:
+#   cp flydeer-controller/src/main/resources/application-dev.yml.example \
+#      flydeer-controller/src/main/resources/application-dev.yml
+
 spring:
-  application:
-    name: flydeer-server
-  profiles:
-    default: dev
   datasource:
     url: jdbc:mysql://localhost:3306/flydeer?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
     username: flydeer
     password: flydeer
-    driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
       host: localhost
       port: 6379
       password:
-  docker:
-    compose:
-      enabled: false
-      lifecycle-management: start-and-stop
-      skip:
-        in-tests: true
-
-mybatis:
-  mapper-locations: classpath*:mapper/**/*.xml
-  type-aliases-package: com.flydeer.repository.mysql.entity
-  configuration:
-    map-underscore-to-camel-case: true
-    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
-
-pagehelper:
-  helper-dialect: mysql
-  reasonable: true
-  support-methods-arguments: true
 
 server:
   port: 8080
-  tomcat:
-    max-http-form-post-size: 5MB
-    max-swallow-size: 5MB
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,refresh
-  endpoint:
-    health:
-      show-details: when_authorized
-
-logging:
-  level:
-    root: INFO
-    com.flydeer: DEBUG
 
 app:
   jwt:
@@ -76,6 +41,7 @@ app:
     country-code: "86"
   user:
     phone-hash-salt: change-me-phone-hash-salt!!
+    # 管理员用户 ID 列表，用于 AuthRequiredLevel.ADMIN
     admin-ids: []
     ratelimit:
       sms-interval: 60s
@@ -87,16 +53,16 @@ app:
     timeout: 600000
     oauth:
       gitee:
-        client-id:
-        client-secret:
+        client-id: 3f9e74c4e6b4b68a1259bc1c0c30b334b37a7c1f1072f1149af62ef43143acec
+        client-secret: 6ba48fc7cde9da0a453de81b79840d8dbdd5192e7ae41ef0cd4b7f8d3eb358f1
         redirect-uri: http://localhost:8080/api/v1/auth/gitee/callback
         authorize-url: https://gitee.com/oauth/authorize
         token-url: https://gitee.com/oauth/token
         user-url: https://gitee.com/api/v5/user
         scope: user_info
       github:
-        client-id:
-        client-secret:
+        client-id: Ov23linw1wfo2KnQMRTy
+        client-secret: 9f8756a289567ffe5246912d4c88168627059ac4
         redirect-uri: http://localhost:8080/api/v1/auth/github/callback
         authorize-url: https://github.com/login/oauth/authorize
         token-url: https://github.com/login/oauth/access_token

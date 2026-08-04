@@ -64,9 +64,10 @@ logs/
 *.pid.lock
 .env
 .env.*
-!.env.example
-application-local.yml
-application-local.properties
+application-dev.yml
+application-dev.properties
+application-prod.yml
+application-prod.properties
 application-secret.yml
 application-secret.properties
 

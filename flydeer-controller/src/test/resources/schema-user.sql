@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `user_info` (
     `channel`      VARCHAR(16)  NOT NULL,
     `channel_uid`  VARCHAR(128) NOT NULL,
     `phone`        VARCHAR(32)  NULL,
+    `phone_hash`   VARCHAR(64)  NULL,
     `verified`     TINYINT      NOT NULL DEFAULT 0,
     `name`         VARCHAR(64)  NOT NULL DEFAULT '',
     `status`       TINYINT      NOT NULL DEFAULT 1,

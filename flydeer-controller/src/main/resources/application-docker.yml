@@ -1,0 +1,14 @@
+# Docker Compose profile — activated by SPRING_PROFILES_ACTIVE=docker
+spring:
+  datasource:
+    url: jdbc:mysql://mysql:3306/flydeer?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: flydeer
+    password: flydeer
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password:
+  docker:
+    compose:
+      enabled: false

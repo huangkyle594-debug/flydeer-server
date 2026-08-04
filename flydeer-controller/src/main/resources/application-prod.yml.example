@@ -1,0 +1,48 @@
+# Production profile template.
+# Copy to application-prod.yml (gitignored) and fill real values, then:
+#   java -jar app.jar --spring.profiles.active=prod
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/flydeer?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: flydeer
+    password: change-me
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+
+logging:
+  level:
+    root: INFO
+    com.flydeer: INFO
+
+app:
+  jwt:
+    secret: change-me-to-a-long-random-secret-key!!
+    refresh-cookie-secure: true
+    redirect-url: https://example.com/oauth/callback
+  sms:
+    mock-enabled: false
+    access-key-id:
+    access-key-secret:
+    sign-name:
+    template-code:
+  user:
+    phone-hash-salt: change-me-phone-hash-salt!!
+    admin-ids: []
+  oauth:
+    secret: change-me-oauth-state-hmac-secret!!
+    oauth:
+      gitee:
+        client-id:
+        client-secret:
+        redirect-uri: https://api.example.com/api/v1/auth/gitee/callback
+      github:
+        client-id:
+        client-secret:
+        redirect-uri: https://api.example.com/api/v1/auth/github/callback

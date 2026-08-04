@@ -15,6 +15,8 @@ public class UserInfoEntity {
 
     private String phone;
 
+    private String phoneHash;
+
     private Integer verified;
 
     private String name;

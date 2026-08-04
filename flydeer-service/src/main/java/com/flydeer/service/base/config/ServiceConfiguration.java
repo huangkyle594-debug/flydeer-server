@@ -24,7 +24,7 @@ import java.time.ZoneId;
 import java.util.TimeZone;
 
 @Configuration
-@EnableConfigurationProperties({IdGenerateConfig.class, JwtTokenConfig.class, OauthConfig.class, SmsConfig.class, RateLimitConfig.class})
+@EnableConfigurationProperties({IdGenerateConfig.class, JwtTokenConfig.class, OauthConfig.class, SmsConfig.class, RateLimitConfig.class, UserConfig.class})
 public class ServiceConfiguration {
 
     @Bean
