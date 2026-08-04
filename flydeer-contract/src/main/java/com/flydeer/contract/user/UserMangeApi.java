@@ -8,6 +8,7 @@ import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
 import com.flydeer.contract.base.request.ApiRequest;
 import com.flydeer.contract.user.request.BindPhoneRequest;
+import com.flydeer.contract.user.request.DisableUserRequest;
 import com.flydeer.contract.user.request.UpdateUserRequest;
 import com.flydeer.contract.user.vo.JwtTokenVO;
 import com.flydeer.contract.user.vo.UserProfileVO;
@@ -20,4 +21,6 @@ public interface UserMangeApi {
 
     JwtTokenVO bindPhone(BindPhoneRequest request) throws UserNotFoundException, SmsVerifyException,
         UserInvalidException, BindPhoneExceedException, PhoneChannelOperateException, NeedVerifyException;
+
+    void disable(DisableUserRequest request) throws UserNotFoundException;
 }

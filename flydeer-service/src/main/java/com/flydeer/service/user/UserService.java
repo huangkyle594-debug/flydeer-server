@@ -20,6 +20,7 @@ import com.flydeer.service.user.config.UserConfig;
 import com.flydeer.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -116,8 +117,25 @@ public class UserService {
         return user;
     }
 
-    // todo
-    //  封禁账号，同时revoke所有授权关系
+    /**
+     * Admin disable: set status=DISABLED and revoke open delegate relations.
+     * Access tokens remain usable until expiry; refresh/login will fail.
+     */
+    @Transactional
+    public void disableUser(Long operatorId) throws UserNotFoundException {
+        UserInfoDTO user = userInfoRepository.queryById(operatorId);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        if (UserStatusEnum.STATUS_DISABLED.getCode().equals(user.getStatus())) {
+            return;
+        }
+        UserInfoDTO dto = new UserInfoDTO();
+        dto.setId(operatorId);
+        dto.setStatus(UserStatusEnum.STATUS_DISABLED.getCode());
+        userInfoRepository.update(dto);
+        userDelegateRepository.revokeAllInvolving(operatorId);
+    }
 
     private void ensureActive(UserInfoDTO user) throws UserInvalidException {
         if (!UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {

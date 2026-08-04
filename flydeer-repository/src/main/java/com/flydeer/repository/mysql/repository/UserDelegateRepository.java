@@ -1,5 +1,6 @@
 package com.flydeer.repository.mysql.repository;
 
+import com.flydeer.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.repository.mysql.entity.UserDelegateEntity;
 import com.flydeer.repository.mysql.entity.UserDelegateEntityExample;
@@ -57,5 +58,25 @@ public class UserDelegateRepository {
     public void update(UserDelegateDTO dto) {
         UserDelegateEntity entity = UserDelegateMapping.INSTANCE.dto2entity(dto);
         userDelegateMapper.updateByPrimaryKeySelective(entity);
+    }
+
+    /**
+     * Revoke PENDING/ACCEPTED relations where the user is either side.
+     */
+    public void revokeAllInvolving(Long userId) {
+        List<String> openStatuses = List.of(
+            DelegateStatusEnum.PENDING.name(),
+            DelegateStatusEnum.ACCEPTED.name());
+        UserDelegateEntityExample example = new UserDelegateEntityExample();
+        example.createCriteria()
+            .andDelegatorIdEqualTo(userId)
+            .andStatusIn(openStatuses);
+        example.or()
+            .andDelegatedIdEqualTo(userId)
+            .andStatusIn(openStatuses);
+
+        UserDelegateEntity row = new UserDelegateEntity();
+        row.setStatus(DelegateStatusEnum.REVOKE.name());
+        userDelegateMapper.updateByExampleSelective(row, example);
     }
 }

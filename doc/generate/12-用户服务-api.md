@@ -40,6 +40,7 @@ Controller 通过参数注解 `@AuthCheck` 解析身份：
 |---|---|
 | 认证类（发码、登录、OAuth、刷新） | 匿名可访问（可不带 Token） |
 | 用户 / 委托类 | 必须已登录（`AUTHENTICATED`）；改昵称要求已实名（`VERIFIED`） |
+| 管理员类（禁用账户等） | 必须已登录且 userId ∈ `app.user.admin-ids`（`ADMIN`） |
 
 未登录访问受保护接口时，通常返回 **HTTP 401**。需要「已校验」而 Token 未 verified 时为 **HTTP 403**（改昵称接口要求 `VERIFIED`）。
 
@@ -328,6 +329,35 @@ curl http://localhost:8080/api/v1/user/me \
 ```
 
 **Response `data`**：`JwtTokenVO`
+
+---
+
+### 3.5 禁用账户（管理员）
+
+- **路由**：`POST /api/v1/user/disable`
+- **鉴权**：已登录且当前用户 ID 在 `app.user.admin-ids` 中（`ADMIN`）；非管理员返回 **HTTP 403**
+- **逻辑**：将目标用户 `status` 置为禁用（`0`），并撤销其作为任一方的未结束委托关系（`PENDING` / `ACCEPTED` → `REVOKE`）
+- **注意**：
+  - 不能禁用自己
+  - 已禁用则幂等成功
+  - 已签发的 Access Token 在过期前仍可能可用；登录与 refresh 会立即拒绝
+
+**Request Body**
+
+```json
+{
+  "targetUserId": 10000001
+}
+```
+
+**Response `data`**：`null`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/user/disable \
+  -H 'Authorization: Bearer <adminAccessToken>' \
+  -H 'Content-Type: application/json' \
+  -d '{"targetUserId":10000001}'
+```
 
 ---
 

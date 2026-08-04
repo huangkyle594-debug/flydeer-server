@@ -16,6 +16,7 @@ import com.flydeer.contract.base.response.ApiResult;
 import com.flydeer.contract.user.AuthorizationApi;
 import com.flydeer.contract.user.UserMangeApi;
 import com.flydeer.contract.user.request.BindPhoneRequest;
+import com.flydeer.contract.user.request.DisableUserRequest;
 import com.flydeer.contract.user.request.SendSmsCodeRequest;
 import com.flydeer.contract.user.request.UpdateUserRequest;
 import com.flydeer.contract.user.vo.JwtTokenVO;
@@ -83,5 +84,17 @@ public class UserController {
         JwtTokenVO token = userMangeApi.bindPhone(request);
         authCookieUtils.writeRefreshCookie(response, token);
         return ApiResult.ok(token.clearRefreshToken());
+    }
+
+    @PostMapping("/disable")
+    public ApiResult<Void> disable(
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.ADMIN) ApiRequest apiRequest,
+        @RequestBody DisableUserRequest body)
+        throws UserNotFoundException {
+
+        DisableUserRequest request = new DisableUserRequest(apiRequest);
+        request.setOperatorId(body.getOperatorId());
+        userMangeApi.disable(request);
+        return ApiResult.ok();
     }
 }
