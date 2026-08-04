@@ -5,7 +5,6 @@ import com.flydeer.common.constants.AtlasConstants;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.AtlasForbiddenException;
 import com.flydeer.common.exception.business.AtlasNotFoundException;
-import com.flydeer.common.exception.business.UserNotFoundException;
 import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.contract.atlas.AtlasApi;
 import com.flydeer.contract.atlas.enums.AtlasPermissionScope;
@@ -19,7 +18,6 @@ import com.flydeer.contract.atlas.vo.AtlasVO;
 import com.flydeer.repository.mysql.dto.AtlasDTO;
 import com.flydeer.repository.mysql.dto.AtlasQueryDTO;
 import com.flydeer.service.atlas.AtlasService;
-import com.flydeer.service.user.UserService;
 import com.github.pagehelper.PageInfo;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -33,7 +31,6 @@ import java.util.List;
 public class AtlasApiImpl implements AtlasApi {
 
     private final AtlasService atlasService;
-    private final UserService userService;
 
     @Override
     public AtlasPageVO listAtlases(@Valid AtlasQueryRequest request) throws NeedLoginException {

@@ -51,8 +51,7 @@ public class AtlasController {
     }
 
     @PostMapping("/tags/query")
-    public ApiResult<List<String>> tags(
-        @AuthCheck(resolve = AuthResolveLevel.NONE, required = AuthRequiredLevel.ANONYMOUS) ApiRequest apiRequest) {
+    public ApiResult<List<String>> tags() {
         return ApiResult.ok(atlasApi.listTags());
     }
 
