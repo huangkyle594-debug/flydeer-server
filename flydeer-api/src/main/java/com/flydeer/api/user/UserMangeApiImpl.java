@@ -64,4 +64,9 @@ public class UserMangeApiImpl implements UserMangeApi {
     public void disable(@Valid DisableUserRequest request) throws UserNotFoundException {
         userService.disableUser(request.getOperatorId());
     }
+
+    @Override
+    public void cancel(@Valid ApiRequest request) throws UserNotFoundException {
+        userService.deleteUser(request.getUserId());
+    }
 }

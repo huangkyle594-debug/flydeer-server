@@ -79,6 +79,10 @@ public class UserInfoRepository {
         userInfoMapper.updateByPrimaryKeySelective(entity);
     }
 
+    public void deleteById(Long userId) {
+        userInfoMapper.deleteByPrimaryKey(userId);
+    }
+
     public List<UserInfoDTO> selectByPhoneHash(String phoneHash) {
         UserInfoEntityExample example = new UserInfoEntityExample();
         example.createCriteria().andPhoneHashEqualTo(phoneHash);

@@ -79,4 +79,14 @@ public class UserDelegateRepository {
         row.setStatus(DelegateStatusEnum.REVOKE.name());
         userDelegateMapper.updateByExampleSelective(row, example);
     }
+
+    /**
+     * Physically delete all relations where the user is either side.
+     */
+    public void deleteAllInvolving(Long userId) {
+        UserDelegateEntityExample example = new UserDelegateEntityExample();
+        example.createCriteria().andDelegatorIdEqualTo(userId);
+        example.or().andDelegatedIdEqualTo(userId);
+        userDelegateMapper.deleteByExample(example);
+    }
 }

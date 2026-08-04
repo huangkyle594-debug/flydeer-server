@@ -23,4 +23,7 @@ public interface UserMangeApi {
         UserInvalidException, BindPhoneExceedException, PhoneChannelOperateException, NeedVerifyException;
 
     void disable(DisableUserRequest request) throws UserNotFoundException;
+
+    /** Self-cancel: delete account + {@code UserDeletedEvent}. */
+    void cancel(ApiRequest request) throws UserNotFoundException;
 }

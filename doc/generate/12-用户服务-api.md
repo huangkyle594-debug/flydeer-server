@@ -346,7 +346,7 @@ curl http://localhost:8080/api/v1/user/me \
 
 ```json
 {
-  "targetUserId": 10000001
+  "operatorId": 10000001
 }
 ```
 
@@ -356,7 +356,30 @@ curl http://localhost:8080/api/v1/user/me \
 curl -X POST http://localhost:8080/api/v1/user/disable \
   -H 'Authorization: Bearer <adminAccessToken>' \
   -H 'Content-Type: application/json' \
-  -d '{"targetUserId":10000001}'
+  -d '{"operatorId":10000001}'
+```
+
+---
+
+### 3.6 注销自己的账号
+
+- **路由**：`POST /api/v1/user/me/cancel`
+- **鉴权**：已登录
+- **逻辑**：物理删除当前用户记录，并发布 `UserDeletedEvent`；各 Service 异步处理波及数据（如删除全部代理关系），并清除 Refresh Cookie
+- **注意**：
+  - 与管理员「禁用」不同：注销是删除账号，不是改 `status`
+  - 删除后同渠道身份可重新注册
+  - 前端应同时清除本地 Access Token
+  - 代理关系物理删除为事务提交后的异步副作用
+
+**Request Body**：无
+
+**Response `data`**：`null`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/user/me/cancel \
+  -H 'Authorization: Bearer <accessToken>' \
+  -c cookies.txt -b cookies.txt
 ```
 
 ---
@@ -464,6 +487,8 @@ curl -X POST http://localhost:8080/api/v1/user/disable \
 | 改昵称 | POST | `/api/v1/user/me/update` | 是 | 否 |
 | 绑手机发码 | POST | `/api/v1/user/me/phone/send` | 是 | 否 |
 | 绑手机提交 | POST | `/api/v1/user/me/phone/bind` | 是 | 写 |
+| 注销账号 | POST | `/api/v1/user/me/cancel` | 是 | 清 |
+| 管理员禁用 | POST | `/api/v1/user/disable` | 是（ADMIN） | 否 |
 | 查委托 | POST | `/api/v1/user/delegate/query` | 是 | 否 |
 | 发起委托 | POST | `/api/v1/user/delegate/create` | 是 | 否 |
 | 接受委托 | POST | `/api/v1/user/delegate/accept` | 是 | 否 |

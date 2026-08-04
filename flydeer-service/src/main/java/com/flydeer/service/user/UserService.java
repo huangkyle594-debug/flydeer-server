@@ -17,6 +17,7 @@ import com.flydeer.repository.mysql.option.user.UserOptions;
 import com.flydeer.repository.mysql.repository.UserDelegateRepository;
 import com.flydeer.repository.mysql.repository.UserInfoRepository;
 import com.flydeer.service.user.config.UserConfig;
+import com.flydeer.service.user.event.UserDeletedEvent;
 import com.flydeer.service.user.event.UserDisabledEvent;
 import com.flydeer.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
@@ -124,7 +125,6 @@ public class UserService {
     /**
      * Admin disable: set status=DISABLED and publish {@link UserDisabledEvent}.
      * Side effects (e.g. revoke delegates) are handled by async listeners.
-     * Access tokens remain usable until expiry; refresh/login will fail.
      */
     @Transactional
     public void disableUser(Long userId) throws UserNotFoundException {
@@ -140,6 +140,20 @@ public class UserService {
         dto.setStatus(UserStatusEnum.STATUS_DISABLED.getCode());
         userInfoRepository.update(dto);
         eventPublisher.publishEvent(new UserDisabledEvent(userId));
+    }
+
+    /**
+     * Self-cancel: physically delete the user and publish {@link UserDeletedEvent}.
+     * Side effects (e.g. delete delegate rows) are handled by async listeners.
+     */
+    @Transactional
+    public void deleteUser(Long userId) throws UserNotFoundException {
+        UserInfoDTO user = userInfoRepository.queryById(userId);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        userInfoRepository.deleteById(userId);
+        eventPublisher.publishEvent(new UserDeletedEvent(userId));
     }
 
     private void ensureActive(UserInfoDTO user) throws UserInvalidException {

@@ -7,6 +7,7 @@ import com.flydeer.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.repository.mysql.option.user.UserOptions;
 import com.flydeer.repository.mysql.repository.UserDelegateRepository;
+import com.flydeer.service.user.event.UserDeletedEvent;
 import com.flydeer.service.user.event.UserDisabledEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +90,17 @@ public class UserDelegateService {
             log.info("revoked delegate relations for disabled userId={}", event.userId());
         } catch (Exception e) {
             log.error("failed to revoke delegates for disabled userId={}", event.userId(), e);
+        }
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onUserDeleted(UserDeletedEvent event) {
+        try {
+            userDelegateRepository.deleteAllInvolving(event.userId());
+            log.info("deleted delegate relations for deleted userId={}", event.userId());
+        } catch (Exception e) {
+            log.error("failed to delete delegates for deleted userId={}", event.userId(), e);
         }
     }
 }

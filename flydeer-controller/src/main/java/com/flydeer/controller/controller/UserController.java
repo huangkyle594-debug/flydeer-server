@@ -97,4 +97,15 @@ public class UserController {
         userMangeApi.disable(request);
         return ApiResult.ok();
     }
+
+    @PostMapping("/me/cancel")
+    public ApiResult<Void> cancel(
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        HttpServletResponse response)
+        throws UserNotFoundException {
+
+        userMangeApi.cancel(apiRequest);
+        authCookieUtils.clearRefreshCookie(response);
+        return ApiResult.ok();
+    }
 }
