@@ -1,4 +1,4 @@
-package com.flydeer.service.base.config;
+package com.flydeer.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;

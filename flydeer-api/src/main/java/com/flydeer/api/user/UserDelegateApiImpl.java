@@ -1,6 +1,6 @@
 package com.flydeer.api.user;
 
-import com.flydeer.api.user.mapper.UserDelegateMapper;
+import com.flydeer.api.user.mapping.UserDelegateMapping;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
@@ -31,7 +31,7 @@ public class UserDelegateApiImpl implements UserDelegateApi {
     public List<DelegateVO> queryDelegateRelation(@Valid QueryDelegateRequest request) {
         List<UserDelegateDTO> list = userDelegateService.queryDelegations(
             request.getUserId(), request.statusNullIfEmpty(), request.getRelation());
-        return UserDelegateMapper.INSTANCE.toVOList(list);
+        return UserDelegateMapping.INSTANCE.toVOList(list);
     }
 
     @Override

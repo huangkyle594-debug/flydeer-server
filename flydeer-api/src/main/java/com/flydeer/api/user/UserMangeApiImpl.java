@@ -1,6 +1,6 @@
 package com.flydeer.api.user;
 
-import com.flydeer.api.user.mapper.AuthorizationMapper;
+import com.flydeer.api.user.mapping.AuthorizationMapping;
 import com.flydeer.common.exception.auth.SmsVerifyException;
 import com.flydeer.common.exception.business.BindPhoneExceedException;
 import com.flydeer.common.exception.business.PhoneChannelOperateException;
@@ -54,6 +54,6 @@ public class UserMangeApiImpl implements UserMangeApi {
         BindPhoneExceedException, PhoneChannelOperateException {
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         userService.bindPhone(request.getUserId(), request.getPhone());
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(request.getUserId(), true));
+        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(request.getUserId(), true));
     }
 }

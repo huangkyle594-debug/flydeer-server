@@ -1,4 +1,4 @@
-package com.flydeer.api.user.mapper;
+package com.flydeer.api.user.mapping;
 
 import com.flydeer.contract.user.vo.DelegateVO;
 import com.flydeer.repository.mysql.dto.UserDelegateDTO;
@@ -10,9 +10,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface UserDelegateMapper {
+public interface UserDelegateMapping {
 
-    UserDelegateMapper INSTANCE = Mappers.getMapper(UserDelegateMapper.class);
+    UserDelegateMapping INSTANCE = Mappers.getMapper(UserDelegateMapping.class);
 
     DelegateVO toVO(UserDelegateDTO dto);
 

@@ -1,6 +1,6 @@
 package com.flydeer.api.user;
 
-import com.flydeer.api.user.mapper.AuthorizationMapper;
+import com.flydeer.api.user.mapping.AuthorizationMapping;
 import com.flydeer.common.exception.auth.*;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
@@ -44,12 +44,12 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         rateLimiter.checkLogin("sms:" + request.getPhone() + ":" + request.getIp());
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterPhone(request.getPhone());
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
     }
 
     @Override
     public OauthUrlVO oauthLoginUrl(@Valid OauthLoginRequest request) throws OauthUrlBuildException {
-        return AuthorizationMapper.INSTANCE.oauthUrl(oauthService.buildAuthorizeUrl(request.getChannel()));
+        return AuthorizationMapping.INSTANCE.oauthUrl(oauthService.buildAuthorizeUrl(request.getChannel()));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         oauthService.validateState(request.getState());
         OauthUserRecord info = oauthService.exchange(request.getChannel(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterOauth(request.getChannel(), info);
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         throws RefreshTokenParseException, UserNotFoundException, UserInvalidException {
         long userId = jwtTokenUtils.parseRefreshToken(request.getRefreshToken());
         UserInfoDTO user = userService.requireActive(userId);
-        return AuthorizationMapper.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
     }
 
     private static boolean isVerified(UserInfoDTO user) {
