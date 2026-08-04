@@ -336,11 +336,11 @@ curl http://localhost:8080/api/v1/user/me \
 
 - **路由**：`POST /api/v1/user/disable`
 - **鉴权**：已登录且当前用户 ID 在 `app.user.admin-ids` 中（`ADMIN`）；非管理员返回 **HTTP 403**
-- **逻辑**：将目标用户 `status` 置为禁用（`0`），并撤销其作为任一方的未结束委托关系（`PENDING` / `ACCEPTED` → `REVOKE`）
+- **逻辑**：将目标用户 `status` 置为禁用（`0`），并发布 `UserDisabledEvent`；委托撤销等波及操作由各 Service 异步监听处理
 - **注意**：
-  - 不能禁用自己
-  - 已禁用则幂等成功
+  - 已禁用则幂等成功（不再发事件）
   - 已签发的 Access Token 在过期前仍可能可用；登录与 refresh 会立即拒绝
+  - 委托关系撤销为事务提交后的异步副作用，接口返回时可能尚未完成
 
 **Request Body**
 

@@ -7,11 +7,17 @@ import com.flydeer.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.repository.mysql.dto.UserDelegateDTO;
 import com.flydeer.repository.mysql.option.user.UserOptions;
 import com.flydeer.repository.mysql.repository.UserDelegateRepository;
+import com.flydeer.service.user.event.UserDisabledEvent;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserDelegateService {
@@ -73,5 +79,16 @@ public class UserDelegateService {
         update.setId(exist.getId());
         update.setStatus(DelegateStatusEnum.REVOKE.name());
         userDelegateRepository.update(update);
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onUserDisabled(UserDisabledEvent event) {
+        try {
+            userDelegateRepository.revokeAllInvolving(event.userId());
+            log.info("revoked delegate relations for disabled userId={}", event.userId());
+        } catch (Exception e) {
+            log.error("failed to revoke delegates for disabled userId={}", event.userId(), e);
+        }
     }
 }

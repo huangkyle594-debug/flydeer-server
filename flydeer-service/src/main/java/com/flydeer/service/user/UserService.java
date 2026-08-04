@@ -17,8 +17,10 @@ import com.flydeer.repository.mysql.option.user.UserOptions;
 import com.flydeer.repository.mysql.repository.UserDelegateRepository;
 import com.flydeer.repository.mysql.repository.UserInfoRepository;
 import com.flydeer.service.user.config.UserConfig;
+import com.flydeer.service.user.event.UserDisabledEvent;
 import com.flydeer.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,8 @@ public class UserService {
     private final UserDelegateRepository userDelegateRepository;
 
     private final UserConfig userConfig;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     public UserInfoDTO queryUser(Long userId)
         throws UserNotFoundException, UserInvalidException, NeedVerifyException {
@@ -118,12 +122,13 @@ public class UserService {
     }
 
     /**
-     * Admin disable: set status=DISABLED and revoke open delegate relations.
+     * Admin disable: set status=DISABLED and publish {@link UserDisabledEvent}.
+     * Side effects (e.g. revoke delegates) are handled by async listeners.
      * Access tokens remain usable until expiry; refresh/login will fail.
      */
     @Transactional
-    public void disableUser(Long operatorId) throws UserNotFoundException {
-        UserInfoDTO user = userInfoRepository.queryById(operatorId);
+    public void disableUser(Long userId) throws UserNotFoundException {
+        UserInfoDTO user = userInfoRepository.queryById(userId);
         if (user == null) {
             throw new UserNotFoundException();
         }
@@ -131,10 +136,10 @@ public class UserService {
             return;
         }
         UserInfoDTO dto = new UserInfoDTO();
-        dto.setId(operatorId);
+        dto.setId(userId);
         dto.setStatus(UserStatusEnum.STATUS_DISABLED.getCode());
         userInfoRepository.update(dto);
-        userDelegateRepository.revokeAllInvolving(operatorId);
+        eventPublisher.publishEvent(new UserDisabledEvent(userId));
     }
 
     private void ensureActive(UserInfoDTO user) throws UserInvalidException {

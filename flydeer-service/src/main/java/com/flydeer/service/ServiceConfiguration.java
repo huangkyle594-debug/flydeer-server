@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.time.ZoneId;
 import java.util.TimeZone;
 
 @Configuration
+@EnableAsync
 @EnableConfigurationProperties({IdGenerateConfig.class, JwtTokenConfig.class, OauthConfig.class, SmsConfig.class, RateLimitConfig.class, UserConfig.class})
 public class ServiceConfiguration {
 
