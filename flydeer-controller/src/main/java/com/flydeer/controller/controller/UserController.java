@@ -2,6 +2,7 @@ package com.flydeer.controller.controller;
 
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
+import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.auth.SmsSendException;
 import com.flydeer.common.exception.auth.SmsVerifyException;
 import com.flydeer.common.exception.business.BindPhoneExceedException;
@@ -38,7 +39,7 @@ public class UserController {
     @GetMapping("/me")
     public ApiResult<UserProfileVO> me(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest)
-        throws UserNotFoundException, UserInvalidException {
+        throws UserNotFoundException, UserInvalidException, NeedVerifyException {
 
         return ApiResult.ok(userMangeApi.me(apiRequest));
     }
@@ -47,7 +48,7 @@ public class UserController {
     public ApiResult<UserProfileVO> updateUser(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody UpdateUserRequest body)
-        throws UserNotFoundException, UserInvalidException {
+        throws UserNotFoundException, UserInvalidException, NeedVerifyException {
 
         UpdateUserRequest request = new UpdateUserRequest(apiRequest);
         request.setName(body.getName());
@@ -74,7 +75,7 @@ public class UserController {
         @RequestBody BindPhoneRequest body,
         HttpServletResponse response)
         throws UserNotFoundException, SmsVerifyException, UserInvalidException,
-        BindPhoneExceedException, PhoneChannelOperateException {
+        BindPhoneExceedException, PhoneChannelOperateException, NeedVerifyException {
 
         BindPhoneRequest request = new BindPhoneRequest(apiRequest);
         request.setPhone(body.getPhone());
