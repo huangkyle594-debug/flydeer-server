@@ -18,6 +18,15 @@ public class UserDelegateService {
 
     private final UserDelegateRepository userDelegateRepository;
 
+    public List<UserDelegateDTO> queryDelegations(
+        Long userId, List<String> status, DelegateRelationEnum relation) {
+        UserOptions options = UserOptions.option();
+        if (DelegateRelationEnum.DELEGATED.equals(relation)) {
+            options.delegated();
+        }
+        return userDelegateRepository.queryDelegate(userId, status, options);
+    }
+
     public void delegate(Long delegatorId, Long delegatedId)
         throws DelegateSelfException {
         if (delegatorId.equals(delegatedId)) {
@@ -33,7 +42,7 @@ public class UserDelegateService {
             UserDelegateDTO update = new UserDelegateDTO();
             update.setId(exist.getId());
             update.setStatus(DelegateStatusEnum.PENDING.name());
-            userDelegateRepository.update(update, UserOptions.option());
+            userDelegateRepository.update(update);
             return;
         }
 
@@ -41,7 +50,7 @@ public class UserDelegateService {
         insert.setDelegatorId(delegatorId);
         insert.setDelegatedId(delegatedId);
         insert.setStatus(DelegateStatusEnum.PENDING.name());
-        userDelegateRepository.delegate(insert, UserOptions.option());
+        userDelegateRepository.delegate(insert);
     }
 
     public void accept(Long delegatorId, Long delegatedId) throws DelegateNotFoundException {
@@ -52,7 +61,7 @@ public class UserDelegateService {
         UserDelegateDTO update = new UserDelegateDTO();
         update.setId(exist.getId());
         update.setStatus(DelegateStatusEnum.ACCEPTED.name());
-        userDelegateRepository.update(update, UserOptions.option());
+        userDelegateRepository.update(update);
     }
 
     public void revoke(Long delegatorId, Long delegatedId) throws DelegateNotFoundException {
@@ -63,15 +72,6 @@ public class UserDelegateService {
         UserDelegateDTO update = new UserDelegateDTO();
         update.setId(exist.getId());
         update.setStatus(DelegateStatusEnum.REVOKE.name());
-        userDelegateRepository.update(update, UserOptions.option());
-    }
-
-    public List<UserDelegateDTO> queryDelegations(
-        Long userId, List<String> status, DelegateRelationEnum relation) {
-        UserOptions options = UserOptions.option();
-        if (DelegateRelationEnum.DELEGATED.equals(relation)) {
-            options.delegated();
-        }
-        return userDelegateRepository.queryDelegate(userId, status, options);
+        userDelegateRepository.update(update);
     }
 }
