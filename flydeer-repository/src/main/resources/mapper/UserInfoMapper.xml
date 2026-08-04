@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--suppress SpringElInspection,MybatisXMapperXmlInspection
+     MyBatis OGNL: criteria.valid → Criteria.isValid(); IDE cannot resolve foreach item type. -->
 <mapper namespace="com.flydeer.repository.mysql.mapper.UserInfoMapper">
   <resultMap id="BaseResultMap" type="com.flydeer.repository.mysql.entity.UserInfoEntity">
     <id column="id" jdbcType="BIGINT" property="id" />
@@ -16,7 +18,7 @@
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
+        <if test="criteria.isValid()">
           <trim prefix="(" prefixOverrides="and" suffix=")">
             <foreach collection="criteria.criteria" item="criterion">
               <choose>
@@ -45,7 +47,7 @@
   <sql id="Update_By_Example_Where_Clause">
     <where>
       <foreach collection="example.oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
+        <if test="criteria.isValid()">
           <trim prefix="(" prefixOverrides="and" suffix=")">
             <foreach collection="criteria.criteria" item="criterion">
               <choose>
