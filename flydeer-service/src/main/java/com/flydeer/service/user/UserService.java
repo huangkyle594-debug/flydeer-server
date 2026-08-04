@@ -1,6 +1,7 @@
 package com.flydeer.service.user;
 
 import com.flydeer.common.constants.UserConstants;
+import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.BindPhoneExceedException;
 import com.flydeer.common.exception.business.PhoneChannelOperateException;
 import com.flydeer.common.exception.business.UserInvalidException;
@@ -32,17 +33,22 @@ public class UserService {
 
     private final UserConfig userConfig;
 
-    public UserInfoDTO requireActive(Long userId) throws UserNotFoundException, UserInvalidException {
-        return requireActive(userId, UserOptions.option());
+    public UserInfoDTO queryUser(Long userId)
+        throws UserNotFoundException, UserInvalidException, NeedVerifyException {
+        return queryUser(userId, UserOptions.option());
     }
 
-    public UserInfoDTO requireActive(Long userId, UserOptions options) throws UserNotFoundException, UserInvalidException {
+    public UserInfoDTO queryUser(Long userId, UserOptions options)
+        throws UserInvalidException, UserNotFoundException, NeedVerifyException {
         UserInfoDTO user = userInfoRepository.queryById(userId);
         if (user == null) {
             throw new UserNotFoundException();
         }
-        if (!UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
-            throw new UserInvalidException();
+        if (options.hasRequireActive()) {
+            ensureActive(user);
+        }
+        if (options.hasRequireVerify()) {
+            ensureVerify(user);
         }
         if (options.hasDelegated()) {
             List<Long> delegators = userDelegateRepository.queryDelegate(userId, null, UserOptions.option())
@@ -75,17 +81,17 @@ public class UserService {
             channel, info.channelUid(), info.username(), null, null, UserOptions.option());
     }
 
-    public void updateUserName(Long userId, String userName) throws UserNotFoundException, UserInvalidException {
-        requireActive(userId);
+    public void updateUserName(Long userId, String userName) {
         UserInfoDTO dto = new UserInfoDTO();
         dto.setId(userId);
         dto.setName(TextUtils.trimText(userName, UserConstants.MAX_USER_NAME_LENGTH));
-        userInfoRepository.update(dto, UserOptions.option());
+        userInfoRepository.update(dto);
     }
 
-    public void bindPhone(Long userId, String phone)
-        throws UserNotFoundException, UserInvalidException, PhoneChannelOperateException, BindPhoneExceedException {
-        UserInfoDTO user = requireActive(userId);
+    public UserInfoDTO bindPhone(Long userId, String phone)
+        throws UserNotFoundException, PhoneChannelOperateException, BindPhoneExceedException,
+        UserInvalidException, NeedVerifyException {
+        UserInfoDTO user = queryUser(userId);
         ensureNotPhoneChannel(user.getChannel());
         String phoneHash = PhoneNumberUtils.hashPhone(phone, userConfig.getPhoneHashSalt());
         String maskedPhone = PhoneNumberUtils.maskPhone(phone);
@@ -103,7 +109,11 @@ public class UserService {
         dto.setVerified(UserVerifiedStatusEnum.VERIFIED.getCode());
         dto.setPhone(maskedPhone);
         dto.setPhoneHash(phoneHash);
-        userInfoRepository.update(dto, UserOptions.option());
+        userInfoRepository.update(dto);
+        user.setVerified(UserVerifiedStatusEnum.VERIFIED.getCode());
+        user.setPhone(maskedPhone);
+        user.setPhoneHash(phoneHash);
+        return user;
     }
 
     // todo
@@ -112,6 +122,12 @@ public class UserService {
     private void ensureActive(UserInfoDTO user) throws UserInvalidException {
         if (!UserStatusEnum.STATUS_ACTIVE.getCode().equals(user.getStatus())) {
             throw new UserInvalidException();
+        }
+    }
+
+    private void ensureVerify(UserInfoDTO user) throws NeedVerifyException {
+        if (!UserVerifiedStatusEnum.VERIFIED.getCode().equals(user.getVerified())) {
+            throw new NeedVerifyException();
         }
     }
 

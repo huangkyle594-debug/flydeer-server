@@ -2,6 +2,7 @@ package com.flydeer.service.user.utils;
 
 import com.flydeer.common.exception.auth.AccessTokenParseException;
 import com.flydeer.common.exception.auth.RefreshTokenParseException;
+import com.flydeer.contract.user.enums.UserStatusEnum;
 import com.flydeer.service.user.config.JwtTokenConfig;
 import com.flydeer.service.user.model.AccessTokenClaims;
 import com.flydeer.service.user.model.IssuedTokensRecord;
@@ -22,6 +23,7 @@ public class JwtTokenUtils {
     public static final String TYP_ACCESS = "access";
     public static final String TYP_REFRESH = "refresh";
     public static final String CLAIM_VERIFIED = "verified";
+    public static final String CLAIM_STATUS = "status";
 
     private final JwtTokenConfig jwtTokenConfig;
 
@@ -29,20 +31,22 @@ public class JwtTokenUtils {
         this.jwtTokenConfig = jwtTokenConfig;
     }
 
-    public IssuedTokensRecord issue(long userId, boolean verified) {
+    public IssuedTokensRecord issue(long userId, boolean verified, Integer status) {
         Instant now = Instant.now();
         Instant accessExp = now.plus(jwtTokenConfig.getAccessTokenTtl());
         Instant refreshExp = now.plus(jwtTokenConfig.getRefreshTokenTtl());
-        String access = buildAccessToken(userId, verified, now, accessExp);
+        int resolvedStatus = status != null ? status : UserStatusEnum.STATUS_ACTIVE.getCode();
+        String access = buildAccessToken(userId, verified, resolvedStatus, now, accessExp);
         String refresh = buildRefreshToken(userId, now, refreshExp);
         return new IssuedTokensRecord(access, refresh, jwtTokenConfig.getAccessTokenTtl().toSeconds());
     }
 
-    private String buildAccessToken(long userId, boolean verified, Instant iat, Instant exp) {
+    private String buildAccessToken(long userId, boolean verified, int status, Instant iat, Instant exp) {
         return Jwts.builder()
             .subject(String.valueOf(userId))
             .claim("typ", TYP_ACCESS)
             .claim(CLAIM_VERIFIED, verified)
+            .claim(CLAIM_STATUS, status)
             .issuedAt(Date.from(iat))
             .expiration(Date.from(exp))
             .signWith(secretKey())
@@ -64,7 +68,8 @@ public class JwtTokenUtils {
             Claims claims = parseClaims(token, TYP_ACCESS);
             long userId = Long.parseLong(claims.getSubject());
             Boolean verified = claims.get(CLAIM_VERIFIED, Boolean.class);
-            return new AccessTokenClaims(userId, Boolean.TRUE.equals(verified));
+            Integer status = claims.get(CLAIM_STATUS, Integer.class);
+            return new AccessTokenClaims(userId, Boolean.TRUE.equals(verified), status);
         } catch (Exception e) {
             throw new AccessTokenParseException();
         }

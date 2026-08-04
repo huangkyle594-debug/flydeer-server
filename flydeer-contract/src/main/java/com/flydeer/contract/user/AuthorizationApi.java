@@ -23,5 +23,5 @@ public interface AuthorizationApi {
         throws OauthValidateException, OauthExchangeException, UserInvalidException;
 
     JwtTokenVO refresh(RefreshTokenRequest request)
-        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException;
+        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException, NeedVerifyException;
 }

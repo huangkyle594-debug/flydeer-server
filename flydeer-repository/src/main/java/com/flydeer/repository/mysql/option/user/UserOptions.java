@@ -7,6 +7,24 @@ public class UserOptions extends Options<UserOption> {
         return new UserOptions();
     }
 
+    public UserOptions requireActive() {
+        add(UserOption.REQUIRE_ACTIVE);
+        return this;
+    }
+
+    public Boolean hasRequireActive() {
+        return contains(UserOption.REQUIRE_ACTIVE);
+    }
+
+    public UserOptions requireVerify() {
+        add(UserOption.REQUIRE_VERIFY);
+        return this;
+    }
+
+    public Boolean hasRequireVerify() {
+        return contains(UserOption.REQUIRE_VERIFY);
+    }
+
     public UserOptions withDelegatorIds() {
         add(UserOption.WITH_DELEGATOR_IDS);
         return this;
@@ -23,15 +41,6 @@ public class UserOptions extends Options<UserOption> {
 
     public Boolean hasLoginUsePhone() {
         return contains(UserOption.LOGIN_USE_PHONE);
-    }
-
-    public UserOptions updateToNull() {
-        add(UserOption.UPDATE_TO_NULL);
-        return this;
-    }
-
-    public Boolean hasUpdateToNull() {
-        return contains(UserOption.UPDATE_TO_NULL);
     }
 
     public UserOptions delegated() {

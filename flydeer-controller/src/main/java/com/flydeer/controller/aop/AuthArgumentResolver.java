@@ -6,6 +6,7 @@ import com.flydeer.common.exception.auth.AccessTokenParseException;
 import com.flydeer.common.exception.auth.NeedAdminException;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.auth.NeedVerifyException;
+import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.contract.base.request.ApiRequest;
 import com.flydeer.contract.user.enums.DelegateRelationEnum;
 import com.flydeer.contract.user.enums.DelegateStatusEnum;
@@ -66,7 +67,8 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   @NonNull NativeWebRequest webRequest, WebDataBinderFactory binderFactory)
-        throws AccessTokenParseException, NeedLoginException, NeedVerifyException, NeedAdminException {
+        throws AccessTokenParseException, NeedLoginException, NeedVerifyException, NeedAdminException,
+        UserInvalidException {
 
         AuthCheck authCheck = parameter.getParameterAnnotation(AuthCheck.class);
         if (authCheck == null) {
@@ -96,13 +98,17 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
     }
 
     private void enforceRequired(AuthRequiredLevel required, AccessTokenClaims claims)
-        throws NeedLoginException, NeedVerifyException, NeedAdminException {
+        throws NeedLoginException, NeedVerifyException, NeedAdminException, UserInvalidException {
 
         if (required == AuthRequiredLevel.ANONYMOUS) {
             return;
         }
         if (claims == null) {
             throw new NeedLoginException();
+        }
+        // status comes from JWT; disable takes effect after access token expires / refresh.
+        if (!claims.active()) {
+            throw new UserInvalidException();
         }
         if (required == AuthRequiredLevel.VERIFIED && !claims.verified()) {
             throw new NeedVerifyException();

@@ -22,7 +22,7 @@ public interface AtlasApi {
     List<String> listTags();
 
     AtlasVO createAtlas(AtlasCreateRequest request)
-        throws UserNotFoundException, UserInvalidException, BadRequestException;
+        throws UserNotFoundException, UserInvalidException;
 
     AtlasVO updateAtlas(AtlasUpdateRequest request)
         throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException;

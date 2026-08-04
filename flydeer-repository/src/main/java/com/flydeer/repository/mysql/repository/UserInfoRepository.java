@@ -74,13 +74,9 @@ public class UserInfoRepository {
         return UserInfoMapping.INSTANCE.toDto(user);
     }
 
-    public void update(UserInfoDTO dto, UserOptions options) {
+    public void update(UserInfoDTO dto) {
         UserInfoEntity entity = UserInfoMapping.INSTANCE.dto2entity(dto);
-        if (options.hasUpdateToNull()) {
-            userInfoMapper.updateByPrimaryKey(entity);
-        } else {
-            userInfoMapper.updateByPrimaryKeySelective(entity);
-        }
+        userInfoMapper.updateByPrimaryKeySelective(entity);
     }
 
     public List<UserInfoDTO> selectByPhoneHash(String phoneHash) {

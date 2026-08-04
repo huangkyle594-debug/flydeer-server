@@ -3,6 +3,7 @@ package com.flydeer.controller.controller;
 import com.flydeer.api.user.UserDelegateApi;
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
+import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
@@ -42,9 +43,9 @@ public class DelegateController {
 
     @PostMapping("/create")
     public ApiResult<Void> create(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody DelegateOperateRequest body)
-        throws UserNotFoundException, UserInvalidException, DelegateSelfException {
+        throws UserNotFoundException, UserInvalidException, DelegateSelfException, NeedVerifyException {
 
         DelegateOperateRequest request = new DelegateOperateRequest(apiRequest);
         request.setOperateId(body.getOperateId());
@@ -54,9 +55,9 @@ public class DelegateController {
 
     @PostMapping("/accept")
     public ApiResult<Void> accept(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody DelegateOperateRequest body)
-        throws UserNotFoundException, UserInvalidException, DelegateNotFoundException {
+        throws UserNotFoundException, UserInvalidException, DelegateNotFoundException, NeedVerifyException {
 
         DelegateOperateRequest request = new DelegateOperateRequest(apiRequest);
         request.setOperateId(body.getOperateId());
@@ -66,7 +67,7 @@ public class DelegateController {
 
     @PostMapping("/revoke")
     public ApiResult<Void> revoke(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
+        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody DelegateOperateRequest body)
         throws DelegateNotFoundException, BadRequestException {
 

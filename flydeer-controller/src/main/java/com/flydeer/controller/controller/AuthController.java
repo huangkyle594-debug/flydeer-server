@@ -103,7 +103,8 @@ public class AuthController {
         @AuthCheck ApiRequest apiRequest,
         HttpServletRequest request,
         HttpServletResponse response)
-        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException, NeedLoginException {
+        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException,
+        NeedLoginException, NeedVerifyException {
 
         String refresh = authCookieUtils.readRefreshCookie(request);
         if (!StringUtils.hasText(refresh)) {

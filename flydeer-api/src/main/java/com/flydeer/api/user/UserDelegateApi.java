@@ -1,6 +1,7 @@
 package com.flydeer.api.user;
 
 import com.flydeer.api.user.mapping.UserDelegateMapping;
+import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
@@ -10,6 +11,7 @@ import com.flydeer.contract.user.request.DelegateOperateRequest;
 import com.flydeer.contract.user.request.QueryDelegateRequest;
 import com.flydeer.contract.user.vo.DelegateVO;
 import com.flydeer.repository.mysql.dto.UserDelegateDTO;
+import com.flydeer.repository.mysql.option.user.UserOptions;
 import com.flydeer.service.user.UserDelegateService;
 import com.flydeer.service.user.UserService;
 import jakarta.validation.Valid;
@@ -35,15 +37,15 @@ public class UserDelegateApi implements com.flydeer.contract.user.UserDelegateAp
 
     @Override
     public void delegate(@Valid DelegateOperateRequest request)
-        throws UserNotFoundException, UserInvalidException, DelegateSelfException {
-        userService.requireActive(request.getOperateId());
+        throws UserNotFoundException, UserInvalidException, DelegateSelfException, NeedVerifyException {
+        userService.queryUser(request.getOperateId(), UserOptions.option().requireActive().requireVerify());
         userDelegateService.delegate(request.getUserId(), request.getOperateId());
     }
 
     @Override
     public void accept(@Valid DelegateOperateRequest request)
-        throws UserNotFoundException, UserInvalidException, DelegateNotFoundException {
-        userService.requireActive(request.getOperateId());
+        throws UserNotFoundException, UserInvalidException, DelegateNotFoundException, NeedVerifyException {
+        userService.queryUser(request.getOperateId(), UserOptions.option().requireActive().requireVerify());
         userDelegateService.accept(request.getOperateId(), request.getUserId());
     }
 

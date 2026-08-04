@@ -12,6 +12,7 @@ import com.flydeer.contract.user.request.*;
 import com.flydeer.contract.user.vo.JwtTokenVO;
 import com.flydeer.contract.user.vo.OauthUrlVO;
 import com.flydeer.repository.mysql.dto.UserInfoDTO;
+import com.flydeer.repository.mysql.option.user.UserOptions;
 import com.flydeer.service.user.OauthService;
 import com.flydeer.service.user.SmsVerifyService;
 import com.flydeer.service.user.UserService;
@@ -44,7 +45,8 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         rateLimiter.checkLogin("sms:" + request.getPhone() + ":" + request.getIp());
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterPhone(request.getPhone());
-        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+        return AuthorizationMapping.INSTANCE.jwtToken(
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus()));
     }
 
     @Override
@@ -58,19 +60,22 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         oauthService.validateState(request.getState());
         OauthUserRecord info = oauthService.exchange(request.getChannel(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterOauth(request.getChannel(), info);
-        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+        return AuthorizationMapping.INSTANCE.jwtToken(
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus()));
     }
 
     @Override
     public JwtTokenVO refresh(@Valid RefreshTokenRequest request)
-        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException {
+        throws RefreshTokenParseException, UserNotFoundException, UserInvalidException, NeedVerifyException {
         long userId = jwtTokenUtils.parseRefreshToken(request.getRefreshToken());
-        UserInfoDTO user = userService.requireActive(userId);
-        return AuthorizationMapping.INSTANCE.jwtToken(jwtTokenUtils.issue(user.getId(), isVerified(user)));
+        // Refresh re-reads DB status so disable takes effect at latest on token rotation.
+        UserInfoDTO user = userService.queryUser(userId, UserOptions.option().requireActive());
+        return AuthorizationMapping.INSTANCE.jwtToken(
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus()));
     }
 
     private static boolean isVerified(UserInfoDTO user) {
         return user.getVerified() != null
-            && user.getVerified() == UserVerifiedStatusEnum.VERIFIED.getCode();
+            && user.getVerified().equals(UserVerifiedStatusEnum.VERIFIED.getCode());
     }
 }

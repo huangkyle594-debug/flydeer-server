@@ -60,7 +60,7 @@ public class AtlasController {
     public ApiResult<AtlasVO> create(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.AUTHENTICATED) ApiRequest apiRequest,
         @RequestBody AtlasCreateRequest body)
-        throws UserNotFoundException, UserInvalidException, BadRequestException {
+        throws UserNotFoundException, UserInvalidException {
 
         AtlasCreateRequest request = new AtlasCreateRequest(apiRequest);
         request.setName(body.getName());

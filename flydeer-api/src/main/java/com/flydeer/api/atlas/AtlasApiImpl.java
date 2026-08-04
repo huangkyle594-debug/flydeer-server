@@ -5,7 +5,6 @@ import com.flydeer.common.constants.AtlasConstants;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.AtlasForbiddenException;
 import com.flydeer.common.exception.business.AtlasNotFoundException;
-import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
 import com.flydeer.common.exception.request.BadRequestException;
 import com.flydeer.contract.atlas.AtlasApi;
@@ -19,7 +18,6 @@ import com.flydeer.contract.atlas.vo.AtlasPageVO;
 import com.flydeer.contract.atlas.vo.AtlasVO;
 import com.flydeer.repository.mysql.dto.AtlasDTO;
 import com.flydeer.repository.mysql.dto.AtlasQueryDTO;
-import com.flydeer.repository.mysql.dto.UserInfoDTO;
 import com.flydeer.service.atlas.AtlasService;
 import com.flydeer.service.user.UserService;
 import com.github.pagehelper.PageInfo;
@@ -71,15 +69,13 @@ public class AtlasApiImpl implements AtlasApi {
     }
 
     @Override
-    public AtlasVO createAtlas(@Valid AtlasCreateRequest request)
-        throws UserNotFoundException, UserInvalidException, BadRequestException {
-        UserInfoDTO user = userService.requireActive(request.getUserId());
+    public AtlasVO createAtlas(@Valid AtlasCreateRequest request) {
         AtlasDTO created = atlasService.create(
             request.getName(),
             request.getDescription(),
             request.getTags(),
-            user.getId(),
-            user.getName());
+            request.getUserId(),
+            null);
         return AtlasVoMapper.toVO(created);
     }
 

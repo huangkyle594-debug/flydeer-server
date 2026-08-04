@@ -49,21 +49,13 @@ public class UserDelegateRepository {
         return UserDelegateMapping.INSTANCE.toDto(rows.getFirst());
     }
 
-    public void delegate(UserDelegateDTO dto, UserOptions options) {
+    public void delegate(UserDelegateDTO dto) {
         UserDelegateEntity entity = UserDelegateMapping.INSTANCE.dto2entity(dto);
-        if (options.hasUpdateToNull()) {
-            userDelegateMapper.insert(entity);
-        } else {
-            userDelegateMapper.insertSelective(entity);
-        }
+        userDelegateMapper.insertSelective(entity);
     }
 
-    public void update(UserDelegateDTO dto, UserOptions options) {
+    public void update(UserDelegateDTO dto) {
         UserDelegateEntity entity = UserDelegateMapping.INSTANCE.dto2entity(dto);
-        if (options.hasUpdateToNull()) {
-            userDelegateMapper.updateByPrimaryKey(entity);
-        } else {
-            userDelegateMapper.updateByPrimaryKeySelective(entity);
-        }
+        userDelegateMapper.updateByPrimaryKeySelective(entity);
     }
 }

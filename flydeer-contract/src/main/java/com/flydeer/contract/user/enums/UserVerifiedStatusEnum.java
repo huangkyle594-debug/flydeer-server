@@ -11,5 +11,5 @@ public enum UserVerifiedStatusEnum {
     UN_VERIFIED(0),
     ;
 
-    private final int code;
+    private final Integer code;
 }
