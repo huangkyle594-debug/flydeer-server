@@ -1,7 +1,7 @@
 package com.flydeer.contract.atlas.request;
 
 import com.flydeer.contract.atlas.enums.AtlasPermissionScope;
-import com.flydeer.contract.base.request.ApiRequest;
+import com.flydeer.contract.common.request.ApiRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

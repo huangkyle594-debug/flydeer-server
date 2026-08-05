@@ -1,4 +1,4 @@
-package com.flydeer.contract.base.request;
+package com.flydeer.contract.common.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

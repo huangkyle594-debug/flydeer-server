@@ -1,6 +1,6 @@
 package com.flydeer.contract.atlas.request;
 
-import com.flydeer.contract.base.request.ApiRequest;
+import com.flydeer.contract.common.request.ApiRequest;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

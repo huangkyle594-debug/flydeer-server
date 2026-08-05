@@ -1,4 +1,4 @@
-package com.flydeer.contract.base.response;
+package com.flydeer.contract.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.flydeer.common.exception.ErrorCodes;

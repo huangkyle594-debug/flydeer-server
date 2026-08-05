@@ -1,7 +1,7 @@
 package com.flydeer.contract.user.request;
 
 import com.flydeer.common.constants.UserConstants;
-import com.flydeer.contract.base.request.ApiRequest;
+import com.flydeer.contract.common.request.ApiRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

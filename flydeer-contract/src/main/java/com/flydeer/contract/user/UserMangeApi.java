@@ -6,7 +6,7 @@ import com.flydeer.common.exception.business.BindPhoneExceedException;
 import com.flydeer.common.exception.business.PhoneChannelOperateException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.contract.base.request.ApiRequest;
+import com.flydeer.contract.common.request.ApiRequest;
 import com.flydeer.contract.user.request.BindPhoneRequest;
 import com.flydeer.contract.user.request.DisableUserRequest;
 import com.flydeer.contract.user.request.UpdateUserRequest;

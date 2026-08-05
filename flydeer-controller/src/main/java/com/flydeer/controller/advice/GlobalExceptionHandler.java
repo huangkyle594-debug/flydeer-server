@@ -9,7 +9,7 @@ import com.flydeer.common.exception.auth.SmsVerifyException;
 import com.flydeer.common.exception.business.BusinessException;
 import com.flydeer.common.exception.frequency.FrequencyException;
 import com.flydeer.common.exception.request.BadRequestException;
-import com.flydeer.contract.base.response.ApiResult;
+import com.flydeer.contract.common.response.ApiResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

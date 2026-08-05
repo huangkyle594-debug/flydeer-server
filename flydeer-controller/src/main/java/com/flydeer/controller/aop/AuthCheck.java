@@ -2,11 +2,12 @@ package com.flydeer.controller.aop;
 
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
+import com.flydeer.contract.common.request.ApiRequest;
 
 import java.lang.annotation.*;
 
 /**
- * Marks an {@link com.flydeer.contract.base.request.ApiRequest} parameter
+ * Marks an {@link ApiRequest} parameter
  * to be resolved from HTTP auth context.
  */
 @Target(ElementType.PARAMETER)

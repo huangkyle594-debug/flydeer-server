@@ -46,3 +46,5 @@ app:
         client-id:
         client-secret:
         redirect-uri: https://api.example.com/api/v1/auth/github/callback
+  common:
+    notice: "网站建设中，个人备案无法提供用户登录功能，登陆组件仅为演示"

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flydeer.repository.mysql.config.IdGenerateConfig;
+import com.flydeer.service.common.config.CommonConfig;
 import com.flydeer.service.user.config.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,7 +27,14 @@ import java.util.TimeZone;
 
 @Configuration
 @EnableAsync
-@EnableConfigurationProperties({IdGenerateConfig.class, JwtTokenConfig.class, OauthConfig.class, SmsConfig.class, RateLimitConfig.class, UserConfig.class})
+@EnableConfigurationProperties({
+    IdGenerateConfig.class,
+    JwtTokenConfig.class,
+    OauthConfig.class,
+    SmsConfig.class,
+    RateLimitConfig.class,
+    UserConfig.class,
+    CommonConfig.class})
 public class ServiceConfiguration {
 
     @Bean

@@ -102,3 +102,6 @@ app:
         token-url: https://github.com/login/oauth/access_token
         user-url: https://api.github.com/user
         scope: read:user
+
+  common:
+    notice: "网站建设中，个人备案无法提供用户登录功能，登陆组件仅为演示"

@@ -7,7 +7,7 @@ import com.flydeer.common.exception.auth.NeedAdminException;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.UserInvalidException;
-import com.flydeer.contract.base.request.ApiRequest;
+import com.flydeer.contract.common.request.ApiRequest;
 import com.flydeer.contract.user.enums.DelegateRelationEnum;
 import com.flydeer.contract.user.enums.DelegateStatusEnum;
 import com.flydeer.controller.utils.AuthCookieUtils;
