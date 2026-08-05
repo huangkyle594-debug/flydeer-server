@@ -51,7 +51,7 @@ public class OauthService {
 
     public String buildAuthorizeUrl(LoginChannelEnum channel) throws OauthUrlBuildException {
         try {
-            OauthProviderPojo provider = oauthConfig.get(channel.name());
+            OauthProviderPojo provider = requireProvider(channel);
             String state = signState(channel.name() + ":" + System.currentTimeMillis());
             StringBuilder sb = new StringBuilder();
             sb.append(provider.getAuthorizeUrl())
@@ -64,6 +64,7 @@ public class OauthService {
             }
             return sb.toString();
         } catch (Exception e) {
+            log.warn("oauth authorize url build failed, channel={}", channel, e);
             throw new OauthUrlBuildException();
         }
     }
@@ -85,8 +86,7 @@ public class OauthService {
 
     public OauthUserRecord exchange(LoginChannelEnum channel, String code) throws OauthExchangeException {
         try {
-            OauthProviderPojo provider = oauthConfig.get(channel.name().toLowerCase(Locale.ROOT));
-            Assert.notNull(provider, "oauth provider not configured: " + channel);
+            OauthProviderPojo provider = requireProvider(channel);
             Assert.hasText(provider.getClientId(), "oauth client-id missing: " + channel);
             Assert.hasText(provider.getClientSecret(), "oauth client-secret missing: " + channel);
             ThirdPlatformExchanger exchanger = exchangerMap.get(channel);
@@ -96,6 +96,16 @@ public class OauthService {
             log.warn("oauth exchange failed, channel={}", channel, e);
             throw new OauthExchangeException();
         }
+    }
+
+    /** YAML 键用小写 gitee/github；兼容历史大写 GITEE/GITHUB */
+    private OauthProviderPojo requireProvider(LoginChannelEnum channel) {
+        String lower = channel.name().toLowerCase(Locale.ROOT);
+        OauthProviderPojo provider = oauthConfig.get(lower);
+        Assert.notNull(provider, "oauth provider not configured: " + channel);
+        Assert.hasText(provider.getAuthorizeUrl(), "oauth authorize-url missing: " + channel);
+        Assert.hasText(provider.getClientId(), "oauth client-id missing: " + channel);
+        return provider;
     }
 
     private interface ThirdPlatformExchanger {
