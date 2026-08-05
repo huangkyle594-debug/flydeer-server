@@ -53,8 +53,8 @@ app:
     timeout: 600000
     oauth:
       gitee:
-        client-id: f4d0f3a16b09c2fa716c0f0359ebfa54f07acaf4fec12d3c66494fd2c8683766
-        client-secret: 910741827ef729eb176fcb999167bb54f2a3d3efb41cf4a74590abb54df1f1a5
+        client-id: 3f9e74c4e6b4b68a1259bc1c0c30b334b37a7c1f1072f1149af62ef43143acec
+        client-secret: 6ba48fc7cde9da0a453de81b79840d8dbdd5192e7ae41ef0cd4b7f8d3eb358f1
         redirect-uri: http://localhost/api/v1/auth/gitee/callback
         authorize-url: https://gitee.com/oauth/authorize
         token-url: https://gitee.com/oauth/token
