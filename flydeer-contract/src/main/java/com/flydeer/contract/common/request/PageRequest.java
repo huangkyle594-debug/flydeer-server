@@ -3,10 +3,12 @@ package com.flydeer.contract.common.request;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class PageRequest<T> extends ApiRequest {
 
     @NotNull(message = "查询条件不能为空")
