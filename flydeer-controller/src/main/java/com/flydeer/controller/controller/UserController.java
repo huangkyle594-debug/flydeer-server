@@ -18,7 +18,7 @@ import com.flydeer.contract.user.UserMangeApi;
 import com.flydeer.contract.user.request.BindPhoneRequest;
 import com.flydeer.contract.user.request.DisableUserRequest;
 import com.flydeer.contract.user.request.SendSmsCodeRequest;
-import com.flydeer.contract.user.request.UpdateUserRequest;
+import com.flydeer.contract.user.request.UpdateUserNameRequest;
 import com.flydeer.contract.user.vo.JwtTokenVO;
 import com.flydeer.contract.user.vo.UserProfileVO;
 import com.flydeer.controller.aop.AuthCheck;
@@ -45,15 +45,18 @@ public class UserController {
         return ApiResult.ok(userMangeApi.me(apiRequest));
     }
 
-    @PostMapping("/me/update")
-    public ApiResult<UserProfileVO> updateUser(
+    @PostMapping("/me/name")
+    public ApiResult<JwtTokenVO> updateName(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
-        @RequestBody UpdateUserRequest body)
+        @RequestBody UpdateUserNameRequest body,
+        HttpServletResponse response)
         throws UserNotFoundException, UserInvalidException, NeedVerifyException {
 
-        UpdateUserRequest request = new UpdateUserRequest(apiRequest);
+        UpdateUserNameRequest request = new UpdateUserNameRequest(apiRequest);
         request.setName(body.getName());
-        return ApiResult.ok(userMangeApi.update(request));
+        JwtTokenVO token = userMangeApi.updateName(request);
+        authCookieUtils.writeRefreshCookie(response, token);
+        return ApiResult.ok(token.clearRefreshToken());
     }
 
     @PostMapping("/me/phone/send")

@@ -21,6 +21,8 @@ public class AtlasDTO {
 
     private String status;
 
+    private Boolean visible;
+
     private List<String> tags;
 
     private LocalDateTime createdAt;

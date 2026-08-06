@@ -3,13 +3,14 @@ package com.flydeer.contract.atlas.vo;
 import java.util.List;
 
 public record AtlasVO(
-    String id,
+    Long id,
     String name,
     String description,
-    String authorId,
+    Long authorId,
     String authorName,
     String status,
     List<String> tags,
     Long createdAt,
-    Long updatedAt) {
+    Long updatedAt,
+    Boolean editable) {
 }

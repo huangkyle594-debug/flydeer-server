@@ -1,16 +1,16 @@
 package com.flydeer.controller.controller;
 
-import com.flydeer.api.user.UserDelegateApi;
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
 import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.request.DelegateRevokeException;
 import com.flydeer.common.exception.request.DelegateSelfException;
 import com.flydeer.contract.common.request.ApiRequest;
 import com.flydeer.contract.common.response.ApiResult;
+import com.flydeer.contract.user.UserDelegateApi;
 import com.flydeer.contract.user.request.DelegateOperateRequest;
 import com.flydeer.contract.user.request.QueryDelegateRequest;
 import com.flydeer.contract.user.vo.DelegateVO;
@@ -69,7 +69,7 @@ public class DelegateController {
     public ApiResult<Void> revoke(
         @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody DelegateOperateRequest body)
-        throws DelegateNotFoundException, BadRequestException {
+        throws DelegateNotFoundException, DelegateRevokeException {
 
         DelegateOperateRequest request = new DelegateOperateRequest(apiRequest);
         request.setOperateId(body.getOperateId());

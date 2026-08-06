@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS `atlas` (
     `author_id`    BIGINT       NOT NULL,
     `author_name`  VARCHAR(64)  NOT NULL DEFAULT '',
     `status`       VARCHAR(16)  NOT NULL,
-    `tags_json`    VARCHAR(2000) NOT NULL DEFAULT '[]',
+    `visible`      TINYINT      NOT NULL DEFAULT 0,
+    `tags`         VARCHAR(2000) NOT NULL DEFAULT '[]',
     `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)

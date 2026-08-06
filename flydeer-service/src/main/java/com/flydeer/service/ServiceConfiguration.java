@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flydeer.repository.mysql.config.IdGenerateConfig;
+import com.flydeer.service.atlas.config.AtlasConfig;
 import com.flydeer.service.common.config.CommonConfig;
 import com.flydeer.service.user.config.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -34,7 +35,8 @@ import java.util.TimeZone;
     SmsConfig.class,
     RateLimitConfig.class,
     UserConfig.class,
-    CommonConfig.class})
+    CommonConfig.class,
+    AtlasConfig.class})
 public class ServiceConfiguration {
 
     @Bean

@@ -4,7 +4,7 @@ import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.request.DelegateRevokeException;
 import com.flydeer.common.exception.request.DelegateSelfException;
 import com.flydeer.contract.user.request.DelegateOperateRequest;
 import com.flydeer.contract.user.request.QueryDelegateRequest;
@@ -22,5 +22,5 @@ public interface UserDelegateApi {
     void accept(DelegateOperateRequest request)
         throws UserNotFoundException, UserInvalidException, DelegateNotFoundException, NeedVerifyException;
 
-    void revoke(DelegateOperateRequest request) throws DelegateNotFoundException, BadRequestException;
+    void revoke(DelegateOperateRequest request) throws DelegateNotFoundException, DelegateRevokeException;
 }

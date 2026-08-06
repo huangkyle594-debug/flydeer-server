@@ -26,4 +26,9 @@ public class AtlasCreateRequest extends ApiRequest {
     public AtlasCreateRequest(ApiRequest auth) {
         super(auth);
     }
+
+    /** User display name from JWT ({@link ApiRequest#getName()}), not the atlas title. */
+    public String getAuthorName() {
+        return super.getName();
+    }
 }

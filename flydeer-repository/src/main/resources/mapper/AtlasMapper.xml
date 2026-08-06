@@ -10,7 +10,8 @@
     <result column="author_id" jdbcType="BIGINT" property="authorId" />
     <result column="author_name" jdbcType="VARCHAR" property="authorName" />
     <result column="status" jdbcType="VARCHAR" property="status" />
-    <result column="tags_json" jdbcType="VARCHAR" property="tagsJson" />
+    <result column="visible" jdbcType="TINYINT" property="visible" />
+    <result column="tags" jdbcType="VARCHAR" property="tags" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
   </resultMap>
@@ -73,8 +74,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    `id`, `name`, `description`, `author_id`, `author_name`, `status`, `tags_json`, `created_at`, 
-    `updated_at`
+    `id`, `name`, `description`, `author_id`, `author_name`, `status`, `visible`, `tags`, 
+    `created_at`, `updated_at`
   </sql>
   <select id="selectByExample" parameterType="com.flydeer.repository.mysql.entity.AtlasEntityExample" resultMap="BaseResultMap">
     select
@@ -111,11 +112,13 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into `atlas` (`name`, `description`, `author_id`, 
-      `author_name`, `status`, `tags_json`, 
-      `created_at`, `updated_at`)
+      `author_name`, `status`, `visible`, 
+      `tags`, `created_at`, `updated_at`
+      )
     values (#{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{authorId,jdbcType=BIGINT}, 
-      #{authorName,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{tagsJson,jdbcType=VARCHAR}, 
-      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP})
+      #{authorName,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{visible,jdbcType=TINYINT}, 
+      #{tags,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.flydeer.repository.mysql.entity.AtlasEntity">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -138,8 +141,11 @@
       <if test="status != null">
         `status`,
       </if>
-      <if test="tagsJson != null">
-        `tags_json`,
+      <if test="visible != null">
+        `visible`,
+      </if>
+      <if test="tags != null">
+        `tags`,
       </if>
       <if test="createdAt != null">
         `created_at`,
@@ -164,8 +170,11 @@
       <if test="status != null">
         #{status,jdbcType=VARCHAR},
       </if>
-      <if test="tagsJson != null">
-        #{tagsJson,jdbcType=VARCHAR},
+      <if test="visible != null">
+        #{visible,jdbcType=TINYINT},
+      </if>
+      <if test="tags != null">
+        #{tags,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
         #{createdAt,jdbcType=TIMESTAMP},
@@ -202,8 +211,11 @@
       <if test="row.status != null">
         `status` = #{row.status,jdbcType=VARCHAR},
       </if>
-      <if test="row.tagsJson != null">
-        `tags_json` = #{row.tagsJson,jdbcType=VARCHAR},
+      <if test="row.visible != null">
+        `visible` = #{row.visible,jdbcType=TINYINT},
+      </if>
+      <if test="row.tags != null">
+        `tags` = #{row.tags,jdbcType=VARCHAR},
       </if>
       <if test="row.createdAt != null">
         `created_at` = #{row.createdAt,jdbcType=TIMESTAMP},
@@ -224,7 +236,8 @@
       `author_id` = #{row.authorId,jdbcType=BIGINT},
       `author_name` = #{row.authorName,jdbcType=VARCHAR},
       `status` = #{row.status,jdbcType=VARCHAR},
-      `tags_json` = #{row.tagsJson,jdbcType=VARCHAR},
+      `visible` = #{row.visible,jdbcType=TINYINT},
+      `tags` = #{row.tags,jdbcType=VARCHAR},
       `created_at` = #{row.createdAt,jdbcType=TIMESTAMP},
       `updated_at` = #{row.updatedAt,jdbcType=TIMESTAMP}
     <if test="example != null">
@@ -249,8 +262,11 @@
       <if test="status != null">
         `status` = #{status,jdbcType=VARCHAR},
       </if>
-      <if test="tagsJson != null">
-        `tags_json` = #{tagsJson,jdbcType=VARCHAR},
+      <if test="visible != null">
+        `visible` = #{visible,jdbcType=TINYINT},
+      </if>
+      <if test="tags != null">
+        `tags` = #{tags,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
         `created_at` = #{createdAt,jdbcType=TIMESTAMP},
@@ -268,7 +284,8 @@
       `author_id` = #{authorId,jdbcType=BIGINT},
       `author_name` = #{authorName,jdbcType=VARCHAR},
       `status` = #{status,jdbcType=VARCHAR},
-      `tags_json` = #{tagsJson,jdbcType=VARCHAR},
+      `visible` = #{visible,jdbcType=TINYINT},
+      `tags` = #{tags,jdbcType=VARCHAR},
       `created_at` = #{createdAt,jdbcType=TIMESTAMP},
       `updated_at` = #{updatedAt,jdbcType=TIMESTAMP}
     where `id` = #{id,jdbcType=BIGINT}

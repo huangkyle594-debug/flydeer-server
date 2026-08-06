@@ -18,6 +18,9 @@ public class ApiRequest {
 
     private boolean verified;
 
+    /** Display name from Access Token claims. */
+    private String name;
+
     private List<Long> allUserIds;
 
     public ApiRequest(ApiRequest auth) {
@@ -26,6 +29,7 @@ public class ApiRequest {
         }
         this.userId = auth.userId;
         this.verified = auth.verified;
+        this.name = auth.name;
         this.allUserIds = auth.allUserIds;
     }
 }

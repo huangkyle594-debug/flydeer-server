@@ -505,73 +505,133 @@ public class AtlasEntityExample {
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonIsNull() {
-            addCriterion("`tags_json` is null");
+        public Criteria andVisibleIsNull() {
+            addCriterion("`visible` is null");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonIsNotNull() {
-            addCriterion("`tags_json` is not null");
+        public Criteria andVisibleIsNotNull() {
+            addCriterion("`visible` is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonEqualTo(String value) {
-            addCriterion("`tags_json` =", value, "tagsJson");
+        public Criteria andVisibleEqualTo(Integer value) {
+            addCriterion("`visible` =", value, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonNotEqualTo(String value) {
-            addCriterion("`tags_json` <>", value, "tagsJson");
+        public Criteria andVisibleNotEqualTo(Integer value) {
+            addCriterion("`visible` <>", value, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonGreaterThan(String value) {
-            addCriterion("`tags_json` >", value, "tagsJson");
+        public Criteria andVisibleGreaterThan(Integer value) {
+            addCriterion("`visible` >", value, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonGreaterThanOrEqualTo(String value) {
-            addCriterion("`tags_json` >=", value, "tagsJson");
+        public Criteria andVisibleGreaterThanOrEqualTo(Integer value) {
+            addCriterion("`visible` >=", value, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonLessThan(String value) {
-            addCriterion("`tags_json` <", value, "tagsJson");
+        public Criteria andVisibleLessThan(Integer value) {
+            addCriterion("`visible` <", value, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonLessThanOrEqualTo(String value) {
-            addCriterion("`tags_json` <=", value, "tagsJson");
+        public Criteria andVisibleLessThanOrEqualTo(Integer value) {
+            addCriterion("`visible` <=", value, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonLike(String value) {
-            addCriterion("`tags_json` like", value, "tagsJson");
+        public Criteria andVisibleIn(List<Integer> values) {
+            addCriterion("`visible` in", values, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonNotLike(String value) {
-            addCriterion("`tags_json` not like", value, "tagsJson");
+        public Criteria andVisibleNotIn(List<Integer> values) {
+            addCriterion("`visible` not in", values, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonIn(List<String> values) {
-            addCriterion("`tags_json` in", values, "tagsJson");
+        public Criteria andVisibleBetween(Integer value1, Integer value2) {
+            addCriterion("`visible` between", value1, value2, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonNotIn(List<String> values) {
-            addCriterion("`tags_json` not in", values, "tagsJson");
+        public Criteria andVisibleNotBetween(Integer value1, Integer value2) {
+            addCriterion("`visible` not between", value1, value2, "visible");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonBetween(String value1, String value2) {
-            addCriterion("`tags_json` between", value1, value2, "tagsJson");
+        public Criteria andTagsIsNull() {
+            addCriterion("`tags` is null");
             return (Criteria) this;
         }
 
-        public Criteria andTagsJsonNotBetween(String value1, String value2) {
-            addCriterion("`tags_json` not between", value1, value2, "tagsJson");
+        public Criteria andTagsIsNotNull() {
+            addCriterion("`tags` is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsEqualTo(String value) {
+            addCriterion("`tags` =", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsNotEqualTo(String value) {
+            addCriterion("`tags` <>", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsGreaterThan(String value) {
+            addCriterion("`tags` >", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsGreaterThanOrEqualTo(String value) {
+            addCriterion("`tags` >=", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsLessThan(String value) {
+            addCriterion("`tags` <", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsLessThanOrEqualTo(String value) {
+            addCriterion("`tags` <=", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsLike(String value) {
+            addCriterion("`tags` like", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsNotLike(String value) {
+            addCriterion("`tags` not like", value, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsIn(List<String> values) {
+            addCriterion("`tags` in", values, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsNotIn(List<String> values) {
+            addCriterion("`tags` not in", values, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsBetween(String value1, String value2) {
+            addCriterion("`tags` between", value1, value2, "tags");
+            return (Criteria) this;
+        }
+
+        public Criteria andTagsNotBetween(String value1, String value2) {
+            addCriterion("`tags` not between", value1, value2, "tags");
             return (Criteria) this;
         }
 

@@ -9,9 +9,10 @@ import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
 import com.flydeer.contract.common.request.ApiRequest;
 import com.flydeer.contract.user.UserMangeApi;
+import com.flydeer.contract.user.enums.UserVerifiedStatusEnum;
 import com.flydeer.contract.user.request.BindPhoneRequest;
 import com.flydeer.contract.user.request.DisableUserRequest;
-import com.flydeer.contract.user.request.UpdateUserRequest;
+import com.flydeer.contract.user.request.UpdateUserNameRequest;
 import com.flydeer.contract.user.vo.JwtTokenVO;
 import com.flydeer.contract.user.vo.UserProfileVO;
 import com.flydeer.repository.mysql.dto.UserInfoDTO;
@@ -44,10 +45,11 @@ public class UserMangeApiImpl implements UserMangeApi {
     }
 
     @Override
-    public UserProfileVO update(@Valid UpdateUserRequest request)
+    public JwtTokenVO updateName(@Valid UpdateUserNameRequest request)
         throws UserNotFoundException, UserInvalidException, NeedVerifyException {
-        userService.updateUserName(request.getUserId(), request.getName());
-        return me(request);
+        UserInfoDTO user = userService.updateUserName(request.getUserId(), request.getName());
+        return AuthorizationMapping.INSTANCE.jwtToken(
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus(), user.getName()));
     }
 
     @Override
@@ -57,7 +59,7 @@ public class UserMangeApiImpl implements UserMangeApi {
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         UserInfoDTO user = userService.bindPhone(request.getUserId(), request.getPhone());
         return AuthorizationMapping.INSTANCE.jwtToken(
-            jwtTokenUtils.issue(user.getId(), true, user.getStatus()));
+            jwtTokenUtils.issue(user.getId(), true, user.getStatus(), user.getName()));
     }
 
     @Override
@@ -68,5 +70,10 @@ public class UserMangeApiImpl implements UserMangeApi {
     @Override
     public void cancel(@Valid ApiRequest request) throws UserNotFoundException {
         userService.deleteUser(request.getUserId());
+    }
+
+    private static boolean isVerified(UserInfoDTO user) {
+        return user.getVerified() != null
+            && user.getVerified().equals(UserVerifiedStatusEnum.VERIFIED.getCode());
     }
 }

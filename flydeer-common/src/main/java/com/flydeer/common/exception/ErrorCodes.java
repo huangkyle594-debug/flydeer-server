@@ -22,13 +22,17 @@ public final class ErrorCodes {
 
     public static final int BAD_REQUEST = 40000;
     public static final int DELEGATE_SELF = 41010;
+    public static final int DELEGATE_REVOKE = 41020;
+    public static final int ATLAS_PUBLISH = 42010;
+    public static final int ATLAS_NOT_PUBLISHED = 42020;
 
     public static final int BUSINESS = 50000;
 
     public static final int ENTITY_NOT_FOUND = 51000;
     public static final int USER_NOT_FOUND = 51010;
     public static final int DELEGATE_NOT_FOUND = 51020;
-    public static final int ATLAS_NOT_FOUND = 51030;
+    public static final int ATLAS_NOT_FOUND = 52030;
+    public static final int ATLAS_NOT_VISIBLE = 52040;
 
     public static final int ENTITY_INVALID = 52000;
     public static final int USER_INVALID = 52010;

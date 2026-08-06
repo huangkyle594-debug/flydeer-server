@@ -1,53 +1,83 @@
 package com.flydeer.repository.mysql.repository;
 
+import com.flydeer.common.exception.business.AtlasForbiddenException;
+import com.flydeer.common.exception.business.AtlasNotFoundException;
+import com.flydeer.common.exception.business.AtlasNotVisibleException;
+import com.flydeer.contract.atlas.enums.AtlasVisibleEnum;
+import com.flydeer.contract.atlas.request.AtlasQuery;
+import com.flydeer.contract.common.request.PageRequest;
 import com.flydeer.repository.mysql.dto.AtlasDTO;
-import com.flydeer.repository.mysql.dto.AtlasQueryDTO;
 import com.flydeer.repository.mysql.entity.AtlasEntity;
 import com.flydeer.repository.mysql.entity.AtlasEntityExample;
+import com.flydeer.repository.mysql.mapper.AtlasExtMapper;
 import com.flydeer.repository.mysql.mapper.AtlasMapper;
 import com.flydeer.repository.mysql.mapping.AtlasMapping;
+import com.flydeer.repository.mysql.option.atlas.AtlasOptions;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 @Repository
 @AllArgsConstructor
 public class AtlasRepository {
 
     private final AtlasMapper atlasMapper;
+    private final AtlasExtMapper atlasExtMapper;
 
-    public AtlasDTO findById(Long id) {
-        AtlasEntity entity = atlasMapper.selectByPrimaryKey(id);
-        return entity == null ? null : AtlasMapping.INSTANCE.toDto(entity);
+    public AtlasDTO queryById(Long atlasId, List<Long> userIds, AtlasOptions options)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException {
+        AtlasEntity entity = atlasMapper.selectByPrimaryKey(atlasId);
+        if (options.hasRequireExist()) {
+            ensureExist(entity);
+        }
+        if (options.hasRequireEditable()) {
+            ensureEditable(entity, userIds);
+        }
+        if (options.hasRequireVisible()) {
+            ensureVisible(entity);
+        }
+        return AtlasMapping.INSTANCE.toDto(entity);
     }
 
-    /**
-     * PageHelper-aware query: keeps the MyBatis {@code Page} list wrapper so
-     * {@link com.github.pagehelper.PageInfo} can read total/pages correctly.
-     */
-    public List<AtlasDTO> queryForPage(AtlasQueryDTO query) {
-        List<AtlasEntity> entities = atlasMapper.selectByExample(buildExample(query));
-        List<AtlasDTO> dtos = AtlasMapping.INSTANCE.toDtoList(entities);
-        if (entities instanceof com.github.pagehelper.Page<AtlasEntity> page) {
-            com.github.pagehelper.Page<AtlasDTO> dtoPage =
-                new com.github.pagehelper.Page<>(page.getPageNum(), page.getPageSize());
+    public void ensureExist(AtlasEntity entity) throws AtlasNotFoundException {
+        if (entity == null) {
+            throw new AtlasNotFoundException();
+        }
+    }
+
+    public void ensureEditable(AtlasEntity entity, List<Long> userIds) throws AtlasForbiddenException {
+        if (!userIds.contains(entity.getAuthorId())) {
+            throw new AtlasForbiddenException();
+        }
+    }
+
+    public void ensureVisible(AtlasEntity entity) throws AtlasNotVisibleException {
+        if (!AtlasVisibleEnum.VISIBLE.getCode().equals(entity.getVisible())) {
+            throw new AtlasNotVisibleException();
+        }
+    }
+
+    public Page<AtlasDTO> pageQuery(PageRequest<AtlasQuery> request, AtlasOptions options) {
+        if (options.hasRequireVisible()) {
+            request.getQuery().setVisible(true);
+        }
+
+        PageHelper.startPage(request.getPage(), request.getPageSize());
+        List<AtlasEntity> entities = atlasExtMapper.pageQuery(request);
+        List<AtlasDTO> atlases = AtlasMapping.INSTANCE.toDtoList(entities);
+        if (entities instanceof Page<AtlasEntity> page) {
+            Page<AtlasDTO> dtoPage = new Page<>(page.getPageNum(), page.getPageSize());
             dtoPage.setTotal(page.getTotal());
-            dtoPage.addAll(dtos);
+            dtoPage.addAll(atlases);
             return dtoPage;
         }
-        return dtos;
-    }
-
-    public List<String> listAllTagsJson() {
-        return atlasMapper.selectByExample(new AtlasEntityExample()).stream()
-            .map(AtlasEntity::getTagsJson)
-            .filter(Objects::nonNull)
-            .toList();
+        Page<AtlasDTO> dtoPage = new Page<>(request.getPage(), request.getPageSize());
+        dtoPage.setTotal(atlases.size());
+        dtoPage.addAll(atlases);
+        return dtoPage;
     }
 
     public AtlasDTO insert(AtlasDTO dto) {
@@ -65,84 +95,17 @@ public class AtlasRepository {
         atlasMapper.deleteByPrimaryKey(id);
     }
 
-    private AtlasEntityExample buildExample(AtlasQueryDTO query) {
+    public int deleteByAuthorId(Long authorId) {
         AtlasEntityExample example = new AtlasEntityExample();
-        example.setOrderByClause("`updated_at` desc");
-
-        List<Consumer<AtlasEntityExample.Criteria>> visibility = visibilityPredicates(query);
-        List<Consumer<AtlasEntityExample.Criteria>> keywords = keywordPredicates(query.getKeyword());
-        List<Consumer<AtlasEntityExample.Criteria>> tags = tagPredicates(query.getTags());
-
-        boolean first = true;
-        for (Consumer<AtlasEntityExample.Criteria> vis : visibility) {
-            for (Consumer<AtlasEntityExample.Criteria> kw : keywords) {
-                for (Consumer<AtlasEntityExample.Criteria> tag : tags) {
-                    AtlasEntityExample.Criteria criteria =
-                        first ? example.createCriteria() : example.or();
-                    first = false;
-                    vis.accept(criteria);
-                    kw.accept(criteria);
-                    tag.accept(criteria);
-                }
-            }
-        }
-        return example;
+        example.createCriteria().andAuthorIdEqualTo(authorId);
+        return atlasMapper.deleteByExample(example);
     }
 
-    private List<Consumer<AtlasEntityExample.Criteria>> visibilityPredicates(AtlasQueryDTO query) {
-        String scope = query.getScope();
-        boolean authorOnly = "CREATED".equals(scope) || "MANAGED".equals(scope);
-
-        List<Consumer<AtlasEntityExample.Criteria>> list = new ArrayList<>();
-        if (authorOnly) {
-            list.add(c -> c.andAuthorIdEqualTo(query.getViewerId()));
-            return list;
-        }
-        if (query.getViewerId() != null) {
-            list.add(c -> c.andStatusEqualTo("published"));
-            list.add(c -> c.andAuthorIdEqualTo(query.getViewerId()));
-            return list;
-        }
-        list.add(c -> c.andStatusEqualTo("published"));
-        return list;
-    }
-
-    private List<Consumer<AtlasEntityExample.Criteria>> keywordPredicates(String keyword) {
-        List<Consumer<AtlasEntityExample.Criteria>> list = new ArrayList<>();
-        if (!StringUtils.hasText(keyword)) {
-            list.add(c -> {
-            });
-            return list;
-        }
-        String like = "%" + keyword.trim() + "%";
-        list.add(c -> c.andNameLike(like));
-        list.add(c -> c.andDescriptionLike(like));
-        list.add(c -> c.andAuthorNameLike(like));
-        return list;
-    }
-
-    /**
-     * Tag OR match via {@code tags_json LIKE}; collaboration/JSON_CONTAINS not used
-     * so Example API stays sufficient.
-     */
-    private List<Consumer<AtlasEntityExample.Criteria>> tagPredicates(List<String> tags) {
-        List<Consumer<AtlasEntityExample.Criteria>> list = new ArrayList<>();
-        if (tags == null || tags.isEmpty()) {
-            list.add(c -> {
-            });
-            return list;
-        }
-        for (String tag : tags) {
-            if (!StringUtils.hasText(tag)) {
-                continue;
-            }
-            String like = "%\"" + tag.trim() + "\"%";
-            list.add(c -> c.andTagsJsonLike(like));
-        }
-        if (list.isEmpty()) {
-            list.add(c -> {
-            });
-        }
-        return list;
+    public int updateAuthorNameByAuthorId(Long authorId, String authorName) {
+        AtlasEntityExample example = new AtlasEntityExample();
+        example.createCriteria().andAuthorIdEqualTo(authorId);
+        AtlasEntity row = new AtlasEntity();
+        row.setAuthorName(authorName);
+        return atlasMapper.updateByExampleSelective(row, example);
     }
 }

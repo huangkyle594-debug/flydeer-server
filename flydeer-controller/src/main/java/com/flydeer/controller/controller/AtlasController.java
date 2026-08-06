@@ -3,20 +3,18 @@ package com.flydeer.controller.controller;
 import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
 import com.flydeer.common.exception.auth.NeedLoginException;
-import com.flydeer.common.exception.business.AtlasForbiddenException;
-import com.flydeer.common.exception.business.AtlasNotFoundException;
-import com.flydeer.common.exception.business.UserInvalidException;
-import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.business.*;
+import com.flydeer.common.exception.request.AtlasPublishException;
 import com.flydeer.contract.atlas.AtlasApi;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
 import com.flydeer.contract.atlas.request.AtlasIdRequest;
-import com.flydeer.contract.atlas.request.AtlasQueryRequest;
+import com.flydeer.contract.atlas.request.AtlasQuery;
 import com.flydeer.contract.atlas.request.AtlasUpdateRequest;
-import com.flydeer.contract.atlas.vo.AtlasPageVO;
 import com.flydeer.contract.atlas.vo.AtlasVO;
 import com.flydeer.contract.common.request.ApiRequest;
+import com.flydeer.contract.common.request.PageRequest;
 import com.flydeer.contract.common.response.ApiResult;
+import com.flydeer.contract.common.vo.PageVO;
 import com.flydeer.controller.aop.AuthCheck;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,20 +29,18 @@ public class AtlasController {
     private final AtlasApi atlasApi;
 
     @PostMapping("/query")
-    public ApiResult<AtlasPageVO> list(
+    public ApiResult<PageVO<AtlasVO>> list(
         @AuthCheck(resolve = AuthResolveLevel.DELEGATE) ApiRequest apiRequest,
-        @RequestBody(required = false) AtlasQueryRequest body)
+        @RequestBody(required = false) PageRequest<AtlasQuery> body)
         throws NeedLoginException {
 
-        AtlasQueryRequest request = new AtlasQueryRequest(apiRequest);
-        if (body != null) {
-            request.setKeyword(body.getKeyword());
-            request.setScope(body.getScope());
-            request.setTags(body.getTags());
-            request.setPage(body.getPage());
-            request.setPageSize(body.getPageSize());
-        }
-        return ApiResult.ok(atlasApi.listAtlases(request));
+        PageRequest<AtlasQuery> request = new PageRequest<>(apiRequest);
+        request.setQuery(body.getQuery());
+        request.setPage(body.getPage());
+        request.setPageSize(body.getPageSize());
+        request.setOrderBy(body.getOrderBy());
+        request.setIsAsc(body.getIsAsc());
+        return ApiResult.ok(atlasApi.pageQuery(request));
     }
 
     @GetMapping("/tags")
@@ -69,7 +65,7 @@ public class AtlasController {
     public ApiResult<AtlasVO> update(
         @AuthCheck(resolve = AuthResolveLevel.DELEGATE, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasUpdateRequest body)
-        throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException {
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException {
 
         AtlasUpdateRequest request = new AtlasUpdateRequest(apiRequest);
         request.setAtlasId(body.getAtlasId());
@@ -83,7 +79,7 @@ public class AtlasController {
     public ApiResult<Void> submitReview(
         @AuthCheck(resolve = AuthResolveLevel.DELEGATE, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasIdRequest body)
-        throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException {
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException, AtlasPublishException {
 
         AtlasIdRequest request = new AtlasIdRequest(apiRequest);
         request.setAtlasId(body.getAtlasId());
@@ -95,22 +91,11 @@ public class AtlasController {
     public ApiResult<Void> delete(
         @AuthCheck(resolve = AuthResolveLevel.DELEGATE, required = AuthRequiredLevel.VERIFIED) ApiRequest apiRequest,
         @RequestBody AtlasIdRequest body)
-        throws AtlasNotFoundException, AtlasForbiddenException {
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException {
 
         AtlasIdRequest request = new AtlasIdRequest(apiRequest);
         request.setAtlasId(body.getAtlasId());
         atlasApi.deleteAtlas(request);
         return ApiResult.ok();
-    }
-
-    @PostMapping("/detail")
-    public ApiResult<AtlasVO> detail(
-        @AuthCheck(resolve = AuthResolveLevel.SELF, required = AuthRequiredLevel.ANONYMOUS) ApiRequest apiRequest,
-        @RequestBody AtlasIdRequest body)
-        throws AtlasNotFoundException, AtlasForbiddenException {
-
-        AtlasIdRequest request = new AtlasIdRequest(apiRequest);
-        request.setAtlasId(body.getAtlasId());
-        return ApiResult.ok(atlasApi.getAtlas(request));
     }
 }

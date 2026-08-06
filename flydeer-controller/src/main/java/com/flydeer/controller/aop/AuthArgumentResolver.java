@@ -121,6 +121,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver, WebM
     private void fillRequest(ApiRequest apiRequest, AccessTokenClaims claims, AuthResolveLevel resolveLevel) {
         apiRequest.setUserId(claims.userId());
         apiRequest.setVerified(claims.verified());
+        apiRequest.setName(claims.name());
 
         if (resolveLevel == AuthResolveLevel.SELF) {
             apiRequest.setAllUserIds(List.of(claims.userId()));

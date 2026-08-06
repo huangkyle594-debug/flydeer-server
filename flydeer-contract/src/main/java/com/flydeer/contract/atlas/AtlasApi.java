@@ -1,23 +1,21 @@
 package com.flydeer.contract.atlas;
 
 import com.flydeer.common.exception.auth.NeedLoginException;
-import com.flydeer.common.exception.business.AtlasForbiddenException;
-import com.flydeer.common.exception.business.AtlasNotFoundException;
-import com.flydeer.common.exception.business.UserInvalidException;
-import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.business.*;
+import com.flydeer.common.exception.request.AtlasPublishException;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
 import com.flydeer.contract.atlas.request.AtlasIdRequest;
-import com.flydeer.contract.atlas.request.AtlasQueryRequest;
+import com.flydeer.contract.atlas.request.AtlasQuery;
 import com.flydeer.contract.atlas.request.AtlasUpdateRequest;
-import com.flydeer.contract.atlas.vo.AtlasPageVO;
 import com.flydeer.contract.atlas.vo.AtlasVO;
+import com.flydeer.contract.common.request.PageRequest;
+import com.flydeer.contract.common.vo.PageVO;
 
 import java.util.List;
 
 public interface AtlasApi {
 
-    AtlasPageVO listAtlases(AtlasQueryRequest request) throws NeedLoginException;
+    PageVO<AtlasVO> pageQuery(PageRequest<AtlasQuery> request) throws NeedLoginException;
 
     List<String> listTags();
 
@@ -25,14 +23,11 @@ public interface AtlasApi {
         throws UserNotFoundException, UserInvalidException;
 
     AtlasVO updateAtlas(AtlasUpdateRequest request)
-        throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException;
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException;
 
     void submitReview(AtlasIdRequest request)
-        throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException;
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException, AtlasPublishException;
 
     void deleteAtlas(AtlasIdRequest request)
-        throws AtlasNotFoundException, AtlasForbiddenException;
-
-    AtlasVO getAtlas(AtlasIdRequest request)
-        throws AtlasNotFoundException, AtlasForbiddenException;
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException;
 }

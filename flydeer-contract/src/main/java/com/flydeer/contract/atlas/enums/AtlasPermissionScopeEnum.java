@@ -1,6 +1,6 @@
 package com.flydeer.contract.atlas.enums;
 
-public enum AtlasPermissionScope {
+public enum AtlasPermissionScopeEnum {
 
     ALL,
     CREATED,

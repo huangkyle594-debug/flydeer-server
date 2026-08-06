@@ -20,12 +20,14 @@ public interface AtlasMapping {
 
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Mapping(target = "tags", source = "tagsJson", qualifiedByName = "jsonToTags")
+    @Mapping(target = "tags", source = "tags", qualifiedByName = "jsonToTags")
+    @Mapping(target = "visible", source = "visible", qualifiedByName = "intToBool")
     AtlasDTO toDto(AtlasEntity entity);
 
     List<AtlasDTO> toDtoList(List<AtlasEntity> entities);
 
-    @Mapping(target = "tagsJson", source = "tags", qualifiedByName = "tagsToJson")
+    @Mapping(target = "tags", source = "tags", qualifiedByName = "tagsToJson")
+    @Mapping(target = "visible", source = "visible", qualifiedByName = "boolToInt")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     AtlasEntity dto2entity(AtlasDTO dto);
@@ -53,5 +55,18 @@ public interface AtlasMapping {
         } catch (JsonProcessingException e) {
             return "[]";
         }
+    }
+
+    @Named("intToBool")
+    default Boolean intToBool(Integer value) {
+        return value != null && value != 0;
+    }
+
+    @Named("boolToInt")
+    default Integer boolToInt(Boolean value) {
+        if (value == null) {
+            return null;
+        }
+        return value ? 1 : 0;
     }
 }

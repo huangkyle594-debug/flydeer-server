@@ -1,134 +1,159 @@
 package com.flydeer.service.atlas;
 
 import com.flydeer.common.constants.AtlasConstants;
+import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.AtlasForbiddenException;
 import com.flydeer.common.exception.business.AtlasNotFoundException;
-import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.business.AtlasNotVisibleException;
+import com.flydeer.common.exception.request.AtlasNotPublishedException;
+import com.flydeer.common.exception.request.AtlasPublishException;
+import com.flydeer.contract.atlas.enums.AtlasPermissionScopeEnum;
 import com.flydeer.contract.atlas.enums.AtlasStatus;
+import com.flydeer.contract.atlas.request.AtlasCreateRequest;
+import com.flydeer.contract.atlas.request.AtlasQuery;
+import com.flydeer.contract.atlas.request.AtlasUpdateRequest;
+import com.flydeer.contract.common.request.PageRequest;
 import com.flydeer.repository.mysql.dto.AtlasDTO;
-import com.flydeer.repository.mysql.dto.AtlasQueryDTO;
-import com.flydeer.repository.mysql.mapping.AtlasMapping;
+import com.flydeer.repository.mysql.option.atlas.AtlasOptions;
 import com.flydeer.repository.mysql.repository.AtlasRepository;
-import com.github.pagehelper.PageHelper;
+import com.flydeer.service.atlas.config.AtlasConfig;
+import com.flydeer.service.user.event.UserDeletedEvent;
+import com.flydeer.service.user.event.UserNameUpdatedEvent;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AtlasService {
 
     private final AtlasRepository atlasRepository;
+    private final AtlasConfig atlasConfig;
 
-    public PageInfo<AtlasDTO> list(AtlasQueryDTO query, int page, int pageSize) {
-        PageHelper.startPage(page, pageSize);
-        List<AtlasDTO> rows = atlasRepository.queryForPage(query);
+    public List<String> listTags() {
+        return atlasConfig.getTags();
+    }
+
+    public PageInfo<AtlasDTO> pageQuery(PageRequest<AtlasQuery> request) throws NeedLoginException {
+        if ((AtlasPermissionScopeEnum.CREATED == request.getQuery().getScope()
+            || AtlasPermissionScopeEnum.MANAGED == request.getQuery().getScope())
+            && request.getUserId() == null) {
+            throw new NeedLoginException();
+        }
+        return pageQuery(request, AtlasOptions.option().requireVisible());
+    }
+
+    public PageInfo<AtlasDTO> pageQuery(PageRequest<AtlasQuery> request, AtlasOptions options) {
+        Page<AtlasDTO> rows = atlasRepository.pageQuery(request, options);
         return new PageInfo<>(rows);
     }
 
-    public List<String> listTags() {
-        Set<String> tags = new LinkedHashSet<>(AtlasConstants.PRESET_TAGS);
-        List<String> used = new ArrayList<>();
-        for (String tagsJson : atlasRepository.listAllTagsJson()) {
-            for (String tag : AtlasMapping.INSTANCE.jsonToTags(tagsJson)) {
-                if (StringUtils.hasText(tag) && !tags.contains(tag)) {
-                    used.add(tag);
-                }
+    public AtlasDTO queryById(Long atlasId, List<Long> userIds, Boolean isAdmin)
+        throws AtlasForbiddenException, AtlasNotFoundException, AtlasNotVisibleException, AtlasNotPublishedException {
+        AtlasDTO atlas = atlasRepository.queryById(atlasId, userIds, AtlasOptions.option().requireExist().requireVisible());
+        if (!isAdmin) {
+            if (userIds == null || !userIds.contains(atlas.getAuthorId())) {
+                ensurePublished(atlas);
             }
         }
-        used.sort(String::compareTo);
-        tags.addAll(used);
-        return List.copyOf(tags);
+        return atlas;
     }
 
-    public AtlasDTO create(String name, String description, List<String> tags, Long authorId, String authorName) {
+    public AtlasDTO create(AtlasCreateRequest request) {
         AtlasDTO dto = new AtlasDTO();
-        dto.setName(name.trim());
-        dto.setDescription(description == null ? "" : description.trim());
-        dto.setAuthorId(authorId);
-        dto.setAuthorName(authorName == null ? "" : authorName);
-        dto.setStatus(AtlasStatus.draft.name());
-        dto.setTags(normalizeTags(tags));
+        dto.setName(request.getName().trim());
+        dto.setDescription(request.getDescription().trim());
+        dto.setAuthorId(request.getUserId());
+        dto.setAuthorName(request.getAuthorName());
+        dto.setStatus(AtlasStatus.DRAFT.name());
+        dto.setVisible(false);
+        dto.setTags(normalizeTags(request.getTags()));
         return atlasRepository.insert(dto);
     }
 
-    public AtlasDTO update(Long atlasId, Long userId, String name, String description, List<String> tags)
-        throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException {
-        AtlasDTO exist = requireAuthor(atlasId, userId);
+    public AtlasDTO update(AtlasUpdateRequest request)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException {
+        AtlasDTO exist = atlasRepository.queryById(request.getAtlasId(), request.getAllUserIds(),
+            AtlasOptions.option().requireExist().requireEditable());
+
+        AtlasDTO update = new AtlasDTO();
+        update.setId(exist.getId());
         boolean touched = false;
-        if (name != null) {
-            if (!StringUtils.hasText(name)) {
-                throw new BadRequestException("图集名称不能为空");
-            }
-            exist.setName(name.trim());
+        if (StringUtils.hasText(request.getName())) {
+            update.setName(request.getName());
             touched = true;
         }
-        if (description != null) {
-            exist.setDescription(description.trim());
+        if (StringUtils.hasText(request.getDescription())) {
+            update.setDescription(request.getDescription());
             touched = true;
         }
-        if (tags != null) {
-            exist.setTags(normalizeTags(tags));
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            update.setTags(normalizeTags(request.getTags()));
             touched = true;
         }
         if (!touched) {
             return exist;
         }
-        if (AtlasStatus.pending.name().equals(exist.getStatus())) {
-            exist.setStatus(AtlasStatus.draft.name());
-        }
-        atlasRepository.update(exist);
-        return atlasRepository.findById(atlasId);
+        atlasRepository.update(update);
+        return atlasRepository.queryById(request.getAtlasId(), request.getAllUserIds(), AtlasOptions.option());
     }
 
-    public void submitReview(Long atlasId, Long userId)
-        throws AtlasNotFoundException, AtlasForbiddenException, BadRequestException {
-        AtlasDTO exist = requireAuthor(atlasId, userId);
-        if (!AtlasStatus.draft.name().equals(exist.getStatus())) {
-            throw new BadRequestException("仅草稿状态可提交审核");
+    public void submitReview(Long atlasId, List<Long> userIds)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasPublishException, AtlasNotVisibleException {
+        AtlasDTO exist = atlasRepository.queryById(atlasId, userIds,
+            AtlasOptions.option().requireExist().requireEditable());
+        if (!AtlasStatus.DRAFT.name().equals(exist.getStatus())) {
+            throw new AtlasPublishException();
         }
         AtlasDTO update = new AtlasDTO();
         update.setId(atlasId);
-        update.setStatus(AtlasStatus.pending.name());
+        update.setStatus(AtlasStatus.PENDING.name());
         atlasRepository.update(update);
     }
 
-    public void delete(Long atlasId, Long userId) throws AtlasNotFoundException, AtlasForbiddenException {
-        requireAuthor(atlasId, userId);
+    public void delete(Long atlasId, List<Long> userIds)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException {
+        atlasRepository.queryById(atlasId, userIds,
+            AtlasOptions.option().requireExist().requireEditable());
         atlasRepository.deleteById(atlasId);
     }
 
-    public AtlasDTO getVisible(Long atlasId, Long viewerId)
-        throws AtlasNotFoundException, AtlasForbiddenException {
-        AtlasDTO exist = atlasRepository.findById(atlasId);
-        if (exist == null) {
-            throw new AtlasNotFoundException();
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onUserDeleted(UserDeletedEvent event) {
+        try {
+            int deleted = atlasRepository.deleteByAuthorId(event.userId());
+            log.info("deleted {} atlases for deleted userId={}", deleted, event.userId());
+        } catch (Exception e) {
+            log.error("failed to delete atlases for deleted userId={}", event.userId(), e);
         }
-        boolean published = AtlasStatus.published.name().equals(exist.getStatus());
-        boolean owner = viewerId != null && Objects.equals(viewerId, exist.getAuthorId());
-        if (!published && !owner) {
-            throw new AtlasForbiddenException();
-        }
-        return exist;
     }
 
-    public AtlasDTO requireAuthor(Long atlasId, Long userId)
-        throws AtlasNotFoundException, AtlasForbiddenException {
-        AtlasDTO exist = atlasRepository.findById(atlasId);
-        if (exist == null) {
-            throw new AtlasNotFoundException();
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onUserNameUpdated(UserNameUpdatedEvent event) {
+        try {
+            int updated = atlasRepository.updateAuthorNameByAuthorId(event.userId(), event.newName());
+            log.info("updated author_name on {} atlases for userId={}", updated, event.userId());
+        } catch (Exception e) {
+            log.error("failed to update atlas author_name for userId={}", event.userId(), e);
         }
-        if (!Objects.equals(userId, exist.getAuthorId())) {
-            throw new AtlasForbiddenException();
+    }
+
+    private void ensurePublished(AtlasDTO atlas) throws AtlasNotPublishedException {
+        if (!AtlasStatus.PUBLISHED.name().equals(atlas.getStatus())) {
+            throw new AtlasNotPublishedException();
         }
-        return exist;
     }
 
     private List<String> normalizeTags(List<String> tags) {

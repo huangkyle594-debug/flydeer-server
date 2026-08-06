@@ -73,11 +73,11 @@ Controller 通过参数注解 `@AuthCheck` 解析身份：
 
 ### 1.4 公共响应类型
 
-**JwtTokenVO**（登录 / 刷新 / 绑手机成功）
+**JwtTokenVO**（登录 / 刷新 / 改昵称 / 绑手机成功）
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| `accessToken` | string | 访问令牌 |
+| `accessToken` | string | 访问令牌（claims 含 `userId` / `verified` / `status` / `name`） |
 | `refreshToken` | string \| null | HTTP 接口中会被置为 `null`（已写入 Cookie） |
 | `expiresInSeconds` | long | Access Token 剩余有效秒数 |
 
@@ -273,10 +273,12 @@ curl http://localhost:8080/api/v1/user/me \
 
 ### 3.2 更新昵称
 
-- **路由**：`POST /api/v1/user/me/update`
+- **路由**：`POST /api/v1/user/me/name`
 - **鉴权**：已登录且已实名（`VERIFIED`）
-- **逻辑**：更新名称后返回最新资料
-- **注意**：名称最长 **20** 个字符
+- **逻辑**：更新名称 → 重新签发 Token（Access claims 含新 `name`）→ 更新 Refresh Cookie；并发布 `UserNameUpdatedEvent`（含 `userId` / `oldName` / `newName`），波及同步由各 Service 异步监听处理
+- **注意**：
+  - 名称最长 **20** 个字符
+  - 成功后务必替换本地 Access Token
 
 **Request Body**
 
@@ -286,7 +288,14 @@ curl http://localhost:8080/api/v1/user/me \
 }
 ```
 
-**Response `data`**：`UserProfileVO`
+**Response `data`**：`JwtTokenVO`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/user/me/name \
+  -H 'Authorization: Bearer <accessToken>' \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"飞鹿用户"}'
+```
 
 ---
 
@@ -484,7 +493,7 @@ curl -X POST http://localhost:8080/api/v1/user/me/cancel \
 | 刷新 | POST | `/api/v1/auth/refresh` | 否 | 读/写 |
 | 登出 | POST | `/api/v1/auth/logout` | 否 | 清 |
 | 我的资料 | GET | `/api/v1/user/me` | 是 | 否 |
-| 改昵称 | POST | `/api/v1/user/me/update` | 是 | 否 |
+| 改昵称 | POST | `/api/v1/user/me/name` | 是 | 写 |
 | 绑手机发码 | POST | `/api/v1/user/me/phone/send` | 是 | 否 |
 | 绑手机提交 | POST | `/api/v1/user/me/phone/bind` | 是 | 写 |
 | 注销账号 | POST | `/api/v1/user/me/cancel` | 是 | 清 |

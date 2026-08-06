@@ -19,6 +19,7 @@ import com.flydeer.repository.mysql.repository.UserInfoRepository;
 import com.flydeer.service.user.config.UserConfig;
 import com.flydeer.service.user.event.UserDeletedEvent;
 import com.flydeer.service.user.event.UserDisabledEvent;
+import com.flydeer.service.user.event.UserNameUpdatedEvent;
 import com.flydeer.service.user.model.OauthUserRecord;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -87,11 +88,23 @@ public class UserService {
             channel, info.channelUid(), info.username(), null, null, UserOptions.option());
     }
 
-    public void updateUserName(Long userId, String userName) {
+    /**
+     * Update display name and publish {@link UserNameUpdatedEvent}.
+     * Side effects (e.g. denormalized name sync) are handled by async listeners.
+     */
+    @Transactional
+    public UserInfoDTO updateUserName(Long userId, String userName)
+        throws UserNotFoundException, UserInvalidException, NeedVerifyException {
+        UserInfoDTO user = queryUser(userId, UserOptions.option().requireActive());
+        String oldName = user.getName();
+        String name = TextUtils.trimText(userName, UserConstants.MAX_USER_NAME_LENGTH);
         UserInfoDTO dto = new UserInfoDTO();
         dto.setId(userId);
-        dto.setName(TextUtils.trimText(userName, UserConstants.MAX_USER_NAME_LENGTH));
+        dto.setName(name);
         userInfoRepository.update(dto);
+        user.setName(name);
+        eventPublisher.publishEvent(new UserNameUpdatedEvent(userId, oldName, name));
+        return user;
     }
 
     public UserInfoDTO bindPhone(Long userId, String phone)

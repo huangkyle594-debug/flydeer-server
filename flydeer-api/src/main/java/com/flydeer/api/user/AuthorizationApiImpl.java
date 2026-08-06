@@ -46,7 +46,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         smsVerifyService.checkVerifyCode(request.getPhone(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterPhone(request.getPhone());
         return AuthorizationMapping.INSTANCE.jwtToken(
-            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus()));
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus(), user.getName()));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         OauthUserRecord info = oauthService.exchange(request.getChannel(), request.getCode());
         UserInfoDTO user = userService.loginOrRegisterOauth(request.getChannel(), info);
         return AuthorizationMapping.INSTANCE.jwtToken(
-            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus()));
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus(), user.getName()));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class AuthorizationApiImpl implements AuthorizationApi {
         // Refresh re-reads DB status so disable takes effect at latest on token rotation.
         UserInfoDTO user = userService.queryUser(userId, UserOptions.option().requireActive());
         return AuthorizationMapping.INSTANCE.jwtToken(
-            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus()));
+            jwtTokenUtils.issue(user.getId(), isVerified(user), user.getStatus(), user.getName()));
     }
 
     private static boolean isVerified(UserInfoDTO user) {

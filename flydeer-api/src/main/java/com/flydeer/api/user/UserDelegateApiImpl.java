@@ -5,8 +5,9 @@ import com.flydeer.common.exception.auth.NeedVerifyException;
 import com.flydeer.common.exception.business.DelegateNotFoundException;
 import com.flydeer.common.exception.business.UserInvalidException;
 import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.request.DelegateRevokeException;
 import com.flydeer.common.exception.request.DelegateSelfException;
+import com.flydeer.contract.user.UserDelegateApi;
 import com.flydeer.contract.user.request.DelegateOperateRequest;
 import com.flydeer.contract.user.request.QueryDelegateRequest;
 import com.flydeer.contract.user.vo.DelegateVO;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class UserDelegateApi implements com.flydeer.contract.user.UserDelegateApi {
+public class UserDelegateApiImpl implements UserDelegateApi {
 
     private final UserDelegateService userDelegateService;
 
@@ -50,9 +51,9 @@ public class UserDelegateApi implements com.flydeer.contract.user.UserDelegateAp
     }
 
     @Override
-    public void revoke(@Valid DelegateOperateRequest request) throws DelegateNotFoundException, BadRequestException {
+    public void revoke(@Valid DelegateOperateRequest request) throws DelegateNotFoundException, DelegateRevokeException {
         if (request.getRelation() == null) {
-            throw new BadRequestException("身份不能为空");
+            throw new DelegateRevokeException();
         }
         switch (request.getRelation()) {
             case DELEGATOR:

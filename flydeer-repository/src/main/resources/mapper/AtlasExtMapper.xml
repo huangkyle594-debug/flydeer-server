@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flydeer.repository.mysql.mapper.AtlasExtMapper">
+
+  <!--
+    param: PageRequest&lt;AtlasQuery&gt;
+    WHERE query.visible? → visible = #{query.visible}
+      AND query.scope:
+           CREATED  → author_id = #{userId}
+           MANAGED  → author_id IN (#{allUserIds})
+           else/ALL → status = 'PUBLISHED'
+      AND query.keyword? → (name OR description OR author_name) LIKE
+      AND query.tags?    → JSON_OVERLAPS 命中任一
+    ORDER BY ${orderBy} asc|desc
+  -->
+  <select id="pageQuery"
+          parameterType="com.flydeer.contract.common.request.PageRequest"
+          resultMap="com.flydeer.repository.mysql.mapper.AtlasMapper.BaseResultMap">
+    select
+      `id`, `name`, `description`, `author_id`, `author_name`, `status`, `visible`, `tags`,
+      `created_at`, `updated_at`
+    from `atlas`
+    <where>
+      <if test="query.visible != null">
+        and `visible` = #{query.visible}
+      </if>
+      <choose>
+        <when test="query.scope != null and query.scope.name() == 'CREATED'">
+          and `author_id` = #{userId}
+        </when>
+        <when test="query.scope != null and query.scope.name() == 'MANAGED'">
+          and `author_id` in
+          <foreach collection="allUserIds" item="id" open="(" separator="," close=")">
+            #{id}
+          </foreach>
+        </when>
+        <otherwise>
+          and `status` = 'PUBLISHED'
+        </otherwise>
+      </choose>
+      <if test="query.keyword != null and query.keyword != ''">
+        and (
+          `name` like concat('%', #{query.keyword}, '%')
+          or `description` like concat('%', #{query.keyword}, '%')
+          or `author_name` like concat('%', #{query.keyword}, '%')
+        )
+      </if>
+      <if test="query.tags != null and query.tags.size() &gt; 0">
+        and json_overlaps(
+          `tags`,
+          cast(concat('[',
+            <foreach collection="query.tags" item="tag" separator=",">
+              json_quote(#{tag})
+            </foreach>
+          , ']') as json)
+        )
+      </if>
+    </where>
+    order by ${orderBy}
+    <choose>
+      <when test="isAsc != null and isAsc">asc</when>
+      <otherwise>desc</otherwise>
+    </choose>
+  </select>
+</mapper>

@@ -76,7 +76,7 @@ app:
     country-code: "86"
   user:
     phone-hash-salt: change-me-phone-hash-salt!!
-    admin-ids: []
+    admin-ids: [ ]
     ratelimit:
       sms-interval: 60s
       sms-daily-limit-per-phone: 20
@@ -105,3 +105,19 @@ app:
 
   common:
     notice: "网站建设中，个人备案无法提供用户登录功能，登陆组件仅为演示"
+  atlas:
+    tags:
+      - 流程
+      - 系统
+      - 架构
+      - 鉴权
+      - 入门
+      - 进阶
+      - 计算机
+      - 调试
+      - 机器学习
+      - Web
+      - 运维
+      - 数据库
+      - 网络
+      - 安全

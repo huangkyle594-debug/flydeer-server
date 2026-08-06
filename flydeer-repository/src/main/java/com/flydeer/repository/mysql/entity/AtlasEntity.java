@@ -19,7 +19,9 @@ public class AtlasEntity {
 
     private String status;
 
-    private String tagsJson;
+    private Integer visible;
+
+    private String tags;
 
     private LocalDateTime createdAt;
 

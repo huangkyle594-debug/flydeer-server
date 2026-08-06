@@ -58,11 +58,13 @@ Controller 通过 `@AuthCheck` 解析身份：
 
 ### 1.3 权限与可见范围
 
+库表字段 `visible`（`TINYINT`，`1`=可见 / `0`=不可见）控制**对外发现**。开发阶段创建的图集一律 `visible=0`，对外列表/详情均不可见；作者仍可查看与管理自己的图集。
+
 | 规则 | 说明 |
 |---|---|
-| 列表 `scope=ALL`（默认） | **已发布**全部 +（已登录时）**自己创建的**任意状态图集 |
-| 列表 `CREATED` / `MANAGED` | 均要求已登录；当前实现均为「`authorId` = 当前用户」（协作未拆分） |
-| 详情 | 已发布：任何人；非已发布：仅作者 |
+| 列表 `scope=ALL`（默认） | **`published` 且 `visible=1`** +（已登录时）**自己创建的**任意状态图集 |
+| 列表 `CREATED` / `MANAGED` | 均要求已登录；当前实现均为「`authorId` = 当前用户」（协作未拆分）；不受 `visible` 限制 |
+| 详情 | `published` 且 `visible=1`：任何人；否则仅作者 |
 | `editable`（仅列表项） | `viewerId`（Token 用户）与 `authorId` 相等时为 `true` |
 | 作者字段 | 创建时前端**不传**；由 Token 写入 `authorId`；`authorName` 当前写入空串 |
 | 写操作作者校验 | `update` / `submit-review` / `delete`：`authorId` 必须等于 Token `userId`，否则 `ATLAS_FORBIDDEN` |
@@ -83,7 +85,7 @@ draft  --提交审核-->  pending  --人审通过-->  published
 |---|---|
 | `draft` | 草稿：可编辑、可提交审核、可删除 |
 | `pending` | 待人审；期间对元信息的改动 → 回滚为 `draft` |
-| `published` | 已发布：全员可见；作者仍可编辑（`pending` 时改动会回滚为 `draft`） |
+| `published` | 已发布；对外可见还需 `visible=1`；作者仍可编辑（`pending` 时改动会回滚为 `draft`） |
 
 人审通过为运营 / 服务端操作，**无前端接口**。
 
@@ -166,7 +168,7 @@ draft  --提交审核-->  pending  --人审通过-->  published
 |---|---|---|---|
 | `keyword` | string | 否 | 模糊匹配标题 / 简介 / 作者名 |
 | `scope` | string | 否 | 见下表；默认 / 省略 = `ALL` |
-| `tags` | string[] | 否 | 命中**任一**标签即保留（`tags_json LIKE`） |
+| `tags` | string[] | 否 | 命中**任一**标签即保留（`tags LIKE`） |
 | `page` | int | 否 | 从 1 起，默认 1 |
 | `pageSize` | int | 否 | 默认 10，上限 50 |
 
@@ -174,7 +176,7 @@ draft  --提交审核-->  pending  --人审通过-->  published
 
 | 值 | 含义 | 过滤规则（当前实现） |
 |---|---|---|
-| `ALL`（默认） | 全部可见 | 未登录：仅 `published`；已登录：`published` **或** `authorId`=自己 |
+| `ALL`（默认） | 全部可见 | 未登录：仅 `published` 且 `visible=1`；已登录：同上 **或** `authorId`=自己 |
 | `CREATED` | 我创建的 | 必须登录；`authorId` = 当前用户 |
 | `MANAGED` | 我管理的 | 必须登录；当前与 `CREATED` 相同（协作未上线） |
 
@@ -228,10 +230,10 @@ curl -X POST http://localhost:8080/api/v1/struct-mind/atlases/query \
 
 - **路由**：`GET /api/v1/struct-mind/atlases/tags`
 - **鉴权**：匿名
-- **逻辑**：预置标签 ∪ 库中已出现标签（去重）；预置在前，其余字典序
+- **逻辑**：返回配置项 `app.atlas.preset-tags`（`AtlasConfig.presetTags`），保持配置顺序
 - **Body**：无
 
-**预置标签**（`AtlasConstants.PRESET_TAGS`）：
+**预置标签**（`app.atlas.preset-tags`）：
 
 `流程`、`系统`、`架构`、`鉴权`、`入门`、`进阶`、`计算机`、`调试`、`机器学习`、`Web`、`运维`、`数据库`、`网络`、`安全`
 
