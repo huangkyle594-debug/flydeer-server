@@ -1,10 +1,9 @@
 package com.flydeer.contract.admin;
 
 import com.flydeer.common.exception.business.UserNotFoundException;
-import com.flydeer.contract.user.request.DisableUserRequest;
+import com.flydeer.contract.admin.request.DisableUserRequest;
 
 public interface AdminApi {
 
-    void disable(DisableUserRequest request) throws UserNotFoundException;
-
+    void disableUser(DisableUserRequest request) throws UserNotFoundException;
 }

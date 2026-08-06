@@ -11,7 +11,6 @@ import com.flydeer.contract.common.request.ApiRequest;
 import com.flydeer.contract.user.UserMangeApi;
 import com.flydeer.contract.user.enums.UserVerifiedStatusEnum;
 import com.flydeer.contract.user.request.BindPhoneRequest;
-import com.flydeer.contract.user.request.DisableUserRequest;
 import com.flydeer.contract.user.request.UpdateUserNameRequest;
 import com.flydeer.contract.user.vo.JwtTokenVO;
 import com.flydeer.contract.user.vo.UserProfileVO;
@@ -60,11 +59,6 @@ public class UserMangeApiImpl implements UserMangeApi {
         UserInfoDTO user = userService.bindPhone(request.getUserId(), request.getPhone());
         return AuthorizationMapping.INSTANCE.jwtToken(
             jwtTokenUtils.issue(user.getId(), true, user.getStatus(), user.getName()));
-    }
-
-    @Override
-    public void disable(@Valid DisableUserRequest request) throws UserNotFoundException {
-        userService.disableUser(request.getOperatorId());
     }
 
     @Override
