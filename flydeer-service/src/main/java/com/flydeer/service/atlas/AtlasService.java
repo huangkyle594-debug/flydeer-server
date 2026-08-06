@@ -5,6 +5,7 @@ import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.AtlasForbiddenException;
 import com.flydeer.common.exception.business.AtlasNotFoundException;
 import com.flydeer.common.exception.business.AtlasNotVisibleException;
+import com.flydeer.common.exception.request.AtlasApproveException;
 import com.flydeer.common.exception.request.AtlasNotPublishedException;
 import com.flydeer.common.exception.request.AtlasPublishException;
 import com.flydeer.contract.atlas.enums.AtlasPermissionScopeEnum;
@@ -45,17 +46,35 @@ public class AtlasService {
     }
 
     public PageInfo<AtlasDTO> pageQuery(PageRequest<AtlasQuery> request) throws NeedLoginException {
-        if ((AtlasPermissionScopeEnum.CREATED == request.getQuery().getScope()
-            || AtlasPermissionScopeEnum.MANAGED == request.getQuery().getScope())
-            && request.getUserId() == null) {
-            throw new NeedLoginException();
+        AtlasQuery query = request.getQuery();
+        boolean ownScope = AtlasPermissionScopeEnum.CREATED == query.getScope()
+            || AtlasPermissionScopeEnum.MANAGED == query.getScope();
+        if (ownScope) {
+            if (request.getUserId() == null) {
+                throw new NeedLoginException();
+            }
+            return pageQuery(request, AtlasOptions.option());
         }
+        query.setStatus(AtlasStatus.PUBLISHED.name());
         return pageQuery(request, AtlasOptions.option().requireVisible());
     }
 
     public PageInfo<AtlasDTO> pageQuery(PageRequest<AtlasQuery> request, AtlasOptions options) {
         Page<AtlasDTO> rows = atlasRepository.pageQuery(request, options);
         return new PageInfo<>(rows);
+    }
+
+    /**
+     * Admin review queue: PENDING atlases, not limited by visible.
+     */
+    public PageInfo<AtlasDTO> pagePending(PageRequest<AtlasQuery> request) {
+        AtlasQuery query = request.getQuery();
+        if (query == null) {
+            query = new AtlasQuery();
+            request.setQuery(query);
+        }
+        query.setStatus(AtlasStatus.PENDING.name());
+        return pageQuery(request, AtlasOptions.option());
     }
 
     public AtlasDTO queryById(Long atlasId, List<Long> userIds, Boolean isAdmin)
@@ -118,6 +137,22 @@ public class AtlasService {
         AtlasDTO update = new AtlasDTO();
         update.setId(atlasId);
         update.setStatus(AtlasStatus.PENDING.name());
+        atlasRepository.update(update);
+    }
+
+    /**
+     * Admin approve: PENDING → PUBLISHED and mark visible.
+     */
+    public void approvePublish(Long atlasId)
+        throws AtlasNotFoundException, AtlasApproveException, AtlasNotVisibleException, AtlasForbiddenException {
+        AtlasDTO exist = atlasRepository.queryById(atlasId, null, AtlasOptions.option().requireExist());
+        if (!AtlasStatus.PENDING.name().equals(exist.getStatus())) {
+            throw new AtlasApproveException();
+        }
+        AtlasDTO update = new AtlasDTO();
+        update.setId(atlasId);
+        update.setStatus(AtlasStatus.PUBLISHED.name());
+        update.setVisible(true);
         atlasRepository.update(update);
     }
 

@@ -393,6 +393,64 @@ curl -X POST http://localhost:8080/api/v1/admin/user/disable \
 
 ---
 
+### 3A.2 待发布图集列表
+
+- **路由**：`POST /api/v1/admin/atlas/pending`
+- **鉴权**：`ADMIN`
+- **逻辑**：分页查询 `status=PENDING` 的图集（不受 `visible` 限制）；可附带 `keyword` / `tags` / 分页参数
+- **注意**：服务端强制 `status=PENDING`，请求体中的 status 会被覆盖
+
+**Request Body**（均可选；body 可省略）
+
+```json
+{
+  "query": {
+    "keyword": "架构"
+  },
+  "page": 1,
+  "pageSize": 20,
+  "orderBy": "updated_at",
+  "isAsc": false
+}
+```
+
+**Response `data`**：`PageVO<AtlasVO>`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/admin/atlas/pending \
+  -H 'Authorization: Bearer <adminAccessToken>' \
+  -H 'Content-Type: application/json' \
+  -d '{"page":1,"pageSize":20}'
+```
+
+---
+
+### 3A.3 批准发布图集
+
+- **路由**：`POST /api/v1/admin/atlas/approve`
+- **鉴权**：`ADMIN`
+- **逻辑**：仅 `PENDING` → `PUBLISHED`，并置 `visible=1`；非待审状态失败（`42030`）
+- **注意**：成功后对外列表/详情可读（在可见规则下）
+
+**Request Body**
+
+```json
+{
+  "atlasId": 1
+}
+```
+
+**Response `data`**：`null`
+
+```bash
+curl -X POST http://localhost:8080/api/v1/admin/atlas/approve \
+  -H 'Authorization: Bearer <adminAccessToken>' \
+  -H 'Content-Type: application/json' \
+  -d '{"atlasId":1}'
+```
+
+---
+
 ## 4. Delegate — `/api/v1/user/delegate`
 
 控制器：`DelegateController`  
@@ -498,6 +556,8 @@ curl -X POST http://localhost:8080/api/v1/admin/user/disable \
 | 绑手机提交 | POST | `/api/v1/user/me/phone/bind` | 是 | 写 |
 | 注销账号 | POST | `/api/v1/user/me/cancel` | 是 | 清 |
 | 管理员禁用 | POST | `/api/v1/admin/user/disable` | 是（ADMIN） | 否 |
+| 待发布图集 | POST | `/api/v1/admin/atlas/pending` | 是（ADMIN） | 否 |
+| 批准发布 | POST | `/api/v1/admin/atlas/approve` | 是（ADMIN） | 否 |
 | 查委托 | POST | `/api/v1/user/delegate/query` | 是 | 否 |
 | 发起委托 | POST | `/api/v1/user/delegate/create` | 是 | 否 |
 | 接受委托 | POST | `/api/v1/user/delegate/accept` | 是 | 否 |

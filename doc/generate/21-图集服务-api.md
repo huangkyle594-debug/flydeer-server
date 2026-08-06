@@ -87,7 +87,7 @@ draft  --提交审核-->  pending  --人审通过-->  published
 | `pending` | 待人审；期间对元信息的改动 → 回滚为 `draft` |
 | `published` | 已发布；对外可见还需 `visible=1`；作者仍可编辑（`pending` 时改动会回滚为 `draft`） |
 
-人审通过为运营 / 服务端操作，**无前端接口**。
+人审通过为运营管理端操作：`POST /api/v1/admin/atlas/pending`（待审列表）、`POST /api/v1/admin/atlas/approve`（批准发布）。详见 [12-用户服务-api.md](./12-用户服务-api.md)「管理端接口」。
 
 ### 1.5 与图（Graph）的关系
 
@@ -440,7 +440,7 @@ curl -X POST http://localhost:8080/api/v1/struct-mind/atlases/detail \
 | `0` | 成功 | 200 | — |
 | `31010` | 需要登陆态 | 401 | 写操作未登录；`scope=CREATED/MANAGED` 且未登录 |
 | `31020` | 需要实名 | 403 | 写操作 Token 未 verified |
-| `40000` | 请求不合法 | 400 | 参数校验失败；非草稿提交审核；更新时 name 为空串 |
+| `40000` | 请求不合法 | 400 | 参数校验失败；非草稿提交审核；非待审批准发布；更新时 name 为空串 |
 | `51030` | 图集不存在 | 500 | `ATLAS_NOT_FOUND` |
 | `52010` | 用户已禁用 | 500 | JWT `status` 非 ACTIVE |
 | `52030` | 无权操作该图集 | 500 | `ATLAS_FORBIDDEN`（非作者；或详情不可见） |
@@ -453,5 +453,5 @@ curl -X POST http://localhost:8080/api/v1/struct-mind/atlases/detail \
 
 - 图集导入 / 导出（纯前端）
 - 图内容 CRUD（按 `atlasId` 挂载的一对多图服务）
-- 人审管理端（通过 / 驳回）
+- 人审驳回（当前仅支持批准发布）
 - 委托用户代写图集（`allUserIds` 已解析，业务尚未接入）

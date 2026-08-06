@@ -18,6 +18,8 @@ public class AtlasQuery {
 
     private List<String> tags;
 
+    private String status;
+
     /**
      * 后端赋值，前端无需关注
      */

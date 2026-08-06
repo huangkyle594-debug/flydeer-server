@@ -8,7 +8,8 @@
       AND query.scope:
            CREATED  → author_id = #{userId}
            MANAGED  → author_id IN (#{allUserIds})
-           else/ALL → status = 'PUBLISHED'
+           else/ALL → status = 'PUBLISHED'（若未指定 query.status）
+      AND query.status?  → status = #{query.status}
       AND query.keyword? → (name OR description OR author_name) LIKE
       AND query.tags?    → JSON_OVERLAPS 命中任一
     ORDER BY ${orderBy} asc|desc
@@ -24,6 +25,9 @@
       <if test="query.visible != null">
         and `visible` = #{query.visible}
       </if>
+      <if test="query.status != null and query.status != ''">
+        and `status` = #{query.status}
+      </if>
       <choose>
         <when test="query.scope != null and query.scope.name() == 'CREATED'">
           and `author_id` = #{userId}
@@ -35,7 +39,9 @@
           </foreach>
         </when>
         <otherwise>
-          and `status` = 'PUBLISHED'
+          <if test="query.status == null or query.status == ''">
+            and `status` = 'PUBLISHED'
+          </if>
         </otherwise>
       </choose>
       <if test="query.keyword != null and query.keyword != ''">

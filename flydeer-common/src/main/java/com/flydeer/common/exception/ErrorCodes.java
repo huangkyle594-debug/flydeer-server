@@ -25,6 +25,7 @@ public final class ErrorCodes {
     public static final int DELEGATE_REVOKE = 41020;
     public static final int ATLAS_PUBLISH = 42010;
     public static final int ATLAS_NOT_PUBLISHED = 42020;
+    public static final int ATLAS_APPROVE = 42030;
 
     public static final int BUSINESS = 50000;
 
