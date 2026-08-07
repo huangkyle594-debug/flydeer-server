@@ -66,6 +66,8 @@ logs/
 .env.*
 application-dev.yml
 application-dev.properties
+application-docker.yml
+application-docker.properties
 application-prod.yml
 application-prod.properties
 application-secret.yml

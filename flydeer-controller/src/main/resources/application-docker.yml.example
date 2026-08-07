@@ -1,5 +1,7 @@
-# Docker Compose profile — activated by SPRING_PROFILES_ACTIVE=docker
-# 业务配置与 application-dev.yml 同步；连接地址与 OAuth 回调适配 Docker 网关
+# Docker Compose profile template — activated by SPRING_PROFILES_ACTIVE=docker
+# Copy to application-docker.yml (gitignored) and fill real values:
+#   cp flydeer-controller/src/main/resources/application-docker.yml.example \
+#      flydeer-controller/src/main/resources/application-docker.yml
 
 spring:
   datasource:
@@ -30,7 +32,7 @@ server:
 
 app:
   jwt:
-    secret: a1b2c3d4e5f67890ghijklmnopqrstuv
+    secret: change-me-to-a-long-random-secret-key!!
     access-token-ttl: 2h
     refresh-token-ttl: 90d
     refresh-cookie-name: refresh_token
@@ -42,7 +44,7 @@ app:
     step-min: 1
     step-max: 99
   sms:
-    mock-enabled: true
+    mock-enabled: false
     access-key-id:
     access-key-secret:
     sign-name:
@@ -50,6 +52,10 @@ app:
     region: cn-shanghai
     endpoint: dypnsapi.aliyuncs.com
     country-code: "86"
+    code-length: 6
+    valid-time-seconds: 300
+    send-interval-seconds: 60
+    template-expire-minutes: 5
   user:
     phone-hash-salt: change-me-phone-hash-salt!!
     admin-ids: []
@@ -59,20 +65,20 @@ app:
       sms-daily-limit-per-ip: 50
       login-interval: 1s
   oauth:
-    secret: a1b2c3d4e5f67890ghijklmnopqrstuv
+    secret: change-me-oauth-state-hmac-secret!!
     timeout: 600000
     oauth:
       gitee:
-        client-id: 3f9e74c4e6b4b68a1259bc1c0c30b334b37a7c1f1072f1149af62ef43143acec
-        client-secret: 6ba48fc7cde9da0a453de81b79840d8dbdd5192e7ae41ef0cd4b7f8d3eb358f1
-        redirect-uri: http://127.0.0.1/api/v1/auth/github/callback
+        client-id:
+        client-secret:
+        redirect-uri: http://127.0.0.1/api/v1/auth/gitee/callback
         authorize-url: https://gitee.com/oauth/authorize
         token-url: https://gitee.com/oauth/token
         user-url: https://gitee.com/api/v5/user
         scope: user_info
       github:
-        client-id: Ov23linw1wfo2KnQMRTy
-        client-secret: 0e7ee3c08bfe0d8e655eef2d8db290926422547b
+        client-id:
+        client-secret:
         redirect-uri: http://127.0.0.1/api/v1/auth/github/callback
         authorize-url: https://github.com/login/oauth/authorize
         token-url: https://github.com/login/oauth/access_token
