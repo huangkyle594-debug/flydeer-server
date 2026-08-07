@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flydeer.repository.postgres.mapper.GraphMapper">
+
+  <resultMap id="BaseResultMap" type="com.flydeer.repository.postgres.entity.GraphEntity">
+    <id column="graph_id" property="graphId"/>
+    <result column="atlas_id" property="atlasId"/>
+    <result column="name" property="name"/>
+    <result column="parent_graph_id" property="parentGraphId"/>
+    <result column="content" property="content"
+            typeHandler="com.flydeer.repository.postgres.typehandler.JsonbStringTypeHandler"/>
+    <result column="rev" property="rev"/>
+    <result column="node_count" property="nodeCount"/>
+    <result column="deleted" property="deleted"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <resultMap id="MetaResultMap" type="com.flydeer.repository.postgres.entity.GraphEntity">
+    <id column="graph_id" property="graphId"/>
+    <result column="atlas_id" property="atlasId"/>
+    <result column="name" property="name"/>
+    <result column="parent_graph_id" property="parentGraphId"/>
+    <result column="rev" property="rev"/>
+    <result column="node_count" property="nodeCount"/>
+    <result column="deleted" property="deleted"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <resultMap id="ParentLinkMap" type="com.flydeer.repository.postgres.dto.GraphParentLink">
+    <result column="graph_id" property="graphId"/>
+    <result column="parent_graph_id" property="parentGraphId"/>
+  </resultMap>
+
+  <select id="selectByGraphId" resultMap="BaseResultMap">
+    SELECT graph_id, atlas_id, name, parent_graph_id, content::text AS content,
+           rev, node_count, deleted, created_at, updated_at
+    FROM struct_mind_graph
+    WHERE graph_id = #{graphId}
+  </select>
+
+  <select id="selectActiveByGraphId" resultMap="BaseResultMap">
+    SELECT graph_id, atlas_id, name, parent_graph_id, content::text AS content,
+           rev, node_count, deleted, created_at, updated_at
+    FROM struct_mind_graph
+    WHERE graph_id = #{graphId} AND deleted = 0
+  </select>
+
+  <select id="selectMetaByAtlasId" resultMap="MetaResultMap">
+    SELECT graph_id, atlas_id, name, parent_graph_id,
+           rev, node_count, deleted, created_at, updated_at
+    FROM struct_mind_graph
+    WHERE atlas_id = #{atlasId} AND deleted = 0
+    <if test="keyword != null and keyword != ''">
+      AND name ILIKE CONCAT('%', #{keyword}, '%')
+    </if>
+    ORDER BY created_at ASC
+  </select>
+
+  <select id="selectContentByAtlasId" resultMap="BaseResultMap">
+    SELECT graph_id, atlas_id, name, parent_graph_id, content::text AS content,
+           rev, node_count, deleted, created_at, updated_at
+    FROM struct_mind_graph
+    WHERE atlas_id = #{atlasId} AND deleted = 0
+    ORDER BY created_at ASC
+  </select>
+
+  <select id="selectParentLinksByAtlasId" resultMap="ParentLinkMap">
+    SELECT graph_id, parent_graph_id
+    FROM struct_mind_graph
+    WHERE atlas_id = #{atlasId} AND deleted = 0
+  </select>
+
+  <insert id="insert">
+    INSERT INTO struct_mind_graph (
+      graph_id, atlas_id, name, parent_graph_id, content, rev, deleted, created_at, updated_at
+    ) VALUES (
+      #{graphId},
+      #{atlasId},
+      #{name},
+      #{parentGraphId},
+      CAST(#{content, typeHandler=com.flydeer.repository.postgres.typehandler.JsonbStringTypeHandler} AS jsonb),
+      #{rev},
+      #{deleted},
+      #{createdAt},
+      #{updatedAt}
+    )
+  </insert>
+
+  <update id="updateContent">
+    UPDATE struct_mind_graph
+    SET name = #{name},
+        content = CAST(#{content, typeHandler=com.flydeer.repository.postgres.typehandler.JsonbStringTypeHandler} AS jsonb),
+        rev = #{newRev},
+        updated_at = #{updatedAt}
+    WHERE graph_id = #{graphId}
+      AND deleted = 0
+      AND rev = #{expectedRev}
+  </update>
+
+  <update id="updateName">
+    UPDATE struct_mind_graph
+    SET name = #{name},
+        updated_at = #{updatedAt}
+    WHERE graph_id = #{graphId}
+      AND deleted = 0
+  </update>
+
+  <update id="updateParent">
+    UPDATE struct_mind_graph
+    SET parent_graph_id = #{parentGraphId},
+        updated_at = #{updatedAt}
+    WHERE graph_id = #{graphId}
+      AND deleted = 0
+  </update>
+
+  <update id="logicalDeleteByIds">
+    UPDATE struct_mind_graph
+    SET deleted = 1,
+        updated_at = #{updatedAt}
+    WHERE deleted = 0
+      AND graph_id IN
+    <foreach collection="graphIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+</mapper>

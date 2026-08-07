@@ -4,6 +4,7 @@ import com.flydeer.common.enums.AuthRequiredLevel;
 import com.flydeer.common.enums.AuthResolveLevel;
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.*;
+import com.flydeer.common.exception.request.AtlasNotPublishedException;
 import com.flydeer.common.exception.request.AtlasPublishException;
 import com.flydeer.contract.atlas.AtlasApi;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
@@ -41,6 +42,17 @@ public class AtlasController {
         request.setOrderBy(body.getOrderBy());
         request.setIsAsc(body.getIsAsc());
         return ApiResult.ok(atlasApi.pageQuery(request));
+    }
+
+    @PostMapping("/detail")
+    public ApiResult<AtlasVO> detail(
+        @AuthCheck(resolve = AuthResolveLevel.DELEGATE) ApiRequest apiRequest,
+        @RequestBody AtlasIdRequest body)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException, AtlasNotPublishedException {
+
+        AtlasIdRequest request = new AtlasIdRequest(apiRequest);
+        request.setAtlasId(body.getAtlasId());
+        return ApiResult.ok(atlasApi.getAtlas(request));
     }
 
     @GetMapping("/tags")

@@ -26,6 +26,10 @@ public final class ErrorCodes {
     public static final int ATLAS_PUBLISH = 42010;
     public static final int ATLAS_NOT_PUBLISHED = 42020;
     public static final int ATLAS_APPROVE = 42030;
+    public static final int GRAPH_CONTENT_TOO_LARGE = 42110;
+    public static final int GRAPH_PARENT_INVALID = 42120;
+    public static final int GRAPH_REV_CONFLICT = 42130;
+    public static final int GRAPH_ID_INVALID = 42140;
 
     public static final int BUSINESS = 50000;
 
@@ -34,6 +38,7 @@ public final class ErrorCodes {
     public static final int DELEGATE_NOT_FOUND = 51020;
     public static final int ATLAS_NOT_FOUND = 52030;
     public static final int ATLAS_NOT_VISIBLE = 52040;
+    public static final int GRAPH_NOT_FOUND = 52050;
 
     public static final int ENTITY_INVALID = 52000;
     public static final int USER_INVALID = 52010;

@@ -5,6 +5,7 @@ import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.AtlasForbiddenException;
 import com.flydeer.common.exception.business.AtlasNotFoundException;
 import com.flydeer.common.exception.business.AtlasNotVisibleException;
+import com.flydeer.common.exception.request.AtlasNotPublishedException;
 import com.flydeer.common.exception.request.AtlasPublishException;
 import com.flydeer.contract.atlas.AtlasApi;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
@@ -41,6 +42,13 @@ public class AtlasApiImpl implements AtlasApi {
             .map(dto -> AtlasVoMapper.toVO(dto, request.getAllUserIds()))
             .toList();
         return new PageVO<>(items, pageInfo.isHasNextPage(), pageInfo.getTotal());
+    }
+
+    @Override
+    public AtlasVO getAtlas(@Valid AtlasIdRequest request)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException, AtlasNotPublishedException {
+        AtlasDTO atlas = atlasService.requireReadable(request.getAtlasId(), request.getAllUserIds(), false);
+        return AtlasVoMapper.toVO(atlas, request.getAllUserIds());
     }
 
     @Override

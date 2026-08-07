@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flydeer.repository.mysql.config.IdGenerateConfig;
 import com.flydeer.service.atlas.config.AtlasConfig;
 import com.flydeer.service.common.config.CommonConfig;
+import com.flydeer.service.graph.config.GraphConfig;
 import com.flydeer.service.user.config.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.util.TimeZone;
 
 @Configuration
 @EnableAsync
+@EnableTransactionManagement
 @EnableConfigurationProperties({
     IdGenerateConfig.class,
     JwtTokenConfig.class,
@@ -36,7 +39,8 @@ import java.util.TimeZone;
     RateLimitConfig.class,
     UserConfig.class,
     CommonConfig.class,
-    AtlasConfig.class})
+    AtlasConfig.class,
+    GraphConfig.class})
 public class ServiceConfiguration {
 
     @Bean

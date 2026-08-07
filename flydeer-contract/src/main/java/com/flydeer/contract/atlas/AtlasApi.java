@@ -2,6 +2,7 @@ package com.flydeer.contract.atlas;
 
 import com.flydeer.common.exception.auth.NeedLoginException;
 import com.flydeer.common.exception.business.*;
+import com.flydeer.common.exception.request.AtlasNotPublishedException;
 import com.flydeer.common.exception.request.AtlasPublishException;
 import com.flydeer.contract.atlas.request.AtlasCreateRequest;
 import com.flydeer.contract.atlas.request.AtlasIdRequest;
@@ -18,6 +19,9 @@ public interface AtlasApi {
     PageVO<AtlasVO> pageQuery(PageRequest<AtlasQuery> request) throws NeedLoginException;
 
     List<String> listTags();
+
+    AtlasVO getAtlas(AtlasIdRequest request)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException, AtlasNotPublishedException;
 
     AtlasVO createAtlas(AtlasCreateRequest request)
         throws UserNotFoundException, UserInvalidException;

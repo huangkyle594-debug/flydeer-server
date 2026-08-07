@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: docker.m.daocloud.io/library/mysql:8.4
+    image: docker.1ms.run/library/mysql:8.4
     container_name: flydeer-mysql
     environment:
       MYSQL_DATABASE: flydeer
@@ -11,7 +11,9 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./doc/sql:/docker-entrypoint-initdb.d:ro
+      - ./doc/sql/02-user-service.sql:/docker-entrypoint-initdb.d/02-user-service.sql:ro
+      - ./doc/sql/03-atlas.sql:/docker-entrypoint-initdb.d/03-atlas.sql:ro
+      - ./doc/sql/migrations/001_user_info_phone_hash.sql:/docker-entrypoint-initdb.d/04-user-info-phone-hash.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot"]
       interval: 10s
@@ -19,8 +21,27 @@ services:
       retries: 10
       start_period: 30s
 
+  postgres:
+    image: docker.1ms.run/library/postgres:16
+    container_name: flydeer-postgres
+    environment:
+      POSTGRES_DB: flydeer_graph
+      POSTGRES_USER: flydeer
+      POSTGRES_PASSWORD: flydeer
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./doc/sql/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flydeer -d flydeer_graph"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
   redis:
-    image: docker.m.daocloud.io/library/redis:7
+    image: docker.1ms.run/library/redis:7
     container_name: flydeer-redis
     ports:
       - "6379:6379"
@@ -42,6 +63,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     environment:
@@ -58,4 +81,5 @@ services:
 
 volumes:
   mysql_data:
+  postgres_data:
   redis_data:

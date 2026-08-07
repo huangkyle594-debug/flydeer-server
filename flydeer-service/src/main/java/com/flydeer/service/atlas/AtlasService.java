@@ -88,6 +88,34 @@ public class AtlasService {
         return atlas;
     }
 
+    /**
+     * Graph-service read gate: owner/delegate may read drafts; others need published + visible.
+     */
+    public AtlasDTO requireReadable(Long atlasId, List<Long> userIds, boolean isAdmin)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException, AtlasNotPublishedException {
+        AtlasDTO atlas = atlasRepository.queryById(atlasId, userIds, AtlasOptions.option().requireExist());
+        if (isAdmin) {
+            return atlas;
+        }
+        boolean owner = userIds != null && userIds.contains(atlas.getAuthorId());
+        if (owner) {
+            return atlas;
+        }
+        if (!Boolean.TRUE.equals(atlas.getVisible())) {
+            throw new AtlasNotVisibleException();
+        }
+        ensurePublished(atlas);
+        return atlas;
+    }
+
+    /**
+     * Graph-service write gate: author or delegate only.
+     */
+    public AtlasDTO requireEditable(Long atlasId, List<Long> userIds)
+        throws AtlasNotFoundException, AtlasForbiddenException, AtlasNotVisibleException {
+        return atlasRepository.queryById(atlasId, userIds, AtlasOptions.option().requireExist().requireEditable());
+    }
+
     public AtlasDTO create(AtlasCreateRequest request) {
         AtlasDTO dto = new AtlasDTO();
         dto.setName(request.getName().trim());

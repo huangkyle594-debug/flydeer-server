@@ -8,7 +8,7 @@
   输出覆盖：
     entity  → com.flydeer.repository.mysql.entity
     mapper  → com.flydeer.repository.mysql.mapper
-    xml     → src/main/resources/mapper
+    xml     → src/main/resources/mapper/mysql
 
   运行：
     ./bash/mybatis-generate.sh
@@ -64,7 +64,7 @@
         </javaModelGenerator>
 
         <sqlMapGenerator
-                targetPackage="mapper"
+                targetPackage="mapper.mysql"
                 targetProject="flydeer-repository/src/main/resources">
             <property name="enableSubPackages" value="false"/>
         </sqlMapGenerator>

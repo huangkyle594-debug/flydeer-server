@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# 一键启动：Docker Compose（MySQL + Redis + controller）
+# 一键启动：Docker Compose（MySQL + PostgreSQL + Redis + controller）
 # 用法：
 #   ./bash/run.sh              # 构建并启动全栈 (8080)
 #   ./bash/run.sh reload       # 仅重建 app 容器以重载配置（不重新编译）
-#   ./bash/run.sh stop         # 停止 app 容器（保留 MySQL/Redis）
+#   ./bash/run.sh stop         # 停止 app 容器（保留 MySQL/PostgreSQL/Redis）
 #   ./bash/run.sh down         # docker compose down（保留数据卷）
 #   ./bash/run.sh down -v      # 同时删除数据卷
 set -euo pipefail
@@ -49,11 +49,26 @@ wait_app_healthy() {
   die "app 未在超时时间内就绪"
 }
 
+# Other compose projects (e.g. web/gateway) may reuse flydeer-* names and block `up`.
+clear_name_conflicts() {
+  local project_name name id project
+  project_name="$(basename "$ROOT")"
+  for name in flydeer-mysql flydeer-postgres flydeer-redis flydeer-app; do
+    id="$(docker ps -aq -f "name=^/${name}$" 2>/dev/null || true)"
+    [[ -n "$id" ]] || continue
+    project="$(docker inspect -f '{{index .Config.Labels "com.docker.compose.project"}}' "$id" 2>/dev/null || true)"
+    if [[ "$project" != "$project_name" ]]; then
+      log "移除冲突容器 ${name}（来自 compose project=${project:-none}）"
+      docker rm -f "$name" >/dev/null
+    fi
+  done
+}
+
 cmd_stop() {
   setup_docker
   log "停止 app 容器..."
   docker compose stop app
-  log "MySQL / Redis 仍在运行；全停请用 ./bash/run.sh down"
+  log "MySQL / PostgreSQL / Redis 仍在运行；全停请用 ./bash/run.sh down"
 }
 
 cmd_down() {
@@ -65,6 +80,7 @@ cmd_down() {
 
 cmd_reload() {
   setup_docker
+  clear_name_conflicts
   log "重建 app 容器以重载配置（不重新编译镜像）..."
   docker compose up -d --force-recreate --no-deps app
   wait_app_healthy
@@ -73,10 +89,11 @@ cmd_reload() {
 
 cmd_start() {
   setup_docker
-  log "构建并启动 Compose（mysql / redis / app，profile=docker）..."
-  docker compose up -d --build --force-recreate app
+  clear_name_conflicts
+  log "构建并启动 Compose（mysql / postgres / redis / app，profile=docker）..."
+  docker compose up -d --build --force-recreate
   wait_app_healthy
-  log "MySQL=flydeer@localhost:3306  Redis=localhost:6379  App=http://localhost:${APP_PORT}"
+  log "MySQL=flydeer@localhost:3306  PostgreSQL=flydeer_graph@localhost:5432  Redis=localhost:6379  App=http://localhost:${APP_PORT}"
   log "停止 app: ./bash/run.sh stop"
   log "重载配置: ./bash/run.sh reload"
   log "全部停止: ./bash/run.sh down"

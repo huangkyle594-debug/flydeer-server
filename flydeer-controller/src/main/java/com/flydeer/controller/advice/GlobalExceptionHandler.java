@@ -9,6 +9,7 @@ import com.flydeer.common.exception.auth.SmsVerifyException;
 import com.flydeer.common.exception.business.BusinessException;
 import com.flydeer.common.exception.frequency.FrequencyException;
 import com.flydeer.common.exception.request.BadRequestException;
+import com.flydeer.common.exception.request.GraphRevConflictException;
 import com.flydeer.contract.common.response.ApiResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -50,6 +53,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResult<Void>> handleBadRequest(BadRequestException ex) {
         return ResponseEntity.badRequest().body(ApiResult.fail(ex.getCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(GraphRevConflictException.class)
+    public ResponseEntity<ApiResult<Map<String, Integer>>> handleGraphRevConflict(GraphRevConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(ApiResult.fail(ex.getCode(), ex.getMessage(), Map.of("rev", ex.getRev())));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
